@@ -1,0 +1,865 @@
+// !$*UTF8*$!
+{
+	archiveVersion = 1;
+	classes = {
+	};
+	objectVersion = 60;
+	objects = {
+
+/* Begin PBXBuildFile section */
+		010000000000000000000001 /* Geometry.swift in Sources */ = {isa = PBXBuildFile; fileRef = 010000000000000000000101 /* Geometry.swift */; };
+		010000000000000000000002 /* Models.swift in Sources */ = {isa = PBXBuildFile; fileRef = 010000000000000000000102 /* Models.swift */; };
+		010000000000000000000003 /* Normalization.swift in Sources */ = {isa = PBXBuildFile; fileRef = 010000000000000000000103 /* Normalization.swift */; };
+		010000000000000000000004 /* QualityAndScoring.swift in Sources */ = {isa = PBXBuildFile; fileRef = 010000000000000000000104 /* QualityAndScoring.swift */; };
+		010000000000000000000005 /* Sampling.swift in Sources */ = {isa = PBXBuildFile; fileRef = 010000000000000000000105 /* Sampling.swift */; };
+		010000000000000000000006 /* SheetAnalyzer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 010000000000000000000106 /* SheetAnalyzer.swift */; };
+		010000000000000000000012 /* CameraController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 010000000000000000000112 /* CameraController.swift */; };
+		010000000000000000000013 /* ColorMatchingLPSApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 010000000000000000000113 /* ColorMatchingLPSApp.swift */; };
+		010000000000000000000014 /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 010000000000000000000114 /* ContentView.swift */; };
+		010000000000000000000015 /* ImageLinearization.swift in Sources */ = {isa = PBXBuildFile; fileRef = 010000000000000000000115 /* ImageLinearization.swift */; };
+		010000000000000000000016 /* APIClient.swift in Sources */ = {isa = PBXBuildFile; fileRef = 010000000000000000000116 /* APIClient.swift */; };
+		010000000000000000000021 /* MeasurementCore.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 010000000000000000000201 /* MeasurementCore.framework */; };
+		010000000000000000000022 /* MeasurementCore.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 010000000000000000000201 /* MeasurementCore.framework */; };
+		010000000000000000000023 /* MeasurementCore.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 010000000000000000000201 /* MeasurementCore.framework */; };
+		010000000000000000000024 /* MeasurementCore.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = 010000000000000000000201 /* MeasurementCore.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
+		010000000000000000000025 /* ColorMatchingLPSAppCore.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 010000000000000000000205 /* ColorMatchingLPSAppCore.framework */; };
+		010000000000000000000026 /* ColorMatchingLPSAppCore.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = 010000000000000000000205 /* ColorMatchingLPSAppCore.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
+		010000000000000000000027 /* MeasurementCore.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 010000000000000000000201 /* MeasurementCore.framework */; };
+		010000000000000000000028 /* ColorMatchingLPSAppCore.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 010000000000000000000205 /* ColorMatchingLPSAppCore.framework */; };
+		010000000000000000000031 /* MeasurementCoreTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 010000000000000000000131 /* MeasurementCoreTests.swift */; };
+		010000000000000000000032 /* APIClientTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 010000000000000000000132 /* APIClientTests.swift */; };
+/* End PBXBuildFile section */
+
+/* Begin PBXContainerItemProxy section */
+		010000000000000000000301 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 010000000000000000000401 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 010000000000000000000501;
+			remoteInfo = MeasurementCore;
+		};
+		010000000000000000000303 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 010000000000000000000401 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 010000000000000000000501;
+			remoteInfo = MeasurementCore;
+		};
+		010000000000000000000304 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 010000000000000000000401 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 010000000000000000000505;
+			remoteInfo = ColorMatchingLPSAppCore;
+		};
+		010000000000000000000305 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 010000000000000000000401 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 010000000000000000000501;
+			remoteInfo = MeasurementCore;
+		};
+		010000000000000000000306 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 010000000000000000000401 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 010000000000000000000505;
+			remoteInfo = ColorMatchingLPSAppCore;
+		};
+/* End PBXContainerItemProxy section */
+
+/* Begin PBXCopyFilesBuildPhase section */
+		010000000000000000000605 /* Embed Frameworks */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = "";
+			dstSubfolderSpec = 10;
+			files = (
+				010000000000000000000024 /* MeasurementCore.framework in Embed Frameworks */,
+				010000000000000000000026 /* ColorMatchingLPSAppCore.framework in Embed Frameworks */,
+			);
+			name = "Embed Frameworks";
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXCopyFilesBuildPhase section */
+
+/* Begin PBXFileReference section */
+		010000000000000000000101 /* Geometry.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Geometry.swift; sourceTree = "<group>"; };
+		010000000000000000000102 /* Models.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Models.swift; sourceTree = "<group>"; };
+		010000000000000000000103 /* Normalization.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Normalization.swift; sourceTree = "<group>"; };
+		010000000000000000000104 /* QualityAndScoring.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = QualityAndScoring.swift; sourceTree = "<group>"; };
+		010000000000000000000105 /* Sampling.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Sampling.swift; sourceTree = "<group>"; };
+		010000000000000000000106 /* SheetAnalyzer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SheetAnalyzer.swift; sourceTree = "<group>"; };
+		010000000000000000000112 /* CameraController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CameraController.swift; sourceTree = "<group>"; };
+		010000000000000000000113 /* ColorMatchingLPSApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ColorMatchingLPSApp.swift; sourceTree = "<group>"; };
+		010000000000000000000114 /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
+		010000000000000000000115 /* ImageLinearization.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ImageLinearization.swift; sourceTree = "<group>"; };
+		010000000000000000000116 /* APIClient.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = APIClient.swift; sourceTree = "<group>"; };
+		010000000000000000000131 /* MeasurementCoreTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MeasurementCoreTests.swift; sourceTree = "<group>"; };
+		010000000000000000000132 /* APIClientTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = APIClientTests.swift; sourceTree = "<group>"; };
+		010000000000000000000201 /* MeasurementCore.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = MeasurementCore.framework; sourceTree = BUILT_PRODUCTS_DIR; };
+		010000000000000000000202 /* ColorMatchingLPS.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = ColorMatchingLPS.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		010000000000000000000203 /* MeasurementCoreTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = MeasurementCoreTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+		010000000000000000000204 /* ColorMatchingLPSAppTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = ColorMatchingLPSAppTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+		010000000000000000000205 /* ColorMatchingLPSAppCore.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = ColorMatchingLPSAppCore.framework; sourceTree = BUILT_PRODUCTS_DIR; };
+/* End PBXFileReference section */
+
+/* Begin PBXFrameworksBuildPhase section */
+		010000000000000000000601 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		010000000000000000000602 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				010000000000000000000021 /* MeasurementCore.framework in Frameworks */,
+				010000000000000000000025 /* ColorMatchingLPSAppCore.framework in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		010000000000000000000603 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				010000000000000000000022 /* MeasurementCore.framework in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		010000000000000000000604 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				010000000000000000000023 /* MeasurementCore.framework in Frameworks */,
+				010000000000000000000028 /* ColorMatchingLPSAppCore.framework in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		010000000000000000000606 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				010000000000000000000027 /* MeasurementCore.framework in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXFrameworksBuildPhase section */
+
+/* Begin PBXGroup section */
+		010000000000000000000701 = {
+			isa = PBXGroup;
+			children = (
+				010000000000000000000702 /* Sources */,
+				010000000000000000000703 /* Tests */,
+				010000000000000000000704 /* Products */,
+			);
+			sourceTree = "<group>";
+		};
+		010000000000000000000702 /* Sources */ = {
+			isa = PBXGroup;
+			children = (
+				010000000000000000000705 /* MeasurementCore */,
+				010000000000000000000709 /* ColorMatchingLPSAppCore */,
+				010000000000000000000706 /* ColorMatchingLPSApp */,
+			);
+			path = Sources;
+			sourceTree = "<group>";
+		};
+		010000000000000000000703 /* Tests */ = {
+			isa = PBXGroup;
+			children = (
+				010000000000000000000707 /* MeasurementCoreTests */,
+				010000000000000000000708 /* ColorMatchingLPSAppTests */,
+			);
+			path = Tests;
+			sourceTree = "<group>";
+		};
+		010000000000000000000704 /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				010000000000000000000201 /* MeasurementCore.framework */,
+				010000000000000000000205 /* ColorMatchingLPSAppCore.framework */,
+				010000000000000000000202 /* ColorMatchingLPS.app */,
+				010000000000000000000203 /* MeasurementCoreTests.xctest */,
+				010000000000000000000204 /* ColorMatchingLPSAppTests.xctest */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+		010000000000000000000705 /* MeasurementCore */ = {
+			isa = PBXGroup;
+			children = (
+				010000000000000000000101 /* Geometry.swift */,
+				010000000000000000000102 /* Models.swift */,
+				010000000000000000000103 /* Normalization.swift */,
+				010000000000000000000104 /* QualityAndScoring.swift */,
+				010000000000000000000105 /* Sampling.swift */,
+				010000000000000000000106 /* SheetAnalyzer.swift */,
+			);
+			path = MeasurementCore;
+			sourceTree = "<group>";
+		};
+		010000000000000000000706 /* ColorMatchingLPSApp */ = {
+			isa = PBXGroup;
+			children = (
+				010000000000000000000112 /* CameraController.swift */,
+				010000000000000000000113 /* ColorMatchingLPSApp.swift */,
+				010000000000000000000114 /* ContentView.swift */,
+				010000000000000000000115 /* ImageLinearization.swift */,
+			);
+			path = ColorMatchingLPSApp;
+			sourceTree = "<group>";
+		};
+		010000000000000000000707 /* MeasurementCoreTests */ = {
+			isa = PBXGroup;
+			children = (
+				010000000000000000000131 /* MeasurementCoreTests.swift */,
+			);
+			path = MeasurementCoreTests;
+			sourceTree = "<group>";
+		};
+		010000000000000000000708 /* ColorMatchingLPSAppTests */ = {
+			isa = PBXGroup;
+			children = (
+				010000000000000000000132 /* APIClientTests.swift */,
+			);
+			path = ColorMatchingLPSAppTests;
+			sourceTree = "<group>";
+		};
+		010000000000000000000709 /* ColorMatchingLPSAppCore */ = {
+			isa = PBXGroup;
+			children = (
+				010000000000000000000116 /* APIClient.swift */,
+			);
+			path = ColorMatchingLPSAppCore;
+			sourceTree = "<group>";
+		};
+/* End PBXGroup section */
+
+/* Begin PBXNativeTarget section */
+		010000000000000000000501 /* MeasurementCore */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 010000000000000000000901 /* Build configuration list for PBXNativeTarget "MeasurementCore" */;
+			buildPhases = (
+				010000000000000000000801 /* Sources */,
+				010000000000000000000601 /* Frameworks */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = MeasurementCore;
+			productName = MeasurementCore;
+			productReference = 010000000000000000000201 /* MeasurementCore.framework */;
+			productType = "com.apple.product-type.framework";
+		};
+		010000000000000000000502 /* ColorMatchingLPS */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 010000000000000000000902 /* Build configuration list for PBXNativeTarget "ColorMatchingLPS" */;
+			buildPhases = (
+				010000000000000000000802 /* Sources */,
+				010000000000000000000602 /* Frameworks */,
+				010000000000000000000605 /* Embed Frameworks */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				010000000000000000000411 /* PBXTargetDependency */,
+				010000000000000000000414 /* PBXTargetDependency */,
+			);
+			name = ColorMatchingLPS;
+			productName = ColorMatchingLPS;
+			productReference = 010000000000000000000202 /* ColorMatchingLPS.app */;
+			productType = "com.apple.product-type.application";
+		};
+		010000000000000000000503 /* MeasurementCoreTests */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 010000000000000000000903 /* Build configuration list for PBXNativeTarget "MeasurementCoreTests" */;
+			buildPhases = (
+				010000000000000000000803 /* Sources */,
+				010000000000000000000603 /* Frameworks */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				010000000000000000000412 /* PBXTargetDependency */,
+			);
+			name = MeasurementCoreTests;
+			productName = MeasurementCoreTests;
+			productReference = 010000000000000000000203 /* MeasurementCoreTests.xctest */;
+			productType = "com.apple.product-type.bundle.unit-test";
+		};
+		010000000000000000000504 /* ColorMatchingLPSAppTests */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 010000000000000000000904 /* Build configuration list for PBXNativeTarget "ColorMatchingLPSAppTests" */;
+			buildPhases = (
+				010000000000000000000804 /* Sources */,
+				010000000000000000000604 /* Frameworks */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				010000000000000000000416 /* PBXTargetDependency */,
+			);
+			name = ColorMatchingLPSAppTests;
+			productName = ColorMatchingLPSAppTests;
+			productReference = 010000000000000000000204 /* ColorMatchingLPSAppTests.xctest */;
+			productType = "com.apple.product-type.bundle.unit-test";
+		};
+		010000000000000000000505 /* ColorMatchingLPSAppCore */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 010000000000000000000905 /* Build configuration list for PBXNativeTarget "ColorMatchingLPSAppCore" */;
+			buildPhases = (
+				010000000000000000000805 /* Sources */,
+				010000000000000000000606 /* Frameworks */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				010000000000000000000415 /* PBXTargetDependency */,
+			);
+			name = ColorMatchingLPSAppCore;
+			productName = ColorMatchingLPSAppCore;
+			productReference = 010000000000000000000205 /* ColorMatchingLPSAppCore.framework */;
+			productType = "com.apple.product-type.framework";
+		};
+/* End PBXNativeTarget section */
+
+/* Begin PBXProject section */
+		010000000000000000000401 /* Project object */ = {
+			isa = PBXProject;
+			attributes = {
+				BuildIndependentTargetsInParallel = 1;
+				LastSwiftUpdateCheck = 2600;
+				LastUpgradeCheck = 2660;
+				TargetAttributes = {
+					010000000000000000000501 = {
+						CreatedOnToolsVersion = 26.0;
+					};
+					010000000000000000000502 = {
+						CreatedOnToolsVersion = 26.0;
+					};
+					010000000000000000000503 = {
+						CreatedOnToolsVersion = 26.0;
+						TestTargetID = 010000000000000000000501;
+					};
+					010000000000000000000504 = {
+						CreatedOnToolsVersion = 26.0;
+						TestTargetID = 010000000000000000000505;
+					};
+					010000000000000000000505 = {
+						CreatedOnToolsVersion = 26.0;
+					};
+				};
+			};
+			buildConfigurationList = 010000000000000000000900 /* Build configuration list for PBXProject "ColorMatchingLPS" */;
+			compatibilityVersion = "Xcode 15.0";
+			developmentRegion = en;
+			hasScannedForEncodings = 0;
+			knownRegions = (
+				en,
+				Base,
+			);
+			mainGroup = 010000000000000000000701;
+			productRefGroup = 010000000000000000000704 /* Products */;
+			projectDirPath = "";
+			projectRoot = "";
+			targets = (
+				010000000000000000000501 /* MeasurementCore */,
+				010000000000000000000505 /* ColorMatchingLPSAppCore */,
+				010000000000000000000502 /* ColorMatchingLPS */,
+				010000000000000000000503 /* MeasurementCoreTests */,
+				010000000000000000000504 /* ColorMatchingLPSAppTests */,
+			);
+		};
+/* End PBXProject section */
+
+/* Begin PBXSourcesBuildPhase section */
+		010000000000000000000801 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				010000000000000000000001 /* Geometry.swift in Sources */,
+				010000000000000000000002 /* Models.swift in Sources */,
+				010000000000000000000003 /* Normalization.swift in Sources */,
+				010000000000000000000004 /* QualityAndScoring.swift in Sources */,
+				010000000000000000000005 /* Sampling.swift in Sources */,
+				010000000000000000000006 /* SheetAnalyzer.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		010000000000000000000802 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				010000000000000000000012 /* CameraController.swift in Sources */,
+				010000000000000000000013 /* ColorMatchingLPSApp.swift in Sources */,
+				010000000000000000000014 /* ContentView.swift in Sources */,
+				010000000000000000000015 /* ImageLinearization.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		010000000000000000000803 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				010000000000000000000031 /* MeasurementCoreTests.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		010000000000000000000804 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				010000000000000000000032 /* APIClientTests.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		010000000000000000000805 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				010000000000000000000016 /* APIClient.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXSourcesBuildPhase section */
+
+/* Begin PBXTargetDependency section */
+		010000000000000000000411 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 010000000000000000000501 /* MeasurementCore */;
+			targetProxy = 010000000000000000000301 /* PBXContainerItemProxy */;
+		};
+		010000000000000000000412 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 010000000000000000000501 /* MeasurementCore */;
+			targetProxy = 010000000000000000000303 /* PBXContainerItemProxy */;
+		};
+		010000000000000000000414 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 010000000000000000000505 /* ColorMatchingLPSAppCore */;
+			targetProxy = 010000000000000000000304 /* PBXContainerItemProxy */;
+		};
+		010000000000000000000415 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 010000000000000000000501 /* MeasurementCore */;
+			targetProxy = 010000000000000000000305 /* PBXContainerItemProxy */;
+		};
+		010000000000000000000416 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 010000000000000000000505 /* ColorMatchingLPSAppCore */;
+			targetProxy = 010000000000000000000306 /* PBXContainerItemProxy */;
+		};
+/* End PBXTargetDependency section */
+
+/* Begin XCBuildConfiguration section */
+		010000000000000000000A01 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = dwarf;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				ENABLE_TESTABILITY = YES;
+				ENABLE_USER_SCRIPT_SANDBOXING = YES;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"DEBUG=1",
+					"$(inherited)",
+				);
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
+				ONLY_ACTIVE_ARCH = YES;
+				SDKROOT = iphoneos;
+				STRING_CATALOG_GENERATE_SYMBOLS = YES;
+				SWIFT_ACTIVE_COMPILATION_CONDITIONS = DEBUG;
+				SWIFT_VERSION = 5.0;
+			};
+			name = Debug;
+		};
+		010000000000000000000A02 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				ENABLE_USER_SCRIPT_SANDBOXING = YES;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
+				SDKROOT = iphoneos;
+				STRING_CATALOG_GENERATE_SYMBOLS = YES;
+				SWIFT_COMPILATION_MODE = wholemodule;
+				SWIFT_VERSION = 5.0;
+				VALIDATE_PRODUCT = YES;
+			};
+			name = Release;
+		};
+		010000000000000000000A11 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGNING_ALLOWED = NO;
+				CODE_SIGN_IDENTITY = "";
+				DEFINES_MODULE = YES;
+				DEVELOPMENT_TEAM = 2KD4SL268D;
+				DYLIB_INSTALL_NAME_BASE = "@rpath";
+				DYLIB_COMPATIBILITY_VERSION = 1;
+				DYLIB_CURRENT_VERSION = 1;
+				ENABLE_MODULE_VERIFIER = YES;
+				ENABLE_TESTABILITY = YES;
+				GENERATE_INFOPLIST_FILE = YES;
+				MODULE_VERIFIER_SUPPORTED_LANGUAGE_STANDARDS = "gnu17 gnu++14";
+				PRODUCT_BUNDLE_IDENTIFIER = com.viamin.ColorMatchingLPS.MeasurementCore;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SKIP_INSTALL = YES;
+				SUPPORTS_MACCATALYST = NO;
+				SWIFT_VERSION = 5.0;
+			};
+			name = Debug;
+		};
+		010000000000000000000A12 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGNING_ALLOWED = NO;
+				CODE_SIGN_IDENTITY = "";
+				DEFINES_MODULE = YES;
+				DEVELOPMENT_TEAM = 2KD4SL268D;
+				DYLIB_INSTALL_NAME_BASE = "@rpath";
+				DYLIB_COMPATIBILITY_VERSION = 1;
+				DYLIB_CURRENT_VERSION = 1;
+				ENABLE_MODULE_VERIFIER = YES;
+				GENERATE_INFOPLIST_FILE = YES;
+				MODULE_VERIFIER_SUPPORTED_LANGUAGE_STANDARDS = "gnu17 gnu++14";
+				PRODUCT_BUNDLE_IDENTIFIER = com.viamin.ColorMatchingLPS.MeasurementCore;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SKIP_INSTALL = YES;
+				SUPPORTS_MACCATALYST = NO;
+				SWIFT_VERSION = 5.0;
+			};
+			name = Release;
+		};
+		010000000000000000000A21 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = 2KD4SL268D;
+				ENABLE_TESTABILITY = YES;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_KEY_CFBundleDisplayName = "LPS Matcher";
+				INFOPLIST_KEY_NSCameraUsageDescription = "ColorMatching LPS uses the camera to photograph printed color sheets.";
+				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
+				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
+				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
+				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = "UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
+				MARKETING_VERSION = 0.1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.viamin.ColorMatchingLPS;
+				PRODUCT_MODULE_NAME = ColorMatchingLPSApp;
+				PRODUCT_NAME = ColorMatchingLPS;
+				SUPPORTS_MACCATALYST = NO;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Debug;
+		};
+		010000000000000000000A22 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = 2KD4SL268D;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_KEY_CFBundleDisplayName = "LPS Matcher";
+				INFOPLIST_KEY_NSCameraUsageDescription = "ColorMatching LPS uses the camera to photograph printed color sheets.";
+				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
+				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
+				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
+				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = "UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
+				MARKETING_VERSION = 0.1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.viamin.ColorMatchingLPS;
+				PRODUCT_MODULE_NAME = ColorMatchingLPSApp;
+				PRODUCT_NAME = ColorMatchingLPS;
+				SUPPORTS_MACCATALYST = NO;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Release;
+		};
+		010000000000000000000A31 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				BUNDLE_LOADER = "";
+				CODE_SIGNING_ALLOWED = NO;
+				FRAMEWORK_SEARCH_PATHS = (
+					"$(inherited)",
+					"$(BUILT_PRODUCTS_DIR)",
+				);
+				GENERATE_INFOPLIST_FILE = YES;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@loader_path/Frameworks",
+					"@loader_path/../Frameworks",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = com.viamin.ColorMatchingLPS.MeasurementCoreTests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_VERSION = 5.0;
+				TEST_HOST = "";
+			};
+			name = Debug;
+		};
+		010000000000000000000A32 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				BUNDLE_LOADER = "";
+				CODE_SIGNING_ALLOWED = NO;
+				FRAMEWORK_SEARCH_PATHS = (
+					"$(inherited)",
+					"$(BUILT_PRODUCTS_DIR)",
+				);
+				GENERATE_INFOPLIST_FILE = YES;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@loader_path/Frameworks",
+					"@loader_path/../Frameworks",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = com.viamin.ColorMatchingLPS.MeasurementCoreTests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_VERSION = 5.0;
+				TEST_HOST = "";
+			};
+			name = Release;
+		};
+		010000000000000000000A41 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				BUNDLE_LOADER = "";
+				CODE_SIGNING_ALLOWED = NO;
+				FRAMEWORK_SEARCH_PATHS = (
+					"$(inherited)",
+					"$(BUILT_PRODUCTS_DIR)",
+				);
+				GENERATE_INFOPLIST_FILE = YES;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@loader_path/Frameworks",
+					"@loader_path/../Frameworks",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = com.viamin.ColorMatchingLPS.ColorMatchingLPSAppTests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_VERSION = 5.0;
+				TEST_HOST = "";
+			};
+			name = Debug;
+		};
+		010000000000000000000A42 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				BUNDLE_LOADER = "";
+				CODE_SIGNING_ALLOWED = NO;
+				FRAMEWORK_SEARCH_PATHS = (
+					"$(inherited)",
+					"$(BUILT_PRODUCTS_DIR)",
+				);
+				GENERATE_INFOPLIST_FILE = YES;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@loader_path/Frameworks",
+					"@loader_path/../Frameworks",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = com.viamin.ColorMatchingLPS.ColorMatchingLPSAppTests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_VERSION = 5.0;
+				TEST_HOST = "";
+			};
+			name = Release;
+		};
+		010000000000000000000A51 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGNING_ALLOWED = NO;
+				CODE_SIGN_IDENTITY = "";
+				DEFINES_MODULE = YES;
+				DEVELOPMENT_TEAM = 2KD4SL268D;
+				DYLIB_INSTALL_NAME_BASE = "@rpath";
+				DYLIB_COMPATIBILITY_VERSION = 1;
+				DYLIB_CURRENT_VERSION = 1;
+				ENABLE_MODULE_VERIFIER = YES;
+				ENABLE_TESTABILITY = YES;
+				FRAMEWORK_SEARCH_PATHS = (
+					"$(inherited)",
+					"$(BUILT_PRODUCTS_DIR)",
+				);
+				GENERATE_INFOPLIST_FILE = YES;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@loader_path/Frameworks",
+				);
+				MODULE_VERIFIER_SUPPORTED_LANGUAGE_STANDARDS = "gnu17 gnu++14";
+				PRODUCT_BUNDLE_IDENTIFIER = com.viamin.ColorMatchingLPS.ColorMatchingLPSAppCore;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SKIP_INSTALL = YES;
+				SUPPORTS_MACCATALYST = NO;
+				SWIFT_VERSION = 5.0;
+			};
+			name = Debug;
+		};
+		010000000000000000000A52 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGNING_ALLOWED = NO;
+				CODE_SIGN_IDENTITY = "";
+				DEFINES_MODULE = YES;
+				DEVELOPMENT_TEAM = 2KD4SL268D;
+				DYLIB_INSTALL_NAME_BASE = "@rpath";
+				DYLIB_COMPATIBILITY_VERSION = 1;
+				DYLIB_CURRENT_VERSION = 1;
+				ENABLE_MODULE_VERIFIER = YES;
+				FRAMEWORK_SEARCH_PATHS = (
+					"$(inherited)",
+					"$(BUILT_PRODUCTS_DIR)",
+				);
+				GENERATE_INFOPLIST_FILE = YES;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@loader_path/Frameworks",
+				);
+				MODULE_VERIFIER_SUPPORTED_LANGUAGE_STANDARDS = "gnu17 gnu++14";
+				PRODUCT_BUNDLE_IDENTIFIER = com.viamin.ColorMatchingLPS.ColorMatchingLPSAppCore;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SKIP_INSTALL = YES;
+				SUPPORTS_MACCATALYST = NO;
+				SWIFT_VERSION = 5.0;
+			};
+			name = Release;
+		};
+/* End XCBuildConfiguration section */
+
+/* Begin XCConfigurationList section */
+		010000000000000000000900 /* Build configuration list for PBXProject "ColorMatchingLPS" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				010000000000000000000A01 /* Debug */,
+				010000000000000000000A02 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		010000000000000000000901 /* Build configuration list for PBXNativeTarget "MeasurementCore" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				010000000000000000000A11 /* Debug */,
+				010000000000000000000A12 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		010000000000000000000902 /* Build configuration list for PBXNativeTarget "ColorMatchingLPS" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				010000000000000000000A21 /* Debug */,
+				010000000000000000000A22 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		010000000000000000000903 /* Build configuration list for PBXNativeTarget "MeasurementCoreTests" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				010000000000000000000A31 /* Debug */,
+				010000000000000000000A32 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		010000000000000000000904 /* Build configuration list for PBXNativeTarget "ColorMatchingLPSAppTests" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				010000000000000000000A41 /* Debug */,
+				010000000000000000000A42 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		010000000000000000000905 /* Build configuration list for PBXNativeTarget "ColorMatchingLPSAppCore" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				010000000000000000000A51 /* Debug */,
+				010000000000000000000A52 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+/* End XCConfigurationList section */
+	};
+	rootObject = 010000000000000000000401 /* Project object */;
+}
