@@ -252,4 +252,57 @@ final class MeasurementCoreTests: XCTestCase {
 
         return LinearImage(width: width, height: height, pixels: pixels)
     }
+
+    func testDecodesContractManifestFromServer() {
+        // Mirrors the JSON shape emitted by color_matching's manifest endpoint,
+        // including extra top-level keys (created_at, printer_profile,
+        // capture_profile) that the server sends but SheetManifest ignores.
+        let json = #"""
+        {
+          "schema_version": "lps-sheet-manifest/v1",
+          "sheet_version": "lps-letter-grid-v1",
+          "sheet_id": "LPSM-DEV2",
+          "manifest_url": "http://localhost:4000/api/v1/test_sheets/LPSM-DEV2/manifest",
+          "created_at": "2026-07-28T20:10:19Z",
+          "page": {"units": "mm", "width": 215.9, "height": 279.4},
+          "registration_markers": [
+            {"role": "top_left", "shape": "solid_square", "rect": {"x": 12.7, "y": 12.7, "width": 10.0, "height": 10.0}},
+            {"role": "top_right", "shape": "solid_square", "rect": {"x": 193.2, "y": 12.7, "width": 10.0, "height": 10.0}},
+            {"role": "bottom_right", "shape": "solid_square", "rect": {"x": 193.2, "y": 256.7, "width": 10.0, "height": 10.0}},
+            {"role": "bottom_left", "shape": "solid_square", "rect": {"x": 12.7, "y": 256.7, "width": 10.0, "height": 10.0}}
+          ],
+          "printer_profile": {"printer_make_model": "Generic Inkjet", "paper_type": "Plain", "ink_type": "Dye"},
+          "capture_profile": {"expected_illuminant": "low_pressure_sodium", "preferred_camera": "built_in_wide_angle_rear", "scoring_algorithm_version": "lps-distance-v1"},
+          "patches": [
+            {"id": "pair-abc#first", "role": "pair_color", "pair_id": "pair-abc", "pair_side": "first", "reference_role": null, "source_color": "#FF4444", "safe_inset_mm": 1.5, "rect": {"x": 75.95, "y": 107.7, "width": 10.0, "height": 10.0}},
+            {"id": "pair-abc#second", "role": "pair_color", "pair_id": "pair-abc", "pair_side": "second", "reference_role": null, "source_color": "#BB55BB", "safe_inset_mm": 1.5, "rect": {"x": 85.95, "y": 117.7, "width": 10.0, "height": 10.0}}
+          ],
+          "pairs": [
+            {"id": "pair-abc", "first_patch_id": "pair-abc#first", "second_patch_id": "pair-abc#second", "source_colors": ["#FF4444", "#BB55BB"], "grid_row": 0, "grid_col": 1}
+          ]
+        }
+        """#
+
+        let manifest = try! JSONDecoder().decode(SheetManifest.self, from: Data(json.utf8))
+
+        XCTAssertEqual(manifest.sheetID, "LPSM-DEV2")
+        XCTAssertEqual(manifest.page, Page(units: "mm", width: 215.9, height: 279.4))
+        XCTAssertEqual(manifest.registrationMarkers.map(\.role),
+                       ["top_left", "top_right", "bottom_right", "bottom_left"])
+
+        XCTAssertEqual(manifest.patches.count, 2)
+        let first = manifest.patches.first { $0.pairSide == "first" }
+        let second = manifest.patches.first { $0.pairSide == "second" }
+        XCTAssertEqual(first?.id, "pair-abc#first")
+        XCTAssertEqual(second?.id, "pair-abc#second")
+        XCTAssertEqual(first?.sourceColor, "#FF4444")
+        XCTAssertEqual(first?.safeInsetMM, 1.5)
+        XCTAssertEqual(first?.rect.width, 10.0)
+
+        XCTAssertEqual(manifest.pairs.count, 1)
+        let pair = manifest.pairs[0]
+        XCTAssertEqual(pair.firstPatchID, "pair-abc#first")
+        XCTAssertEqual(pair.secondPatchID, "pair-abc#second")
+        XCTAssertEqual(pair.sourceColors, ["#FF4444", "#BB55BB"])
+    }
 }
