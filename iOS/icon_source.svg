@@ -1,0 +1,71 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1024" height="1024" viewBox="0 0 1024 1024">
+  <defs>
+    <!-- Dark warm-charcoal background -->
+    <linearGradient id="bg" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#241F1A"/>
+      <stop offset="1" stop-color="#12100D"/>
+    </linearGradient>
+    <!-- Sodium-amber lamp glow -->
+    <radialGradient id="glow" cx="0.5" cy="0.30" r="0.62">
+      <stop offset="0" stop-color="#FFC36B" stop-opacity="0.92"/>
+      <stop offset="0.38" stop-color="#FF9A2E" stop-opacity="0.40"/>
+      <stop offset="0.72" stop-color="#FF7A00" stop-opacity="0.10"/>
+      <stop offset="1" stop-color="#FF7A00" stop-opacity="0"/>
+    </radialGradient>
+    <!-- Left swatch: cool blue -->
+    <linearGradient id="blue" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#5B9BFF"/>
+      <stop offset="1" stop-color="#2E63D6"/>
+    </linearGradient>
+    <!-- Right swatch: rose/magenta -->
+    <linearGradient id="rose" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#FF6FAE"/>
+      <stop offset="1" stop-color="#D62A7C"/>
+    </linearGradient>
+    <!-- Glossy top highlight -->
+    <linearGradient id="gloss" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#FFFFFF" stop-opacity="0.42"/>
+      <stop offset="1" stop-color="#FFFFFF" stop-opacity="0"/>
+    </linearGradient>
+    <!-- Tile drop shadow -->
+    <filter id="shadow" x="-30%" y="-30%" width="160%" height="160%">
+      <feGaussianBlur in="SourceAlpha" stdDeviation="22"/>
+      <feOffset dx="0" dy="26" result="off"/>
+      <feComponentTransfer><feFuncA type="linear" slope="0.55"/></feComponentTransfer>
+      <feMerge><feMergeNode/><feMergeNode in="SourceGraphic"/></feMerge>
+    </filter>
+    <!-- Soft shadow for the badge -->
+    <filter id="bshadow" x="-40%" y="-40%" width="180%" height="180%">
+      <feGaussianBlur in="SourceAlpha" stdDeviation="10"/>
+      <feOffset dx="0" dy="8" result="off"/>
+      <feComponentTransfer><feFuncA type="linear" slope="0.5"/></feComponentTransfer>
+      <feMerge><feMergeNode/><feMergeNode in="SourceGraphic"/></feMerge>
+    </filter>
+    <!-- Clip for gloss rounding -->
+    <clipPath id="clipL"><rect x="150" y="318" width="316" height="392" rx="58" ry="58"/></clipPath>
+    <clipPath id="clipR"><rect x="558" y="318" width="316" height="392" rx="58" ry="58"/></clipPath>
+  </defs>
+
+  <!-- Background -->
+  <rect x="0" y="0" width="1024" height="1024" fill="url(#bg)"/>
+  <rect x="0" y="0" width="1024" height="1024" fill="url(#glow)"/>
+
+  <!-- Tiles -->
+  <g filter="url(#shadow)">
+    <rect x="150" y="318" width="316" height="392" rx="58" ry="58" fill="url(#blue)"/>
+    <rect x="558" y="318" width="316" height="392" rx="58" ry="58" fill="url(#rose)"/>
+  </g>
+  <!-- Gloss -->
+  <g clip-path="url(#clipL)"><rect x="150" y="318" width="316" height="196" fill="url(#gloss)"/></g>
+  <g clip-path="url(#clipR)"><rect x="558" y="318" width="316" height="196" fill="url(#gloss)"/></g>
+  <!-- Subtle top inner light line -->
+  <rect x="150" y="318" width="316" height="392" rx="58" ry="58" fill="none" stroke="#FFFFFF" stroke-opacity="0.18" stroke-width="3"/>
+  <rect x="558" y="318" width="316" height="392" rx="58" ry="58" fill="none" stroke="#FFFFFF" stroke-opacity="0.18" stroke-width="3"/>
+
+  <!-- "Match" checkmark badge centered on the seam -->
+  <g filter="url(#bshadow)">
+    <circle cx="512" cy="512" r="92" fill="#FFFFFF"/>
+    <path d="M474 514 L502 542 L552 484" fill="none" stroke="#1FA85A" stroke-width="26"
+          stroke-linecap="round" stroke-linejoin="round"/>
+  </g>
+</svg>
