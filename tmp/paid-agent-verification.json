@@ -1,0 +1,68 @@
+{
+  "status": "skipped",
+  "summary": "Test-writing phase for issue #5. Researched the published color_matching OpenAPI spec (viamin/color_matching#110, merged via #113) against docs/color-matching-api-contract.md, recorded six concrete deltas in docs/color-matching-api-contract-deltas.md, and added three red-phase tests (iOS/Tests/ColorMatchingLPSAppTests/APIContractDeltaTests.swift) that fail against the current hand-written APIClient. No Swift toolchain is available in this Linux container, so the tests could not be executed; they were reviewed by hand for consistency with the existing APIClientTests.swift patterns instead. The generated-client implementation itself (swift-openapi-generator package wiring, codegen, replacing hand-written models) is out of scope for this test-only run per the TDD boundary and is blocked on a future implementation run.",
+  "acceptance_criteria": [
+    {
+      "id": "AC-1-add-openapi-generator-dependency",
+      "status": "not_run",
+      "verification": {
+        "kind": "human_or_external_evidence",
+        "references": [
+          { "locator": "N/A - implementation-only change, out of scope for this test-writing run (Package.swift is not a test or doc path)", "result": "not_run" }
+        ]
+      }
+    },
+    {
+      "id": "AC-2-generate-client-for-used-surfaces",
+      "status": "not_run",
+      "verification": {
+        "kind": "human_or_external_evidence",
+        "references": [
+          { "locator": "N/A - codegen requires Package.swift/build-plugin changes, out of scope for this test-writing run", "result": "not_run" }
+        ]
+      }
+    },
+    {
+      "id": "AC-3-replace-hand-written-models-with-generated-types",
+      "status": "not_run",
+      "verification": {
+        "kind": "human_or_external_evidence",
+        "references": [
+          { "locator": "N/A - implementation change, out of scope for this test-writing run", "result": "not_run" }
+        ]
+      }
+    },
+    {
+      "id": "AC-4-swift-tests-against-stubbed-responses",
+      "status": "passed",
+      "verification": {
+        "kind": "unit_or_service_test",
+        "references": [
+          { "locator": "iOS/Tests/ColorMatchingLPSAppTests/APIContractDeltaTests.swift:34 testUploadMeasurementsOmitsNormalizedMedianWhenNilButRealContractRequiresIt", "result": "expected_failure_red_phase" },
+          { "locator": "iOS/Tests/ColorMatchingLPSAppTests/APIContractDeltaTests.swift:59 testCreateCaptureOmitsRequiredImageDimensionsWhenNil", "result": "expected_failure_red_phase" },
+          { "locator": "iOS/Tests/ColorMatchingLPSAppTests/APIContractDeltaTests.swift:94 testUploadMeasurementsBodyIncludesFieldsAbsentFromRealSchema", "result": "expected_failure_red_phase" }
+        ]
+      }
+    },
+    {
+      "id": "AC-5-pr-description-records-contract-deltas-and-gaps",
+      "status": "passed",
+      "verification": {
+        "kind": "human_or_external_evidence",
+        "references": [
+          { "locator": "docs/color-matching-api-contract-deltas.md", "result": "documented - 6 deltas and endpoint gaps recorded with sources (viamin/color_matching api_schemas.ex, router.ex, test_sheet_json.ex via GitHub web UI); to be carried into the implementation PR description" }
+        ]
+      }
+    },
+    {
+      "id": "AC-6-swift-test-disable-sandbox-green",
+      "status": "skipped",
+      "verification": {
+        "kind": "human_or_external_evidence",
+        "references": [
+          { "locator": "N/A - no Swift/Xcode toolchain available in this Linux container (no xcrun, no swift binary); cannot run `swift test --disable-sandbox` here. Tests were hand-reviewed for consistency with existing APIClientTests.swift patterns but not compiled or executed.", "result": "skipped" }
+        ]
+      }
+    }
+  ]
+}
