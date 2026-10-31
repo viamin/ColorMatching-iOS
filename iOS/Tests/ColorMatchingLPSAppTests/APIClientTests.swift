@@ -46,6 +46,73 @@ final class APIClientTests: XCTestCase {
         XCTAssertEqual(quality["rejections"] as? [String], [])
     }
 
+    func testFetchManifestDecodesLocalStubbedResponse() async throws {
+        MockURLProtocol.handler = { request in
+            XCTAssertEqual(request.url?.path, "/api/v1/test_sheets/sheet_1/manifest")
+            XCTAssertEqual(request.value(forHTTPHeaderField: "Authorization"), "Bearer token")
+            return (HTTPURLResponse(url: request.url!, statusCode: 200, httpVersion: nil, headerFields: nil)!, Data(#"""
+            {
+              "schema_version": "lps-sheet-manifest/v1",
+              "sheet_version": "lps-letter-grid-v1",
+              "sheet_id": "sheet_1",
+              "manifest_url": "https://example.test/api/v1/test_sheets/sheet_1/manifest",
+              "page": {"units": "mm", "width": 215.9, "height": 279.4},
+              "registration_markers": [],
+              "patches": [],
+              "pairs": []
+            }
+            """#.utf8))
+        }
+
+        let manifest = try await client().fetchManifest(
+            baseURL: URL(string: "https://example.test")!,
+            sheetCode: "sheet_1"
+        )
+
+        XCTAssertEqual(manifest.sheetID, "sheet_1")
+        XCTAssertEqual(manifest.page.units, "mm")
+    }
+
+    func testFetchRecentSheetsDecodesLocalStubbedResponse() async throws {
+        MockURLProtocol.handler = { request in
+            XCTAssertEqual(request.url?.path, "/api/v1/test_sheets/recent")
+            return (HTTPURLResponse(url: request.url!, statusCode: 200, httpVersion: nil, headerFields: nil)!, Data(#"""
+            {
+              "sheets": [{
+                "sheet_id": "sheet_1",
+                "manifest_url": "https://example.test/api/v1/test_sheets/sheet_1/manifest",
+                "title": "LPS comparison"
+              }]
+            }
+            """#.utf8))
+        }
+
+        let sheets = try await client().fetchRecentSheets(baseURL: URL(string: "https://example.test")!)
+
+        XCTAssertEqual(sheets.map(\.sheetID), ["sheet_1"])
+        XCTAssertEqual(sheets.first?.title, "LPS comparison")
+    }
+
+    func testOpenAPIInputsAndGeneratorDependenciesCoverEveryAppSurface() throws {
+        let iosDirectory = URL(fileURLWithPath: #filePath)
+            .deletingLastPathComponent()
+            .deletingLastPathComponent()
+            .deletingLastPathComponent()
+        let package = try String(contentsOf: iosDirectory.appending(path: "Package.swift"))
+        let specification = try String(contentsOf: iosDirectory.appending(path: "OpenAPI/color-matching.yaml"))
+
+        XCTAssertTrue(package.contains("swift-openapi-generator"))
+        XCTAssertTrue(package.contains("swift-openapi-runtime"))
+        [
+            "/api/v1/test_sheets/{sheet_id}/manifest",
+            "/api/v1/test_sheets/recent",
+            "/api/v1/test_sheets/{sheet_id}/captures",
+            "/api/v1/captures/{capture_id}/measurements",
+            "/api/v1/captures/{capture_id}/judgments",
+            "/api/v1/test_sheets/{sheet_id}/ranked_results"
+        ].forEach { XCTAssertTrue(specification.contains($0), "Missing OpenAPI path: \($0)") }
+    }
+
     func testUploadMeasurementsEncodesScoresWithAlgorithmVersion() async throws {
         var capturedBody: Data?
         MockURLProtocol.handler = { request in
