@@ -1,0 +1,83 @@
+{
+  "status": "not_run",
+  "summary": "Red-phase API-client tests and OpenAPI adoption guard were added, but Swift is unavailable in this environment and the generator dependencies are intentionally absent until the implementation run.",
+  "acceptance_criteria": [
+    {
+      "id": "AC-1",
+      "status": "failed",
+      "verification": {
+        "kind": "unit_or_service_test",
+        "references": [
+          {
+            "locator": "iOS/Tests/ColorMatchingLPSAppTests/GeneratedOpenAPIClientAdoptionTests.swift:5",
+            "result": "red-phase assertion: swift-openapi-generator and swift-openapi-runtime are not yet declared"
+          }
+        ]
+      }
+    },
+    {
+      "id": "AC-2",
+      "status": "not_run",
+      "verification": {
+        "kind": "unit_or_service_test",
+        "references": [
+          {
+            "locator": "iOS/Tests/ColorMatchingLPSAppTests/APIClientTests.swift:49",
+            "result": "local-stub manifest test added; not run because swift is unavailable"
+          },
+          {
+            "locator": "iOS/Tests/ColorMatchingLPSAppTests/APIClientTests.swift:70",
+            "result": "local-stub recent-sheets test added; not run because swift is unavailable"
+          }
+        ]
+      }
+    },
+    {
+      "id": "AC-3",
+      "status": "not_run",
+      "verification": {
+        "kind": "unit_or_service_test",
+        "references": [
+          {
+            "locator": "iOS/Tests/ColorMatchingLPSAppTests/APIClientTests.swift:12",
+            "result": "existing local-stub capture test; not run because swift is unavailable"
+          },
+          {
+            "locator": "iOS/Tests/ColorMatchingLPSAppTests/APIClientTests.swift:85",
+            "result": "existing local-stub measurement test; not run because swift is unavailable"
+          },
+          {
+            "locator": "iOS/Tests/ColorMatchingLPSAppTests/APIClientTests.swift:110",
+            "result": "existing local-stub judgment test; not run because swift is unavailable"
+          }
+        ]
+      }
+    },
+    {
+      "id": "AC-4",
+      "status": "skipped",
+      "verification": {
+        "kind": "human_or_external_evidence",
+        "references": [
+          {
+            "locator": "docs/issue-5-openapi-client-verification.md:31",
+            "result": "upstream ranked-results schema does not describe the result payload needed for a generated-client test"
+          }
+        ]
+      }
+    },
+    {
+      "id": "AC-5",
+      "status": "not_run",
+      "verification": {
+        "kind": "human_or_external_evidence",
+        "references": [
+          {
+            "locator": "docs/issue-5-openapi-client-verification.md:40",
+            "result": "contract-delta and endpoint-gap evidence recorded for the implementation PR"
+          }
+        ]
+      }
+    }
+  ]
+}
