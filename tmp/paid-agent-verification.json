@@ -1,0 +1,71 @@
+{
+  "status": "failed",
+  "summary": "Red-phase tests and contract-delta evidence added; implementation dependencies and vendored OpenAPI document are intentionally absent. Swift tests could not run because this container has no swift executable.",
+  "acceptance_criteria": [
+    {
+      "id": "AC-1",
+      "status": "failed",
+      "verification": {
+        "kind": "unit_or_service_test",
+        "references": [
+          {
+            "locator": "iOS/Tests/ColorMatchingLPSAppTests/GeneratedOpenAPIClientAdoptionTests.swift:5",
+            "result": "expected red: Package.swift does not yet declare swift-openapi-generator/runtime or vendor OpenAPI/openapi.json"
+          }
+        ]
+      }
+    },
+    {
+      "id": "AC-2",
+      "status": "failed",
+      "verification": {
+        "kind": "permanent_system_test",
+        "references": [
+          {
+            "locator": "iOS/Tests/ColorMatchingLPSAppTests/APIClientTests.swift:9",
+            "result": "local stubs cover manifest, recent sheets, capture creation, measurement upload, and judgment upload; ranked results remains absent pending implementation"
+          }
+        ]
+      }
+    },
+    {
+      "id": "AC-3",
+      "status": "skipped",
+      "verification": {
+        "kind": "human_or_external_evidence",
+        "references": [
+          {
+            "locator": "docs/issue-5-openapi-client-verification.md:7",
+            "result": "requires generated sources and compiler evidence in implementation phase"
+          }
+        ]
+      }
+    },
+    {
+      "id": "AC-4",
+      "status": "not_run",
+      "verification": {
+        "kind": "permanent_system_test",
+        "references": [
+          {
+            "locator": "iOS/Tests/ColorMatchingLPSAppTests/APIClientTests.swift:9",
+            "result": "tests are URLProtocol-backed with no live server, but swift test could not run because swift is unavailable"
+          }
+        ]
+      }
+    },
+    {
+      "id": "AC-5",
+      "status": "passed",
+      "verification": {
+        "kind": "human_or_external_evidence",
+        "references": [
+          {
+            "locator": "docs/issue-5-openapi-client-verification.md:17",
+            "result": "documents deltas against viamin/color_matching#113 and the required PR-body evidence"
+          }
+        ]
+      }
+    }
+  ]
+}
