@@ -46,11 +46,37 @@ final class APIClientTests: XCTestCase {
         XCTAssertEqual(quality["rejections"] as? [String], [])
     }
 
+    func testFetchManifestAndRecentSheetsDecodePublishedResponseShapes() async throws {
+        var requestedPaths: [String] = []
+        MockURLProtocol.handler = { request in
+            requestedPaths.append(try XCTUnwrap(request.url?.path))
+            let body: Data
+            switch request.url?.path {
+            case "/api/v1/test_sheets/sheet_1/manifest":
+                body = Data(Self.manifestResponse.utf8)
+            case "/api/v1/test_sheets/recent":
+                body = Data(#"{"sheets":[{"sheet_id":"sheet_1","manifest_url":"https://example.test/api/v1/test_sheets/sheet_1/manifest","title":null}]}"#.utf8)
+            default:
+                throw URLError(.badURL)
+            }
+            return (HTTPURLResponse(url: try XCTUnwrap(request.url), statusCode: 200, httpVersion: nil, headerFields: nil)!, body)
+        }
+
+        let baseURL = URL(string: "https://example.test")!
+        let manifest = try await client().fetchManifest(baseURL: baseURL, sheetCode: "sheet_1")
+        let sheets = try await client().fetchRecentSheets(baseURL: baseURL)
+
+        XCTAssertEqual(manifest.sheetID, "sheet_1")
+        XCTAssertEqual(sheets.map(\.sheetID), ["sheet_1"])
+        XCTAssertNil(sheets.first?.title)
+        XCTAssertEqual(requestedPaths, ["/api/v1/test_sheets/sheet_1/manifest", "/api/v1/test_sheets/recent"])
+    }
+
     func testUploadMeasurementsEncodesScoresWithAlgorithmVersion() async throws {
         var capturedBody: Data?
         MockURLProtocol.handler = { request in
             capturedBody = request.httpBodyStream.flatMap(Self.readBody) ?? request.httpBody
-            return (HTTPURLResponse(url: request.url!, statusCode: 204, httpVersion: nil, headerFields: nil)!, Data())
+            return (HTTPURLResponse(url: request.url!, statusCode: 200, httpVersion: nil, headerFields: nil)!, Data(#"{"capture_id":"cap_1","measurement_count":1,"pair_score_count":1}"#.utf8))
         }
 
         let rgb = RGB(r: 0.2, g: 0.3, b: 0.4)
@@ -77,7 +103,7 @@ final class APIClientTests: XCTestCase {
         MockURLProtocol.handler = { request in
             capturedRequest = request
             capturedBody = request.httpBodyStream.flatMap(Self.readBody) ?? request.httpBody
-            return (HTTPURLResponse(url: request.url!, statusCode: 204, httpVersion: nil, headerFields: nil)!, Data())
+            return (HTTPURLResponse(url: request.url!, statusCode: 200, httpVersion: nil, headerFields: nil)!, Data(#"{"capture_id":"cap_1","judgment_count":1}"#.utf8))
         }
 
         try await client().uploadJudgments(
@@ -90,6 +116,21 @@ final class APIClientTests: XCTestCase {
         XCTAssertEqual(capturedRequest?.url?.path, "/api/v1/captures/cap_1/judgments")
         let json = try XCTUnwrap(Self.jsonObject(from: capturedBody) as? [String: Any])
         XCTAssertEqual((json["judgments"] as? [[String: Any]])?.first?["judgment"] as? String, "near_match")
+    }
+
+    func testGeneratedOpenAPIClientReplacesLegacyTransportModelsAndCoversAllAppEndpoints() throws {
+        let package = try String(contentsOf: Self.iOSDirectory.appending(path: "Package.swift"), encoding: .utf8)
+        let legacyClient = try String(contentsOf: Self.iOSDirectory.appending(path: "Sources/ColorMatchingLPSAppCore/APIClient.swift"), encoding: .utf8)
+
+        XCTAssertTrue(package.contains("swift-openapi-generator"))
+        XCTAssertTrue(package.contains("swift-openapi-runtime"))
+        XCTAssertTrue(package.contains("OpenAPIGenerator"))
+        XCTAssertTrue(FileManager.default.fileExists(atPath: Self.iOSDirectory.appending(path: "Sources/ColorMatchingAPI/openapi.yaml").path))
+        XCTAssertTrue(legacyClient.contains("fetchRankedResults"))
+        XCTAssertFalse(legacyClient.contains("public struct CaptureMetadata"))
+        XCTAssertFalse(legacyClient.contains("public struct CaptureSessionResponse"))
+        XCTAssertFalse(legacyClient.contains("public struct RecentSheet"))
+        XCTAssertFalse(legacyClient.contains("public struct PairJudgment"))
     }
 
     private func client() -> APIClient {
@@ -117,6 +158,25 @@ final class APIClientTests: XCTestCase {
         }
         return data
     }
+
+    private static var iOSDirectory: URL {
+        URL(fileURLWithPath: #filePath)
+            .deletingLastPathComponent()
+            .deletingLastPathComponent()
+    }
+
+    private static let manifestResponse = #"""
+    {
+      "schema_version":"lps-sheet-manifest/v1",
+      "sheet_version":"lps-letter-grid-v1",
+      "sheet_id":"sheet_1",
+      "manifest_url":"https://example.test/api/v1/test_sheets/sheet_1/manifest",
+      "page":{"units":"mm","width":215.9,"height":279.4},
+      "registration_markers":[{"role":"top_left","shape":"solid_square","rect":{"x":12,"y":12,"width":8,"height":8}}],
+      "patches":[{"id":"pair_1#first","role":"pair_color","pair_id":"pair_1","pair_side":"first","reference_role":null,"source_color":"#FF0000","safe_inset_mm":1.5,"rect":{"x":16,"y":38,"width":16,"height":10}}],
+      "pairs":[{"id":"pair_1","first_patch_id":"pair_1#first","second_patch_id":"pair_1#second","source_colors":["#FF0000","#00FF00"],"grid_row":0,"grid_col":1}]
+    }
+    """
 }
 
 private final class MockURLProtocol: URLProtocol {
