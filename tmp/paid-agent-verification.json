@@ -1,0 +1,85 @@
+{
+  "status": "not_run",
+  "summary": "Tests-only red phase for issue #5 (generated OpenAPI Swift client). Wrote three permanent unit-level test files and two LID docs. OpenAPISpecCoverageTests (iOS/Tests/ColorMatchingLPSAppTests/OpenAPISpecCoverageTests.swift) compiles today and pins the vendored spec's semantic facts, which were extracted from the real published API source (viamin/color_matching#113: Router, ApiSpec, ApiSchemas, TestSheetController, CaptureController). GeneratedClientTests + OpenAPIStubTransport are intentionally compile-red until the implementation run adds the ColorMatchingAPI generated target; the missing-module error is the compile-time drift signal the migration buys. No Swift toolchain exists in this container (swift: command not found), so no tests could be executed locally; CI (macos runner) will surface the red phase. Deliverable D5 (contract deltas + endpoint gaps) is fully recorded in docs/color-matching-openapi-contract-deltas.md, derived from the actual upstream spec: manifest/ranked-results schemas are thin (gaps G1/G2), measurement upload drops stats and top-level scoring_algorithm_version, uploads return 200+JSON (not empty 2xx), judgments/rejections are not enums upstream, and four vendoring patches (P1-P4) are documented and enforced by test assertions.",
+  "acceptance_criteria": [
+    {
+      "id": "AC-1",
+      "description": "swift-openapi-generator + swift-openapi-runtime added to the iOS package; OpenAPI document fetched/vendored from viamin/color_matching#110",
+      "status": "not_run",
+      "verification": {
+        "kind": "unit_or_service_test",
+        "references": [
+          { "locator": "iOS/Tests/ColorMatchingLPSAppTests/OpenAPISpecCoverageTests.swift:32", "result": "not_run", "note": "testVendoredSpecExistsAndDeclaresOpenAPI3: fails at runtime until Sources/ColorMatchingAPI/openapi.json is vendored (red phase by design)" },
+          { "locator": "iOS/Tests/ColorMatchingLPSAppTests/OpenAPISpecCoverageTests.swift:47", "result": "not_run", "note": "published operationIds/status codes pinned for all 6 app-used operations" },
+          { "locator": "iOS/Tests/ColorMatchingLPSAppTests/GeneratedClientTests.swift:6", "result": "not_run", "note": "import ColorMatchingAPI / import OpenAPIRuntime: compile-time proof of package wiring once implementation lands" }
+        ],
+        "reason": "No Swift toolchain in this container; implementation (Package.swift, vendored doc, generated target) is out of scope for the tests-only run. The tests that verify this criterion are committed and red."
+      }
+    },
+    {
+      "id": "AC-2",
+      "description": "Generated client covers manifest, recent sheets, capture creation, measurement upload, judgment upload, ranked results",
+      "status": "not_run",
+      "verification": {
+        "kind": "unit_or_service_test",
+        "references": [
+          { "locator": "iOS/Tests/ColorMatchingLPSAppTests/GeneratedClientTests.swift:33", "result": "not_run", "note": "manifest: method/path/operationId + decoded versioned enums" },
+          { "locator": "iOS/Tests/ColorMatchingLPSAppTests/GeneratedClientTests.swift:62", "result": "not_run", "note": "recent sheets incl. null title" },
+          { "locator": "iOS/Tests/ColorMatchingLPSAppTests/GeneratedClientTests.swift:89", "result": "not_run", "note": "capture creation: nested metadata/quality wire body + 201 decode" },
+          { "locator": "iOS/Tests/ColorMatchingLPSAppTests/GeneratedClientTests.swift:151", "result": "not_run", "note": "measurement upload: published payload shape (no stats, no top-level scoring version, required normalized median) + 200 counts decode" },
+          { "locator": "iOS/Tests/ColorMatchingLPSAppTests/GeneratedClientTests.swift:209", "result": "not_run", "note": "judgment upload + 200 count decode" },
+          { "locator": "iOS/Tests/ColorMatchingLPSAppTests/GeneratedClientTests.swift:237", "result": "not_run", "note": "ranked results: lps-ranked-results/v1 decode" }
+        ],
+        "reason": "Tests written against the generated client; they do not compile until the ColorMatchingAPI target exists (expected red phase). Not runnable locally: no Swift toolchain."
+      }
+    },
+    {
+      "id": "AC-3",
+      "description": "App's hand-written API models replaced with generated types (client-side models kept)",
+      "status": "not_run",
+      "verification": {
+        "kind": "unit_or_service_test",
+        "references": [
+          { "locator": "iOS/Tests/ColorMatchingLPSAppTests/GeneratedClientTests.swift:97", "result": "not_run", "note": "requests built exclusively from Components.Schemas.* generated types" }
+        ],
+        "reason": "Replacement itself is implementation-run work (Sources/ are outside this run's allowlist); these tests prescribe the generated-type surface and fail to compile until it exists."
+      }
+    },
+    {
+      "id": "AC-4",
+      "description": "Swift tests exercising the generated client against local stubbed responses (no live server in CI)",
+      "status": "not_run",
+      "verification": {
+        "kind": "unit_or_service_test",
+        "references": [
+          { "locator": "iOS/Tests/ColorMatchingLPSAppTests/OpenAPIStubTransport.swift:14", "result": "not_run", "note": "Transport stub recording requests and answering canned responses; zero network in tests" }
+        ],
+        "reason": "Committed but not executable here: no Swift toolchain."
+      }
+    },
+    {
+      "id": "AC-5",
+      "description": "PR description records what changed between the prose contract and the published spec, and endpoint gaps discovered",
+      "status": "passed",
+      "verification": {
+        "kind": "human_or_external_evidence",
+        "references": [
+          { "locator": "docs/color-matching-openapi-contract-deltas.md:1", "result": "passed", "note": "full prose-vs-published delta table + endpoint gaps G1-G3 + vendoring patches P1-P4, derived from upstream source (viamin/color_matching#113 files fetched and read during this run); embed in the PR body" },
+          { "locator": "docs/openapi-client-migration-test-plan.md:1", "result": "passed", "note": "criterion-to-verification mapping and naming/vendoring contract for the implementation run" }
+        ]
+      }
+    },
+    {
+      "id": "AC-6",
+      "description": "Exit criterion: swift test --disable-sandbox green with generated types wired in",
+      "status": "not_run",
+      "verification": {
+        "kind": "unit_or_service_test",
+        "references": [
+          { "locator": "iOS/Tests/ColorMatchingLPSAppTests", "result": "not_run", "note": "reachable only after the implementation run; no Swift toolchain in this container (swift: command not found)" }
+        ],
+        "reason": "Blocked on implementation phase and missing local toolchain."
+      }
+    }
+  ]
+}
