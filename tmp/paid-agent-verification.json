@@ -1,0 +1,89 @@
+{
+  "status": "failed",
+  "summary": "Tests-writing (red) phase for issue #5, completed across two commits (445fcf4, bca0cf1). Committed: green wire-format pins served by a URLProtocol stub (APIClientContractTests; APIClientTests with stub fixtures matching the published spec's response shapes) and red tests driving the implementation run (vendored OpenAPI 3 document presence, six-surface path coverage, per-operation success status + JSON body + JSON request body + bearerAuth security, schema title/enum/required pins) plus Package.swift wiring pins for swift-openapi-generator + swift-openapi-runtime + OpenAPIGeneratorPlugin. Every contract delta in docs/openapi-client-migration.md was re-verified this run against upstream sources (api_schemas.ex, capture_controller.ex, test_sheet_controller.ex, router.ex at viamin/color_matching main, PR #113). The vendored-spec and package-wiring criteria fail today as expected missing behavior; swift test could not run in this container (no Swift toolchain) and must be exercised on macOS CI / the implementation run.",
+  "acceptance_criteria": [
+    {
+      "id": "AC-1",
+      "description": "Add swift-openapi-generator + swift-openapi-runtime to the iOS package; fetch or vendor the OpenAPI document from viamin/color_matching#110",
+      "status": "failed",
+      "verification": {
+        "kind": "unit_or_service_test",
+        "references": [
+          { "locator": "iOS/Tests/ColorMatchingLPSAppTests/OpenAPIPackageWiringTests.swift:4", "result": "failed", "detail": "testPackageManifestUsesOpenAPIGeneratorPlugin — Package.swift contains neither swift-openapi-generator nor OpenAPIGeneratorPlugin (expected red: wiring is implementation phase)" },
+          { "locator": "iOS/Tests/ColorMatchingLPSAppTests/OpenAPIPackageWiringTests.swift:16", "result": "failed", "detail": "testPackageManifestLinksOpenAPIRuntime — Package.swift lacks swift-openapi-runtime (expected red)" },
+          { "locator": "iOS/Tests/ColorMatchingLPSAppTests/VendoredOpenAPISpecTests.swift:24", "result": "failed", "detail": "testVendoredOpenAPIDocumentExists — OpenAPIDocumentError.notVendored; iOS/OpenAPI/color-matching-openapi.json not vendored yet (expected red)" }
+        ]
+      }
+    },
+    {
+      "id": "AC-2",
+      "description": "Generate the client for the surfaces the app uses today: manifest, recent sheets, capture creation, measurement upload, judgment upload, ranked results",
+      "status": "failed",
+      "verification": {
+        "kind": "unit_or_service_test",
+        "references": [
+          { "locator": "iOS/Tests/ColorMatchingLPSAppTests/VendoredOpenAPISpecTests.swift:36", "result": "failed", "detail": "testVendoredSpecCoversEveryAppSurface — pins the six path/method pairs incl. GET /api/v1/test_sheets/{sheet_id}/ranked_results; fails while the spec is not vendored (expected red)" },
+          { "locator": "iOS/Tests/ColorMatchingLPSAppTests/VendoredOpenAPISpecTests.swift:43", "result": "failed", "detail": "testEveryAppOperationDeclaresSpecSuccessStatusWithJSONBody — pins 200 for reads/uploads and 201 for capture creation with application/json bodies (verified against upstream capture_controller.ex/test_sheet_controller.ex); expected red" },
+          { "locator": "iOS/Tests/ColorMatchingLPSAppTests/VendoredOpenAPISpecTests.swift:64", "result": "failed", "detail": "testUploadOperationsDeclareJSONRequestBody — POSTs declare application/json request bodies; expected red" },
+          { "locator": "iOS/Tests/ColorMatchingLPSAppTests/VendoredOpenAPISpecTests.swift:80", "result": "failed", "detail": "testEveryAppOperationRequiresBearerAuth — per-operation security [{bearerAuth: []}] pinned from upstream controllers; expected red" },
+          { "locator": "iOS/Tests/ColorMatchingLPSAppTests/VendoredOpenAPISchemaTests.swift:24", "result": "failed", "detail": "testSpecDefinesSchemasForAppPayloads — pins the nine upstream schema titles; expected red" },
+          { "locator": "iOS/Tests/ColorMatchingLPSAppTests/VendoredOpenAPISchemaTests.swift:31", "result": "failed", "detail": "testManifestSchemaPinsCompatibilityVersions — enum pins lps-sheet-manifest/v1 and lps-distance-v1; expected red" },
+          { "locator": "iOS/Tests/ColorMatchingLPSAppTests/VendoredOpenAPISchemaTests.swift:73", "result": "failed", "detail": "testUploadResponsesDeclareJSONBodiesProseContractAssumedEmpty — pins MeasurementUploadResponse {capture_id, measurement_count, pair_score_count} and JudgmentUploadResponse {capture_id, judgment_count} required sets; expected red" },
+          { "locator": "iOS/Tests/ColorMatchingLPSAppTests/VendoredOpenAPISchemaTests.swift:88", "result": "failed", "detail": "testCaptureRequestAcceptsNestedMetadataQualityShape — anyOf branch requiring [:metadata] plus quality property, the shape the app sends; expected red" }
+        ]
+      }
+    },
+    {
+      "id": "AC-3",
+      "description": "Replace the app's hand-written API models with generated types; keep purely client-side models as-is",
+      "status": "not_run",
+      "verification": {
+        "kind": "unit_or_service_test",
+        "references": [
+          { "locator": "iOS/Tests/ColorMatchingLPSAppTests/APIClientContractTests.swift:12", "result": "not_run_in_container", "detail": "testFetchManifestDecodesProseContractFixture — green-by-design wire pin; could not be executed here (no Swift toolchain); exercises the manifest surface the generated types must keep satisfying" },
+          { "locator": "iOS/Tests/ColorMatchingLPSAppTests/APIClientTests.swift:12", "result": "not_run_in_container", "detail": "testCreateCaptureEncodesMetadataAndQuality — stub now serves the spec's 201 + numeric-string capture_id so the same fixture exercises the generated client's decoded CaptureCreatedResponse" },
+          { "locator": "iOS/Tests/ColorMatchingLPSAppTests/VendoredOpenAPISchemaTests.swift:62", "result": "failed", "detail": "testManifestRequiredFieldsMatchUpstreamUnderSpecification — drift alarm: fails if upstream expands TestSheetManifest, forcing regeneration and moving geometry fields from client-side models to generated types; expected red now" },
+          { "locator": "docs/openapi-client-migration.md", "result": "reference", "detail": "Records which manifest geometry fields are absent from the published spec and therefore stay client-side models (SheetManifest/Patch/PairManifest) until upstream expands TestSheetManifest" }
+        ],
+        "note": "Model replacement itself is the implementation run; a compile-safe client-call test for ranked_results is not expressible until the generated module exists (no callable symbol today)."
+      }
+    },
+    {
+      "id": "AC-4",
+      "description": "Swift tests exercising the generated client against local stubbed responses (no live server in CI)",
+      "status": "not_run",
+      "verification": {
+        "kind": "unit_or_service_test",
+        "references": [
+          { "locator": "iOS/Tests/ColorMatchingLPSAppTests/TestSupport/ContractStubURLProtocol.swift:3", "result": "reference", "detail": "URLProtocol-based stub serving fixtures with no network dependency; the harness the generated-client tests will use" },
+          { "locator": "iOS/Tests/ColorMatchingLPSAppTests/APIClientTests.swift:51", "result": "not_run_in_container", "detail": "Measurement/judgment upload stubs now serve the spec's 200 count bodies (MeasurementUploadResponse/JudgmentUploadResponse), forward-compatible with the generated client that decodes them" },
+          { "locator": "iOS/Tests/ColorMatchingLPSAppTests/APIClientTests.swift:77", "result": "not_run_in_container", "detail": "Judgment upload stub uses the numeric-string capture id flow (42) the server issues" }
+        ],
+        "note": "Generated-client call tests cannot compile before the generated module exists (compile-time dependency); stub fixtures and harness are in place; tracked for the implementation run."
+      }
+    },
+    {
+      "id": "AC-5",
+      "description": "PR description records what changed between the prose contract and the published spec, and endpoint gaps discovered",
+      "status": "passed",
+      "verification": {
+        "kind": "human_or_external_evidence",
+        "references": [
+          { "locator": "docs/openapi-client-migration.md", "result": "passed", "detail": "Eight verified deltas (manifest under-specification incl. exact required set, ranked-results schema minimal, measurement upload drops top-level scoring_algorithm_version / requires normalized_linear_rgb_median / stats undocumented, upload bodies 200 JSON with exact required fields instead of empty 204, capture_id numeric string with non-integer 404, enums not machine-visible, recent sheets parity incl. required-but-nullable title, bearerAuth per-operation) plus endpoint gaps. Each fact re-verified this run against upstream api_schemas.ex / capture_controller.ex / test_sheet_controller.ex / router.ex fetched from viamin/color_matching main (PR #113). Content destined verbatim for the PR description." }
+        ]
+      }
+    },
+    {
+      "id": "AC-6",
+      "description": "Exit criterion: swift test --disable-sandbox green with generated types wired in",
+      "status": "not_run",
+      "verification": {
+        "kind": "human_or_external_evidence",
+        "references": [
+          { "locator": ".github/workflows/ci.yml:25", "result": "reference", "detail": "macOS CI runs swift test on PRs" }
+        ],
+        "reason": "This container has no Swift toolchain (swift: command not found), so swift test could not be executed. Red-phase assertion failures are the intended demonstration of missing behavior; compile/runtime verification must happen in CI or the implementation run."
+      }
+    }
+  ]
+}
