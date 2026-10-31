@@ -1,0 +1,83 @@
+{
+  "status": "not_run",
+  "summary": "Red-phase API contract tests and a PR-description draft were added. Swift is not installed in this container, so no Swift test result is available.",
+  "acceptance_criteria": [
+    {
+      "id": "AC-1",
+      "status": "not_run",
+      "verification": {
+        "kind": "unit_or_service_test",
+        "references": [
+          {
+            "locator": "iOS/Tests/ColorMatchingLPSAppTests/APIClientTests.swift:132",
+            "result": "not_run: expected red until the OpenAPI generator, runtime, and vended specification are added"
+          }
+        ]
+      }
+    },
+    {
+      "id": "AC-2",
+      "status": "not_run",
+      "verification": {
+        "kind": "unit_or_service_test",
+        "references": [
+          {
+            "locator": "iOS/Tests/ColorMatchingLPSAppTests/APIClientTests.swift:96",
+            "result": "not_run: local-stub manifest decoding coverage added"
+          },
+          {
+            "locator": "iOS/Tests/ColorMatchingLPSAppTests/APIClientTests.swift:117",
+            "result": "not_run: local-stub recent-sheets decoding coverage added"
+          }
+        ]
+      }
+    },
+    {
+      "id": "AC-3",
+      "status": "not_run",
+      "verification": {
+        "kind": "unit_or_service_test",
+        "references": [
+          {
+            "locator": "iOS/Tests/ColorMatchingLPSAppTests/APIClientTests.swift:12",
+            "result": "not_run: local-stub capture creation coverage present"
+          },
+          {
+            "locator": "iOS/Tests/ColorMatchingLPSAppTests/APIClientTests.swift:49",
+            "result": "not_run: local-stub measurement upload coverage present"
+          },
+          {
+            "locator": "iOS/Tests/ColorMatchingLPSAppTests/APIClientTests.swift:74",
+            "result": "not_run: local-stub judgment upload coverage present"
+          }
+        ]
+      }
+    },
+    {
+      "id": "AC-4",
+      "status": "not_run",
+      "verification": {
+        "kind": "human_or_external_evidence",
+        "references": [
+          {
+            "locator": "docs/issue-5-pr-description.md:23",
+            "result": "not_run: implementation PR must compare its exact vended OpenAPI artifact before merge"
+          }
+        ]
+      }
+    },
+    {
+      "id": "AC-5",
+      "status": "not_run",
+      "verification": {
+        "kind": "unit_or_service_test",
+        "references": [
+          {
+            "locator": "iOS/Package.swift:1",
+            "result": "not_run: swift executable is unavailable in the container"
+          }
+        ]
+      }
+    }
+  ]
+}
