@@ -8,13 +8,13 @@ final class VendoredOpenAPISpecTests: XCTestCase {
             .deletingLastPathComponent()
             .deletingLastPathComponent()
             .deletingLastPathComponent()
-            .appending(path: "Sources/GeneratedAPIClient/openapi.json")
+            .appending(path: "Sources/ColorMatchingOpenAPI/openapi.json")
     }
 
     private func loadSpec() throws -> [String: Any] {
         let data = try XCTUnwrap(
             FileManager.default.contents(atPath: Self.vendoredSpecURL.path),
-            "Vendored OpenAPI document is missing at iOS/Sources/GeneratedAPIClient/openapi.json. "
+            "Vendored OpenAPI document is missing at iOS/Sources/ColorMatchingOpenAPI/openapi.json. "
                 + "Vendor it from GET /api/v1/openapi.json (viamin/color_matching#110) with the "
                 + "normalizations recorded in docs/openapi-generated-client.md."
         )
@@ -56,7 +56,7 @@ final class VendoredOpenAPISpecTests: XCTestCase {
     func testRecentSheetsOperationCoversDiscovery() throws {
         let recentOperation = try operation(path: "/api/v1/test_sheets/recent", method: "get")
 
-        XCTAssertEqual(try string(in: recentOperation, "operationId"), "listRecentTestSheets")
+        XCTAssertEqual(try string(in: recentOperation, "operationId"), "listRecentSheets")
         XCTAssertTrue(operationDeclaresResponse(recentOperation, status: "200"))
     }
 

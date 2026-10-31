@@ -1,11 +1,22 @@
 # Generated OpenAPI client for the `color_matching` API
 
-Status: **tests-first (red phase)**. This document records the contract the tests in
-`iOS/Tests/ColorMatchingLPSAppTests/` expect, the deltas found between
-`docs/color-matching-api-contract.md` (the prose contract) and the published
-OpenAPI spec, and the exact wiring the implementation run must land. The PR
-description for the implementation PR should carry the delta and gap tables
-below verbatim.
+Status: **tests-first (red phase)**. This document records the wiring and
+vendoring contract the tests in `iOS/Tests/ColorMatchingLPSAppTests/` expect
+(both `GeneratedAPIClientTests`/`VendoredOpenAPISpecTests` from this change
+and `OpenAPIPackageWiringTests`/`APIClientPublishedSpecContractTests`/
+`GeneratedClientContractTests` from the sibling commit), plus the exact
+normalizations applied when vendoring. The wire-level delta record between the
+prose contract and the published spec lives in
+`docs/color-matching-openapi-delta.md`; the tables below extend it with the
+generation-specific consequences. The implementation PR description should
+carry both documents' deltas.
+
+**Unified contract (do not diverge):** generated target/module
+`ColorMatchingOpenAPI`; vendored document at
+`iOS/Sources/ColorMatchingOpenAPI/openapi.json`; generator defaults —
+**no `openapi-generator-config.yaml`**, so member names keep the documented
+snake_case (`sheet_id`, `capture_profile`, …) and enum comparisons use
+`.rawValue` (e.g. `"lps-distance-v1"`), never generated case names.
 
 ## Upstream dependency
 
@@ -22,23 +33,20 @@ breaking-change gate.
 
    - packages: `swift-openapi-generator` (build plugin) and
      `swift-openapi-runtime` (product `OpenAPIRuntime`).
-   - new target `GeneratedAPIClient` depending on `OpenAPIRuntime` with
+   - new target `ColorMatchingOpenAPI` depending on `OpenAPIRuntime` with
      `plugins: [.plugin(name: "OpenAPIGenerator", package: "swift-openapi-generator")]`
      and `resources: [.process("openapi.json")]`.
-   - `ColorMatchingLPSAppTests` gains dependencies on `GeneratedAPIClient` and
-     the `OpenAPIRuntime` product.
-   - `ColorMatchingLPSAppCore` depends on `GeneratedAPIClient` when the
+   - `ColorMatchingLPSAppTests` gains dependencies on `ColorMatchingOpenAPI`
+     and the `OpenAPIRuntime` product.
+   - `ColorMatchingLPSAppCore` depends on `ColorMatchingOpenAPI` when the
      hand-written `APIClient` is rewired onto the generated `Client`.
 
-2. `iOS/Sources/GeneratedAPIClient/`:
+2. `iOS/Sources/ColorMatchingOpenAPI/`:
 
    - `openapi.json` — the vendored document (see normalizations below).
-   - `openapi-generator-config.yaml` — `namingStrategy: idiomatic`. The tests
-     rely on idiomatic names (`sheetId`, `captureProfile`, enum case
-     `lpsDistanceV1`, method `getTestSheetManifest`, …). Without this file the
-     generator defaults to `defensive` names (`sheet_id`,
-     `lps_hyphen_distance_hyphen_v1`) and the tests will not compile.
-   - `GeneratedAPIClient.swift` — re-export + bearer middleware:
+   - `ColorMatchingOpenAPI.swift` — re-export + bearer middleware (the
+     generated `OpenAPIGeneratedTypes` module is only importable inside the
+     plugin target, so it must be re-exported for the test target):
 
      ```swift
      import OpenAPIRuntime
@@ -62,7 +70,9 @@ breaking-change gate.
    (with `URLSessionTransport` and `BearerAuthMiddleware`), mapping generated
    types to/from the client-side `MeasurementCore` models. Keep
    `APIClientTests` green; they pin paths, payloads, and bearer auth on the
-   wire.
+   wire. `APIClientPublishedSpecContractTests` additionally pin the
+   published-spec wire deltas (integer `iso`, JSON 200 upload bodies, no
+   `stats`, required `normalized_linear_rgb_median`) through the facade.
 
 ## Vendoring rules
 
@@ -70,7 +80,7 @@ Fetch from a running `color_matching` (or the upstream CI artifact):
 
 ```bash
 curl -s http://localhost:4000/api/v1/openapi.json \
-  > iOS/Sources/GeneratedAPIClient/openapi.json
+  > iOS/Sources/ColorMatchingOpenAPI/openapi.json
 ```
 
 Then apply the recorded normalizations (below), record the upstream SHA the
@@ -88,7 +98,7 @@ and paths stay byte-identical to the served document:
 | Path | Method | operationId |
 | --- | --- | --- |
 | `/api/v1/test_sheets/{sheet_id}/manifest` | GET | `getTestSheetManifest` |
-| `/api/v1/test_sheets/recent` | GET | `listRecentTestSheets` |
+| `/api/v1/test_sheets/recent` | GET | `listRecentSheets` |
 | `/api/v1/test_sheets/{sheet_id}/captures` | POST | `createCapture` |
 | `/api/v1/captures/{capture_id}/measurements` | POST | `uploadMeasurements` |
 | `/api/v1/captures/{capture_id}/judgments` | POST | `uploadJudgments` |
@@ -177,38 +187,46 @@ in `lib/color_matching_web/api_schemas.ex` + rendering in
 
 | File | What it pins |
 | --- | --- |
-| `iOS/Tests/ColorMatchingLPSAppTests/GeneratedAPIClientTests.swift` | Generated client behavior for all six surfaces against a stubbed `ClientTransport` (no live server): routing (method/path/operationId/accept/content-type), request encodings (nested capture payload incl. ISO-8601 timestamp and white-balance gains, RGB-object medians, per-score algorithm version, judgment rows), typed responses (envelope enums, counts, 404), tolerance to undocumented manifest fields, and `BearerAuthMiddleware` header injection. Compiled out (with a failing sentinel test) until the `GeneratedAPIClient` target is wired into `iOS/Package.swift`. |
+| `iOS/Tests/ColorMatchingLPSAppTests/GeneratedAPIClientTests.swift` | Generated client behavior for all six surfaces against a stubbed `ClientTransport` (no live server): routing (method/path/operationId/accept/content-type), request encodings (nested capture payload incl. ISO-8601 timestamp and white-balance gains, RGB-object medians, per-score algorithm version, judgment rows), typed responses (envelope enums, counts, 404), tolerance to undocumented manifest fields, and `BearerAuthMiddleware` header injection. Compiled out (with a failing sentinel test) until the `ColorMatchingOpenAPI` target is wired into `iOS/Package.swift`. |
 | `iOS/Tests/ColorMatchingLPSAppTests/VendoredOpenAPISpecTests.swift` | The vendored `openapi.json` artifact: covers the six app surfaces with the clean operationIds, declares `bearerAuth`, carries the machine-visible version enums, and pins the upstream documentation gaps (manifest/ranked-results envelopes, missing `stats`, moved `scoring_algorithm_version`) and the two vendor normalizations. Runs with no dependencies beyond Foundation. |
 | `iOS/Tests/ColorMatchingLPSAppTests/APIClientTests.swift` (pre-existing, unchanged) | Wire-format regression pin while `APIClient` is rewired onto the generated client. |
+| `OpenAPIPackageWiringTests`, `APIClientPublishedSpecContractTests`, `GeneratedClientContractTests` (sibling commit) | Package-manifest wiring, published-spec wire deltas through the `APIClient` facade, and additional generated-client contract checks. |
 
 ### Generated identifiers the tests rely on
 
-With `namingStrategy: idiomatic` and the vendored document above:
+With the generator defaults (defensive naming — no config file) and the
+vendored document above, documented snake_case names are kept verbatim:
 
-- Methods: `getTestSheetManifest`, `listRecentTestSheets`, `createCapture`,
+- Methods: `getTestSheetManifest`, `listRecentSheets`, `createCapture`,
   `uploadMeasurements`, `uploadJudgments`, `getRankedResults` on `Client`.
-- Inputs: `.init(path: .init(sheetId:))`, `.init(path: .init(captureId:), body: .json(...))`;
-  `listRecentTestSheets(.init())`.
-- Outputs: `.ok` / `.created` / `.notFound` cases; body `guard case .json(let payload)`.
+- Inputs: `.init(path: .init(sheet_id:))`,
+  `.init(path: .init(capture_id:), body: .json(...))`;
+  `listRecentSheets(.init())`.
+- Outputs: `.ok` / `.created` / `.notFound` cases; body
+  `guard case .json(let payload) = body`.
 - Schemas: `Components.Schemas.CaptureMetadata`, `.CaptureRequest`,
   `.RgbPayload(value2: .init(r:g:b:))`, `.MeasurementUploadRequest`,
   `.PairScoreRequest`, `.JudgmentUploadRequest`.
-- Enum cases: `.lpsSheetManifestV1`, `.lpsDistanceV1`, `.lpsRankedResultsV1`.
-- Members: `schemaVersion`, `sheetId`, `captureProfile`,
-  `scoringAlgorithmVersion`, `manifestUrl`, `captureId`, `measurementCount`,
-  `pairScoreCount`, `judgmentCount`, `sheets`, `measurements`, `pairScores`,
-  `judgments`, `patchId`, `linearRgbMedian`, `normalizedLinearRgbMedian`,
-  `pairId`, `algorithmVersion`, `similarity`, `distance`, `deviceModel`,
-  `lens`, `exposureDurationSeconds`, `iso`, `focusLensPosition`,
-  `whiteBalanceGains`, `imageWidth`, `imageHeight`, `appVersion`, `timestamp`,
-  `detectedMarkerCount`, `blurScore`, `rejections`.
+- Version enums are compared by `.rawValue` (`"lps-sheet-manifest/v1"`,
+  `"lps-distance-v1"`, `"lps-ranked-results/v1"`), never by generated case
+  name (defensive names like `lps_hyphen_distance_hyphen_v1` are an
+  implementation detail).
+- Members keep snake_case: `schema_version`, `sheet_id`, `capture_profile`,
+  `scoring_algorithm_version`, `manifest_url`, `capture_id`,
+  `measurement_count`, `pair_score_count`, `judgment_count`, `sheets`,
+  `measurements`, `pair_scores`, `judgments`, `patch_id`, `linear_rgb_median`,
+  `normalized_linear_rgb_median`, `pair_id`, `algorithm_version`,
+  `similarity`, `distance`, `device_model`, `lens`,
+  `exposure_duration_seconds`, `iso`, `focus_lens_position`,
+  `white_balance_gains`, `image_width`, `image_height`, `app_version`,
+  `timestamp`, `detected_marker_count`, `blur_score`, `rejections`.
 
 ## Acceptance criteria mapping
 
 | Deliverable (issue #5) | Verification |
 | --- | --- |
-| Add `swift-openapi-generator` + `swift-openapi-runtime`; vendor the OpenAPI document | `VendoredOpenAPISpecTests` (artifact presence + coverage); `GeneratedAPIClientSentinelTests` red until `iOS/Package.swift` wires the packages/target |
-| Generate client for manifest, recent sheets, capture creation, measurement upload, judgment upload, ranked results | Six operation tests in `GeneratedAPIClientTests` (compiled in once the target exists) |
-| Replace hand-written API models with generated types; keep client-side models | `APIClientTests` (unchanged, must stay green through the rewire) + generated-type assertions in `GeneratedAPIClientTests`; `MeasurementCore` models are client-side and stay |
+| Add `swift-openapi-generator` + `swift-openapi-runtime`; vendor the OpenAPI document | `VendoredOpenAPISpecTests` (artifact presence + coverage); `OpenAPIPackageWiringTests` (manifest wiring); `GeneratedAPIClientSentinelTests` red until `iOS/Package.swift` wires the packages/target |
+| Generate client for manifest, recent sheets, capture creation, measurement upload, judgment upload, ranked results | Six operation tests in `GeneratedAPIClientTests` (compiled in once the target exists) + `GeneratedClientContractTests` |
+| Replace hand-written API models with generated types; keep client-side models | `APIClientTests` (unchanged, must stay green through the rewire) + `APIClientPublishedSpecContractTests` + generated-type assertions in `GeneratedAPIClientTests`; `MeasurementCore` models are client-side and stay |
 | Swift tests against local stubbed responses, no live server | `StubTransport` implements `ClientTransport`; no network in any test |
-| PR records contract deltas + endpoint gaps | Tables above; gap pins in `VendoredOpenAPISpecTests` keep them visible in CI |
+| PR records contract deltas + endpoint gaps | Tables above + `docs/color-matching-openapi-delta.md`; gap pins in `VendoredOpenAPISpecTests` keep them visible in CI |

@@ -1,8 +1,8 @@
 import Foundation
 import XCTest
 
-#if canImport(GeneratedAPIClient) && canImport(OpenAPIRuntime)
-import GeneratedAPIClient
+#if canImport(ColorMatchingOpenAPI) && canImport(OpenAPIRuntime)
+import ColorMatchingOpenAPI
 import OpenAPIRuntime
 
 final class GeneratedAPIClientTests: XCTestCase {
@@ -31,7 +31,7 @@ final class GeneratedAPIClientTests: XCTestCase {
             )
         }
 
-        let response = try await makeClient().getTestSheetManifest(.init(path: .init(sheetId: "AB12-CD34")))
+        let response = try await makeClient().getTestSheetManifest(.init(path: .init(sheet_id: "AB12-CD34")))
 
         let request = try recordedRequest()
         XCTAssertEqual(request.method, "GET")
@@ -47,9 +47,9 @@ final class GeneratedAPIClientTests: XCTestCase {
             XCTFail("Expected JSON body in .ok response")
             return
         }
-        XCTAssertEqual(manifest.schemaVersion, .lpsSheetManifestV1)
-        XCTAssertEqual(manifest.sheetId, "AB12-CD34")
-        XCTAssertEqual(manifest.captureProfile.scoringAlgorithmVersion, .lpsDistanceV1)
+        XCTAssertEqual(manifest.schema_version.rawValue, "lps-sheet-manifest/v1")
+        XCTAssertEqual(manifest.sheet_id, "AB12-CD34")
+        XCTAssertEqual(manifest.capture_profile.scoring_algorithm_version.rawValue, "lps-distance-v1")
     }
 
     func testGetTestSheetManifestSurfacesNotFoundAsTypedResponse() async throws {
@@ -60,7 +60,7 @@ final class GeneratedAPIClientTests: XCTestCase {
             )
         }
 
-        let response = try await makeClient().getTestSheetManifest(.init(path: .init(sheetId: "UNKNOWN-1")))
+        let response = try await makeClient().getTestSheetManifest(.init(path: .init(sheet_id: "UNKNOWN-1")))
 
         guard case .notFound = response else {
             XCTFail("Expected .notFound, got \(response)")
@@ -69,7 +69,7 @@ final class GeneratedAPIClientTests: XCTestCase {
         XCTAssertEqual(try recordedRequest().path, "/api/v1/test_sheets/UNKNOWN-1/manifest")
     }
 
-    func testListRecentTestSheetsDecodesSheetsAndOptionalTitle() async throws {
+    func testListRecentSheetsDecodesSheetsAndOptionalTitle() async throws {
         transport = StubTransport { _ in
             StubbedResponse(
                 status: .ok,
@@ -79,12 +79,12 @@ final class GeneratedAPIClientTests: XCTestCase {
             )
         }
 
-        let response = try await makeClient().listRecentTestSheets(.init())
+        let response = try await makeClient().listRecentSheets(.init())
 
         let request = try recordedRequest()
         XCTAssertEqual(request.method, "GET")
         XCTAssertEqual(request.path, "/api/v1/test_sheets/recent")
-        XCTAssertEqual(request.operationID, "listRecentTestSheets")
+        XCTAssertEqual(request.operationID, "listRecentSheets")
 
         guard case .ok(let ok) = response else {
             XCTFail("Expected .ok, got \(response)")
@@ -95,11 +95,11 @@ final class GeneratedAPIClientTests: XCTestCase {
             return
         }
         XCTAssertEqual(payload.sheets.count, 2)
-        XCTAssertEqual(payload.sheets.first?.sheetId, "AB12-CD34")
+        XCTAssertEqual(payload.sheets.first?.sheet_id, "AB12-CD34")
         XCTAssertNil(payload.sheets.first?.title)
         XCTAssertEqual(payload.sheets.last?.title, "July LPS comparison sheet")
         XCTAssertEqual(
-            payload.sheets.last?.manifestUrl,
+            payload.sheets.last?.manifest_url,
             "/api/v1/test_sheets/EF56-GH78/manifest"
         )
     }
@@ -113,24 +113,24 @@ final class GeneratedAPIClientTests: XCTestCase {
         }
 
         let metadata = Components.Schemas.CaptureMetadata(
-            deviceModel: "iPhone16,2",
+            device_model: "iPhone16,2",
             lens: "built_in_wide_angle",
-            exposureDurationSeconds: 0.016,
+            exposure_duration_seconds: 0.016,
             iso: 100,
-            focusLensPosition: 0.42,
-            whiteBalanceGains: try .init(unvalidatedValue: ["red": 1.2, "green": 1.0, "blue": 1.4]),
-            imageWidth: 4032,
-            imageHeight: 3024,
-            appVersion: "0.1.0",
+            focus_lens_position: 0.42,
+            white_balance_gains: try .init(unvalidatedValue: ["red": 1.2, "green": 1.0, "blue": 1.4]),
+            image_width: 4032,
+            image_height: 3024,
+            app_version: "0.1.0",
             timestamp: Date(timeIntervalSince1970: 1_784_000_000)
         )
         let requestBody = Components.Schemas.CaptureRequest(
             metadata: metadata,
-            quality: .init(detectedMarkerCount: 4, blurScore: 0.82, rejections: [])
+            quality: .init(detected_marker_count: 4, blur_score: 0.82, rejections: [])
         )
 
         let response = try await makeClient().createCapture(
-            .init(path: .init(sheetId: "AB12-CD34"), body: .json(requestBody))
+            .init(path: .init(sheet_id: "AB12-CD34"), body: .json(requestBody))
         )
 
         let request = try recordedRequest()
@@ -161,7 +161,7 @@ final class GeneratedAPIClientTests: XCTestCase {
             XCTFail("Expected JSON body in .created response")
             return
         }
-        XCTAssertEqual(payload.captureId, "4101")
+        XCTAssertEqual(payload.capture_id, "4101")
     }
 
     func testUploadMeasurementsEncodesRgbObjectsAndPairScores() async throws {
@@ -176,15 +176,15 @@ final class GeneratedAPIClientTests: XCTestCase {
         let requestBody = Components.Schemas.MeasurementUploadRequest(
             measurements: [
                 .init(
-                    patchId: "pair_1#first",
-                    linearRgbMedian: rgb,
-                    normalizedLinearRgbMedian: rgb
+                    patch_id: "pair_1#first",
+                    linear_rgb_median: rgb,
+                    normalized_linear_rgb_median: rgb
                 )
             ],
-            pairScores: [
+            pair_scores: [
                 .init(
-                    pairId: "pair_1",
-                    algorithmVersion: "lps-distance-v1",
+                    pair_id: "pair_1",
+                    algorithm_version: "lps-distance-v1",
                     score: nil,
                     similarity: 0.965,
                     distance: 0.035
@@ -193,7 +193,7 @@ final class GeneratedAPIClientTests: XCTestCase {
         )
 
         let response = try await makeClient().uploadMeasurements(
-            .init(path: .init(captureId: "4101"), body: .json(requestBody))
+            .init(path: .init(capture_id: "4101"), body: .json(requestBody))
         )
 
         let request = try recordedRequest()
@@ -226,9 +226,9 @@ final class GeneratedAPIClientTests: XCTestCase {
             XCTFail("Expected JSON body in .ok response")
             return
         }
-        XCTAssertEqual(payload.captureId, "4101")
-        XCTAssertEqual(payload.measurementCount, 1)
-        XCTAssertEqual(payload.pairScoreCount, 1)
+        XCTAssertEqual(payload.capture_id, "4101")
+        XCTAssertEqual(payload.measurement_count, 1)
+        XCTAssertEqual(payload.pair_score_count, 1)
     }
 
     func testUploadJudgmentsEncodesJudgmentRows() async throws {
@@ -240,11 +240,11 @@ final class GeneratedAPIClientTests: XCTestCase {
         }
 
         let requestBody = Components.Schemas.JudgmentUploadRequest(
-            judgments: [.init(pairId: "pair_1", judgment: "near_match")]
+            judgments: [.init(pair_id: "pair_1", judgment: "near_match")]
         )
 
         let response = try await makeClient().uploadJudgments(
-            .init(path: .init(captureId: "4101"), body: .json(requestBody))
+            .init(path: .init(capture_id: "4101"), body: .json(requestBody))
         )
 
         let request = try recordedRequest()
@@ -265,8 +265,8 @@ final class GeneratedAPIClientTests: XCTestCase {
             XCTFail("Expected JSON body in .ok response")
             return
         }
-        XCTAssertEqual(payload.captureId, "4101")
-        XCTAssertEqual(payload.judgmentCount, 1)
+        XCTAssertEqual(payload.capture_id, "4101")
+        XCTAssertEqual(payload.judgment_count, 1)
     }
 
     func testGetRankedResultsDecodesSchemaVersionEnvelope() async throws {
@@ -277,7 +277,7 @@ final class GeneratedAPIClientTests: XCTestCase {
             )
         }
 
-        let response = try await makeClient().getRankedResults(.init(path: .init(sheetId: "AB12-CD34")))
+        let response = try await makeClient().getRankedResults(.init(path: .init(sheet_id: "AB12-CD34")))
 
         let request = try recordedRequest()
         XCTAssertEqual(request.method, "GET")
@@ -292,8 +292,8 @@ final class GeneratedAPIClientTests: XCTestCase {
             XCTFail("Expected JSON body in .ok response")
             return
         }
-        XCTAssertEqual(payload.schemaVersion, .lpsRankedResultsV1)
-        XCTAssertEqual(payload.sheetId, "AB12-CD34")
+        XCTAssertEqual(payload.schema_version.rawValue, "lps-ranked-results/v1")
+        XCTAssertEqual(payload.sheet_id, "AB12-CD34")
     }
 
     func testBearerAuthMiddlewareInjectsAuthorizationHeader() async throws {
@@ -305,15 +305,15 @@ final class GeneratedAPIClientTests: XCTestCase {
         }
 
         let authorized = makeClient(
-            middlewares: [GeneratedAPIClient.BearerAuthMiddleware(token: "secret-token")]
+            middlewares: [ColorMatchingOpenAPI.BearerAuthMiddleware(token: "secret-token")]
         )
-        _ = try await authorized.listRecentTestSheets(.init())
+        _ = try await authorized.listRecentSheets(.init())
         XCTAssertEqual(try recordedRequest().authorization, "Bearer secret-token")
 
         transport = StubTransport { _ in
             StubbedResponse(status: .ok, json: Data(#"{"sheets":[]}"#.utf8))
         }
-        _ = try await makeClient().listRecentTestSheets(.init())
+        _ = try await makeClient().listRecentSheets(.init())
         XCTAssertNil(try recordedRequest().authorization)
     }
 
@@ -395,7 +395,7 @@ private final class StubTransport: ClientTransport, @unchecked Sendable {
 final class GeneratedAPIClientSentinelTests: XCTestCase {
     func testGeneratedOpenAIClientTargetIsWiredIntoPackage() {
         XCTFail(
-            "GeneratedAPIClient target (swift-openapi-generator + vendored openapi.json) is not wired into iOS/Package.swift yet, so generated-client tests are compiled out. See docs/openapi-generated-client.md for the expected wiring and generated identifiers."
+            "ColorMatchingOpenAPI target (swift-openapi-generator + vendored openapi.json) is not wired into iOS/Package.swift yet, so generated-client tests are compiled out. See docs/openapi-generated-client.md for the expected wiring and generated identifiers."
         )
     }
 }
