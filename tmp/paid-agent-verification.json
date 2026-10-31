@@ -1,0 +1,125 @@
+{
+  "status": "failed",
+  "summary": "Tests-only red-phase run for issue #5 (generated OpenAPI Swift client). Wrote the full stubbed-response test suite for the six API surfaces plus the contract-delta record. Red by design: the generated ColorMatchingOpenAPI module does not exist yet, so the new suites cannot compile until the implementation run lands; additionally, no Swift toolchain exists in this container, so swift test cannot execute here (CI on macos-latest is the executor of record). Exit criterion 'swift test --disable-sandbox green with generated types' is therefore not met at this head and is expected to be satisfied by the follow-up implementation run after paid-tests-approved.",
+  "acceptance_criteria": [
+    {
+      "id": "AC-1",
+      "description": "Add swift-openapi-generator + swift-openapi-runtime to the iOS package; fetch or vendor the OpenAPI document from viamin/color_matching#110",
+      "status": "not_run",
+      "reason": "Implementation-phase work (Package.swift and iOS/Sources are outside the test-writing allowlist). Dependency verified available: upstream #110 is closed/merged, spec served at GET /api/v1/openapi.json; vendoring plan recorded in docs/generated-openapi-client-migration.md. The new tests' compile failure against the missing ColorMatchingOpenAPI module is the automated red signal.",
+      "verification": {
+        "kind": "human_or_external_evidence",
+        "references": [
+          {
+            "locator": "docs/generated-openapi-client-migration.md#target-architecture-for-the-implementation-run",
+            "result": "plan recorded"
+          },
+          {
+            "locator": "https://github.com/viamin/color_matching/issues/110",
+            "result": "closed (spec merged)"
+          }
+        ]
+      }
+    },
+    {
+      "id": "AC-2",
+      "description": "Generate the client for the surfaces the app uses today: test-sheet manifest + recent sheets, capture session creation, measurement upload, judgment upload, ranked results",
+      "status": "not_run",
+      "reason": "Tests written and inspectable, but cannot execute: generated module absent (red phase) and no Swift toolchain in this container. Each of the six operations has a dedicated stubbed-transport test pinning route, method, operationId, wire body, and typed decoding.",
+      "verification": {
+        "kind": "unit_or_service_test",
+        "references": [
+          {
+            "locator": "iOS/Tests/ColorMatchingLPSAppTests/GeneratedClientContractTests.swift:15",
+            "result": "not_run (module missing; red)"
+          },
+          {
+            "locator": "iOS/Tests/ColorMatchingLPSAppTests/GeneratedClientContractTests.swift:33",
+            "result": "not_run (module missing; red)"
+          },
+          {
+            "locator": "iOS/Tests/ColorMatchingLPSAppTests/GeneratedClientContractTests.swift:51",
+            "result": "not_run (module missing; red)"
+          },
+          {
+            "locator": "iOS/Tests/ColorMatchingLPSAppTests/GeneratedClientContractTests.swift:80",
+            "result": "not_run (module missing; red)"
+          },
+          {
+            "locator": "iOS/Tests/ColorMatchingLPSAppTests/GeneratedClientContractTests.swift:128",
+            "result": "not_run (module missing; red)"
+          },
+          {
+            "locator": "iOS/Tests/ColorMatchingLPSAppTests/GeneratedClientContractTests.swift:149",
+            "result": "not_run (module missing; red)"
+          }
+        ]
+      }
+    },
+    {
+      "id": "AC-3",
+      "description": "Replace the app's hand-written API models with generated types; keep purely client-side models as-is",
+      "status": "not_run",
+      "reason": "APIClientTests.swift rewritten to drive the post-migration facade returning generated types (old hand-written-model tests replaced with justification in the migration doc); MeasurementCoreTests left untouched as the kept-client-side-models guard. Cannot execute: module missing (red phase), no Swift toolchain here.",
+      "verification": {
+        "kind": "unit_or_service_test",
+        "references": [
+          {
+            "locator": "iOS/Tests/ColorMatchingLPSAppTests/APIClientTests.swift:27",
+            "result": "not_run (module missing; red)"
+          },
+          {
+            "locator": "iOS/Tests/ColorMatchingLPSAppTests/APIClientTests.swift:53",
+            "result": "not_run (module missing; red)"
+          },
+          {
+            "locator": "iOS/Tests/ColorMatchingLPSAppTests/APIClientTests.swift:73",
+            "result": "not_run (module missing; red)"
+          },
+          {
+            "locator": "iOS/Tests/MeasurementCoreTests/MeasurementCoreTests.swift",
+            "result": "untouched; must remain green in CI"
+          }
+        ]
+      }
+    },
+    {
+      "id": "AC-4",
+      "description": "Swift tests exercising the generated client against local stubbed responses (no live server in CI)",
+      "status": "not_run",
+      "reason": "All 16 new tests stub at the in-memory RecordingTransport (OpenAPIRuntime ClientTransport) or StubURLProtocol (URLProtocol) layers; zero network access required. Written, not executable in this container (no Swift toolchain; generated module pending).",
+      "verification": {
+        "kind": "permanent_system_test",
+        "references": [
+          {
+            "locator": "iOS/Tests/ColorMatchingLPSAppTests/GeneratedClientTestSupport.swift:162",
+            "result": "RecordingTransport stub (no server)"
+          },
+          {
+            "locator": "iOS/Tests/ColorMatchingLPSAppTests/GeneratedClientTestSupport.swift:214",
+            "result": "StubURLProtocol stub (no server)"
+          }
+        ]
+      }
+    },
+    {
+      "id": "AC-5",
+      "description": "PR description records what changed between the prose contract and the published spec, and any endpoint gaps discovered",
+      "status": "skipped",
+      "reason": "The PR body is published by Paid after this tests-only run, so the description itself does not exist yet; the full delta analysis (16 contract deltas, endpoint gaps incl. under-declared manifest/ranked-results responses) is recorded and ready to copy from the migration doc.",
+      "verification": {
+        "kind": "human_or_external_evidence",
+        "references": [
+          {
+            "locator": "docs/generated-openapi-client-migration.md#contract-deltas-prose-contract-vs-published-spec",
+            "result": "16 deltas recorded"
+          },
+          {
+            "locator": "docs/generated-openapi-client-migration.md#endpoint-gaps",
+            "result": "gaps recorded"
+          }
+        ]
+      }
+    }
+  ]
+}
