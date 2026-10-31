@@ -1,0 +1,69 @@
+{
+  "status": "passed",
+  "summary": "Test-writing run only. Researched the real published OpenAPI spec (viamin/color_matching PR #113, closing #110) against docs/color-matching-api-contract.md, recorded concrete deltas in docs/color-matching-api-contract-deltas.md, and added two red-phase Swift tests pinning the two deltas that are expressible without touching implementation files. Full generated-client wiring (Package.swift deps, vendored spec, generated types, model replacement) is implementation work out of scope for this test-only phase and is not yet done.",
+  "acceptance_criteria": [
+    {
+      "id": "AC-swift-openapi-dependency",
+      "status": "not_run",
+      "verification": {
+        "kind": "human_or_external_evidence",
+        "references": []
+      },
+      "note": "Adding swift-openapi-generator/runtime to Package.swift and vendoring the OpenAPI document is an implementation-file change, blocked by the test-writing-phase TDD boundary in this run. Pending the implementation run after paid-tests-approved."
+    },
+    {
+      "id": "AC-generate-client-for-used-surfaces",
+      "status": "not_run",
+      "verification": {
+        "kind": "human_or_external_evidence",
+        "references": []
+      },
+      "note": "Blocked on the same dependency/codegen wiring as AC-swift-openapi-dependency. docs/color-matching-api-contract-deltas.md records that the ranked-results surface currently has no client implementation at all (delta #3), which the implementation run needs to add."
+    },
+    {
+      "id": "AC-replace-hand-written-models",
+      "status": "not_run",
+      "verification": {
+        "kind": "human_or_external_evidence",
+        "references": []
+      },
+      "note": "Model replacement is implementation work; not permitted in this test-writing run."
+    },
+    {
+      "id": "AC-tests-against-stubbed-responses",
+      "status": "failed",
+      "verification": {
+        "kind": "unit_or_service_test",
+        "references": [
+          {
+            "locator": "iOS/Tests/ColorMatchingLPSAppTests/ManifestContractDeltaTests.swift:25 (testManifestRetainsCaptureProfileScoringAlgorithmVersion)",
+            "result": "failed"
+          },
+          {
+            "locator": "iOS/Tests/ColorMatchingLPSAppTests/ManifestContractDeltaTests.swift:34 (testManifestRetainsPrinterProfile)",
+            "result": "failed"
+          },
+          {
+            "locator": "iOS/Tests/ColorMatchingLPSAppTests/MeasurementUploadContractDeltaTests.swift:28 (testUploadMeasurementsBodyMatchesPublishedSchemaKeys)",
+            "result": "failed"
+          }
+        ]
+      },
+      "note": "Red-phase tests exercising stubbed/local responses against the current hand-written client, pinned to the real published API shape (not the prose doc). They fail today because SheetManifest drops capture_profile/printer_profile and the client's measurement-upload body includes a key the published schema doesn't declare -- exactly the drift issue #5 wants a generated client to catch at compile time instead. Could not run `swift test` in this environment (no Swift toolchain available in this Linux container); failures are derived from careful manual trace of SheetManifest's Codable implementation (Sources/MeasurementCore/Models.swift) and APIClient.uploadMeasurements (Sources/ColorMatchingLPSAppCore/APIClient.swift) against the fixtures in each test file. This is reported explicitly rather than inferred as a pass."
+    },
+    {
+      "id": "AC-pr-description-records-contract-deltas",
+      "status": "passed",
+      "verification": {
+        "kind": "unit_or_service_test",
+        "references": [
+          {
+            "locator": "docs/color-matching-api-contract-deltas.md",
+            "result": "passed"
+          }
+        ]
+      },
+      "note": "Deltas were derived from the actual merged viamin/color_matching PR #113 source (api_schemas.ex, api_spec.ex, router.ex, test_sheet_controller.ex, capture_controller.ex, test_sheet_json.ex at commit 05062f5381a6f76413cc2bdf1cb2cc08a1b70ff7), fetched live via GitHub's public API/raw content -- not guessed. Eight concrete deltas recorded, two of them pinned by the Swift tests above."
+    }
+  ]
+}
