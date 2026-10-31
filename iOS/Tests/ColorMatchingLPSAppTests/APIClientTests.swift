@@ -9,6 +9,61 @@ final class APIClientTests: XCTestCase {
         super.tearDown()
     }
 
+    func testFetchManifestDecodesLocalStubResponse() async throws {
+        var capturedRequest: URLRequest?
+        MockURLProtocol.handler = { request in
+            capturedRequest = request
+            return (try Self.response(for: request), Data(Self.manifestJSON.utf8))
+        }
+
+        let manifest = try await client().fetchManifest(
+            baseURL: URL(string: "https://example.test")!,
+            sheetCode: "sheet_1"
+        )
+
+        XCTAssertEqual(capturedRequest?.httpMethod, "GET")
+        XCTAssertEqual(capturedRequest?.url?.path, "/api/v1/test_sheets/sheet_1/manifest")
+        XCTAssertEqual(capturedRequest?.value(forHTTPHeaderField: "Authorization"), "Bearer token")
+        XCTAssertEqual(manifest.sheetID, "sheet_1")
+        XCTAssertEqual(manifest.patches.map(\.id), ["patch_1", "patch_2"])
+    }
+
+    func testFetchRecentSheetsDecodesLocalStubResponse() async throws {
+        var capturedRequest: URLRequest?
+        MockURLProtocol.handler = { request in
+            capturedRequest = request
+            let body = #"{"sheets":[{"sheet_id":"sheet_1","manifest_url":"https://example.test/api/v1/test_sheets/sheet_1/manifest","title":null}]}"#
+            return (try Self.response(for: request), Data(body.utf8))
+        }
+
+        let sheets = try await client().fetchRecentSheets(baseURL: URL(string: "https://example.test")!)
+
+        XCTAssertEqual(capturedRequest?.httpMethod, "GET")
+        XCTAssertEqual(capturedRequest?.url?.path, "/api/v1/test_sheets/recent")
+        XCTAssertEqual(sheets.map(\.sheetID), ["sheet_1"])
+        XCTAssertNil(sheets.first?.title)
+    }
+
+    func testPackageConfiguresOpenAPIGeneratorAndRuntime() throws {
+        let package = try String(contentsOf: sourceRoot.appending(path: "Package.swift"))
+
+        XCTAssertTrue(package.contains("swift-openapi-generator"))
+        XCTAssertTrue(package.contains("swift-openapi-runtime"))
+    }
+
+    func testVendoredOpenAPISpecIncludesEveryCompanionEndpoint() throws {
+        let data = try Data(contentsOf: sourceRoot.appending(path: "OpenAPI/openapi.json"))
+        let document = try XCTUnwrap(JSONSerialization.jsonObject(with: data) as? [String: Any])
+        let paths = try XCTUnwrap(document["paths"] as? [String: Any])
+
+        XCTAssertNotNil(paths["/api/v1/test_sheets/{sheet_id}/manifest"])
+        XCTAssertNotNil(paths["/api/v1/test_sheets/recent"])
+        XCTAssertNotNil(paths["/api/v1/test_sheets/{sheet_id}/captures"])
+        XCTAssertNotNil(paths["/api/v1/captures/{capture_id}/measurements"])
+        XCTAssertNotNil(paths["/api/v1/captures/{capture_id}/judgments"])
+        XCTAssertNotNil(paths["/api/v1/test_sheets/{sheet_id}/ranked_results"])
+    }
+
     func testCreateCaptureEncodesMetadataAndQuality() async throws {
         var capturedRequest: URLRequest?
         var capturedBody: Data?
@@ -101,6 +156,39 @@ final class APIClientTests: XCTestCase {
     private static func jsonObject(from data: Data?) throws -> Any {
         try JSONSerialization.jsonObject(with: XCTUnwrap(data))
     }
+
+    private static func response(for request: URLRequest, statusCode: Int = 200) throws -> HTTPURLResponse {
+        try XCTUnwrap(
+            HTTPURLResponse(
+                url: try XCTUnwrap(request.url),
+                statusCode: statusCode,
+                httpVersion: nil,
+                headerFields: nil
+            )
+        )
+    }
+
+    private var sourceRoot: URL {
+        URL(fileURLWithPath: #filePath)
+            .deletingLastPathComponent()
+            .deletingLastPathComponent()
+    }
+
+    private static let manifestJSON = #"""
+    {
+      "schema_version": "lps-sheet-manifest/v1",
+      "sheet_version": "lps-letter-grid-v1",
+      "sheet_id": "sheet_1",
+      "manifest_url": "https://example.test/api/v1/test_sheets/sheet_1/manifest",
+      "page": {"units": "mm", "width": 215.9, "height": 279.4},
+      "registration_markers": [{"role": "top_left", "shape": "solid_square", "rect": {"x": 12, "y": 12, "width": 8, "height": 8}}],
+      "patches": [
+        {"id": "patch_1", "role": "pair_color", "pair_id": "pair_1", "pair_side": "first", "reference_role": null, "source_color": "#FF0000", "safe_inset_mm": 1.5, "rect": {"x": 16, "y": 38, "width": 16, "height": 10}},
+        {"id": "patch_2", "role": "pair_color", "pair_id": "pair_1", "pair_side": "second", "reference_role": null, "source_color": "#00FF00", "safe_inset_mm": 1.5, "rect": {"x": 32, "y": 38, "width": 16, "height": 10}}
+      ],
+      "pairs": [{"id": "pair_1", "first_patch_id": "patch_1", "second_patch_id": "patch_2", "source_colors": ["#FF0000", "#00FF00"], "grid_row": 0, "grid_col": 1}]
+    }
+    """#
 
     private static func readBody(_ stream: InputStream) -> Data {
         stream.open()
