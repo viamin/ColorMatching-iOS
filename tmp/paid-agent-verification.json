@@ -1,0 +1,94 @@
+{
+  "status": "failed",
+  "summary": "Tests-only red-phase run for issue #5 (replace hand-written API layer with a generated OpenAPI Swift client). The permanent tests and the PR-description evidence docs are committed; every implementation-dependent acceptance criterion is intentionally unsatisfied at this head, so its criterion status is 'failed' with the red test as the named, inspectable evidence. Infrastructure note: this container has NO Swift toolchain (no swift/xcrun on PATH), so swift test could not be executed here at all; the red state is provable by inspection (the vendored document and generated module the tests depend on do not exist in the tree) and the assertion logic was validated against the reconstructed upstream spec via a Python mirror (all checks passed). Implementation lands in the follow-up run gated on paid-tests-approved.",
+  "acceptance_criteria": [
+    {
+      "id": "AC-1",
+      "description": "Add swift-openapi-generator + swift-openapi-runtime to the iOS package; fetch or vendor the OpenAPI document from viamin/color_matching#110",
+      "status": "failed",
+      "verification": {
+        "kind": "unit_or_service_test",
+        "references": [
+          { "locator": "iOS/Tests/ColorMatchingLPSAppTests/OpenAPISpecCoverageTests.swift:26", "result": "red_by_construction", "note": "testVendoredOpenAPIDocumentExistsAndDescribesTheAPI fails until the document is vendored at iOS/Sources/ColorMatchingOpenAPI/openapi.json; all 11 tests in this class fail today for the same reason" },
+          { "locator": "iOS/Tests/ColorMatchingLPSAppTests/GeneratedClientStubTests.swift:411", "result": "red_by_construction", "note": "#else-branch marker test fails until the generated module is wired into the package" },
+          { "locator": "docs/openapi-vendoring-source.json", "result": "reference_artifact", "note": "reconstruction of ColorMatchingWeb.ApiSpec.spec() from upstream HEAD (no public deployment to fetch from); validated 14 paths / 26 schemas" },
+          { "locator": "docs/openapi-generated-client-plan.md", "result": "plan", "note": "naming contract (module ColorMatchingOpenAPI, vendored path, verbatim operationIds) the tests and implementation share" }
+        ]
+      }
+    },
+    {
+      "id": "AC-2",
+      "description": "Generate the client for the surfaces the app uses today: manifest, recent sheets, capture creation, measurement upload, judgment upload, ranked results",
+      "status": "failed",
+      "verification": {
+        "kind": "unit_or_service_test",
+        "references": [
+          { "locator": "iOS/Tests/ColorMatchingLPSAppTests/OpenAPISpecCoverageTests.swift:43", "result": "red_by_construction", "note": "testSpecCoversTheSixSurfacesTheAppUses pins path+method+operationId+status+response schema for all six surfaces" },
+          { "locator": "iOS/Tests/ColorMatchingLPSAppTests/OpenAPISpecCoverageTests.swift:72", "result": "red_by_construction", "note": "path parameters (sheet_id, capture_id) documented as required strings" },
+          { "locator": "iOS/Tests/ColorMatchingLPSAppTests/GeneratedClientStubTests.swift:25", "result": "not_run", "note": "six canImport-guarded stub tests (one per surface) activate when the generated module exists; derived method names documented in the plan" }
+        ]
+      }
+    },
+    {
+      "id": "AC-3",
+      "description": "Replace the app's hand-written API models with generated types; keep purely client-side models as-is",
+      "status": "failed",
+      "verification": {
+        "kind": "human_or_external_evidence",
+        "references": [
+          { "locator": "iOS/Sources/ColorMatchingLPSAppCore/APIClient.swift", "result": "unchanged", "note": "test-only phase: no implementation files may change; replacement happens in the implementation run" },
+          { "locator": "iOS/Tests/ColorMatchingLPSAppTests/APIClientTests.swift", "result": "unchanged", "note": "existing facade tests kept as the behavioral regression net for the swap" },
+          { "locator": "docs/openapi-generated-client-plan.md", "result": "plan", "note": "known-risk section records the thin-manifest-schema blocker (D8) that gates full model replacement" }
+        ]
+      }
+    },
+    {
+      "id": "AC-4",
+      "description": "Swift tests exercising the generated client against local stubbed responses (no live server in CI)",
+      "status": "failed",
+      "verification": {
+        "kind": "permanent_system_test",
+        "references": [
+          { "locator": "iOS/Tests/ColorMatchingLPSAppTests/GeneratedClientStubTests.swift:330", "result": "committed_red", "note": "in-process StubTransport implements swift-openapi-runtime ClientTransport (no URLSession, no network); signature verified against runtime 1.13.3 sources" },
+          { "locator": "iOS/Tests/ColorMatchingLPSAppTests/GeneratedClientStubTests.swift:149", "result": "committed_red", "note": "upload tests assert the wire-format deltas (per-score algorithm_version, no top-level key, no stats block, counting response bodies)" },
+          { "locator": "iOS/Tests/ColorMatchingLPSAppTests/GeneratedClientStubTests.swift:276", "result": "committed_red", "note": "bearer-token flow preserved through a ClientMiddleware" }
+        ]
+      }
+    },
+    {
+      "id": "AC-5",
+      "description": "PR description records what changed between the prose contract and the published spec, plus endpoint gaps",
+      "status": "passed",
+      "verification": {
+        "kind": "human_or_external_evidence",
+        "references": [
+          { "locator": "docs/contract-deltas-prose-vs-openapi.md", "result": "passed", "note": "13 numbered deltas (D1-D13) + endpoint gaps (5 unused /api/v1 surfaces, 3 previously-undocumented endpoints, undeclared-but-rendered fields), each traced to the upstream spec sources; written to be cited verbatim by the PR description" }
+        ]
+      }
+    },
+    {
+      "id": "EXIT-1",
+      "description": "swift test --disable-sandbox green with generated types wired in",
+      "status": "failed",
+      "verification": {
+        "kind": "unit_or_service_test",
+        "references": [
+          { "locator": "iOS/Tests/ColorMatchingLPSAppTests/OpenAPISpecCoverageTests.swift", "result": "not_run", "note": "cannot execute: no Swift toolchain in this container (swift not found); also intentionally red until implementation lands" },
+          { "locator": "iOS/Tests/ColorMatchingLPSAppTests/GeneratedClientStubTests.swift:412", "result": "not_run", "note": "red marker test documents the missing generated module; exit criterion is scoped to the implementation run" }
+        ]
+      }
+    },
+    {
+      "id": "EXIT-2",
+      "description": "PR description captures contract deltas between docs/color-matching-api-contract.md and the real API",
+      "status": "passed",
+      "verification": {
+        "kind": "human_or_external_evidence",
+        "references": [
+          { "locator": "docs/contract-deltas-prose-vs-openapi.md", "result": "passed" },
+          { "locator": "docs/openapi-vendoring-source.json", "result": "passed", "note": "spec snapshot the deltas were diffed against" }
+        ]
+      }
+    }
+  ]
+}
