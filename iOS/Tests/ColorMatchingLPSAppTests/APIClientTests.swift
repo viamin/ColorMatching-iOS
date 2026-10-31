@@ -46,11 +46,50 @@ final class APIClientTests: XCTestCase {
         XCTAssertEqual(quality["rejections"] as? [String], [])
     }
 
+    func testFetchManifestAndRecentSheetsDecodePublishedResponses() async throws {
+        var requestedPaths: [String] = []
+        MockURLProtocol.handler = { request in
+            requestedPaths.append(request.url!.path)
+            let body: String
+            switch request.url!.path {
+            case "/api/v1/test_sheets/sheet_1/manifest":
+                body = #"""
+                {
+                  "schema_version":"lps-sheet-manifest/v1",
+                  "sheet_version":"lps-letter-grid-v1",
+                  "sheet_id":"sheet_1",
+                  "manifest_url":"https://example.test/api/v1/test_sheets/sheet_1/manifest",
+                  "page":{"units":"mm","width":215.9,"height":279.4},
+                  "registration_markers":[],
+                  "patches":[],
+                  "pairs":[]
+                }
+                """#
+            case "/api/v1/test_sheets/recent":
+                body = #"{"sheets":[{"sheet_id":"sheet_1","manifest_url":"https://example.test/api/v1/test_sheets/sheet_1/manifest","title":null}]}"#
+            default:
+                XCTFail("Unexpected request path: \(request.url!.path)")
+                body = "{}"
+            }
+
+            return (HTTPURLResponse(url: request.url!, statusCode: 200, httpVersion: nil, headerFields: nil)!, Data(body.utf8))
+        }
+
+        let baseURL = URL(string: "https://example.test")!
+        let manifest = try await client().fetchManifest(baseURL: baseURL, sheetCode: "sheet_1")
+        let sheets = try await client().fetchRecentSheets(baseURL: baseURL)
+
+        XCTAssertEqual(manifest.sheetID, "sheet_1")
+        XCTAssertEqual(sheets.map(\.sheetID), ["sheet_1"])
+        XCTAssertNil(sheets.first?.title)
+        XCTAssertEqual(requestedPaths, ["/api/v1/test_sheets/sheet_1/manifest", "/api/v1/test_sheets/recent"])
+    }
+
     func testUploadMeasurementsEncodesScoresWithAlgorithmVersion() async throws {
         var capturedBody: Data?
         MockURLProtocol.handler = { request in
             capturedBody = request.httpBodyStream.flatMap(Self.readBody) ?? request.httpBody
-            return (HTTPURLResponse(url: request.url!, statusCode: 204, httpVersion: nil, headerFields: nil)!, Data())
+            return (HTTPURLResponse(url: request.url!, statusCode: 200, httpVersion: nil, headerFields: nil)!, Data(#"{"capture_id":"cap_1","measurement_count":1,"pair_score_count":1}"#.utf8))
         }
 
         let rgb = RGB(r: 0.2, g: 0.3, b: 0.4)
@@ -77,7 +116,7 @@ final class APIClientTests: XCTestCase {
         MockURLProtocol.handler = { request in
             capturedRequest = request
             capturedBody = request.httpBodyStream.flatMap(Self.readBody) ?? request.httpBody
-            return (HTTPURLResponse(url: request.url!, statusCode: 204, httpVersion: nil, headerFields: nil)!, Data())
+            return (HTTPURLResponse(url: request.url!, statusCode: 200, httpVersion: nil, headerFields: nil)!, Data(#"{"capture_id":"cap_1","judgment_count":1}"#.utf8))
         }
 
         try await client().uploadJudgments(
