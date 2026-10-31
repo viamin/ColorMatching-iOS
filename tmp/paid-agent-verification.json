@@ -1,0 +1,58 @@
+{
+  "status": "not_run",
+  "summary": "Tests were written for the generated-client migration, but this container has no Swift toolchain (swift executable not found).",
+  "acceptance_criteria": [
+    {
+      "id": "AC-1",
+      "status": "not_run",
+      "verification": {
+        "kind": "unit_or_service_test",
+        "references": [
+          {
+            "locator": "iOS/Tests/ColorMatchingLPSAppTests/GeneratedOpenAPIClientAcceptanceTests.swift:5",
+            "result": "not_run: Swift toolchain unavailable"
+          }
+        ]
+      }
+    },
+    {
+      "id": "AC-2",
+      "status": "not_run",
+      "verification": {
+        "kind": "unit_or_service_test",
+        "references": [
+          {
+            "locator": "iOS/Tests/ColorMatchingLPSAppTests/GeneratedOpenAPIClientAcceptanceTests.swift:20",
+            "result": "not_run: endpoint-surface test is intentionally red until generated wiring is implemented"
+          }
+        ]
+      }
+    },
+    {
+      "id": "AC-3",
+      "status": "not_run",
+      "verification": {
+        "kind": "unit_or_service_test",
+        "references": [
+          {
+            "locator": "iOS/Tests/ColorMatchingLPSAppTests/APIClientTests.swift:49",
+            "result": "not_run: local MockURLProtocol stubs cover manifest and recent sheets; ranked-results stub remains pending implementation"
+          }
+        ]
+      }
+    },
+    {
+      "id": "AC-4",
+      "status": "not_run",
+      "verification": {
+        "kind": "human_or_external_evidence",
+        "references": [
+          {
+            "locator": "docs/issue-5-openapi-client-verification.md:14",
+            "result": "published-spec comparison is recorded for transfer to the implementation PR description; no PR was opened in this no-push run"
+          }
+        ]
+      }
+    }
+  ]
+}
