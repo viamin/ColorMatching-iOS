@@ -1,0 +1,88 @@
+{
+  "status": "not_run",
+  "summary": "Tests-only run for issue #5. Focused local-stub tests and a red package-dependency assertion were added; Swift is unavailable in this container, so the suite could not run.",
+  "acceptance_criteria": [
+    {
+      "id": "AC-1",
+      "status": "failed",
+      "verification": {
+        "kind": "unit_or_service_test",
+        "references": [
+          {
+            "locator": "iOS/Tests/ColorMatchingLPSAppTests/APIClientTests.swift:130",
+            "result": "red by static inspection: iOS/Package.swift does not yet declare swift-openapi-generator or swift-openapi-runtime"
+          }
+        ]
+      }
+    },
+    {
+      "id": "AC-2",
+      "status": "not_run",
+      "verification": {
+        "kind": "unit_or_service_test",
+        "references": [
+          {
+            "locator": "docs/issue-5-openapi-client-verification-plan.md",
+            "result": "ranked-results generated operation cannot be tested until provider schema and client generation are wired in"
+          }
+        ]
+      }
+    },
+    {
+      "id": "AC-3",
+      "status": "not_run",
+      "verification": {
+        "kind": "human_or_external_evidence",
+        "references": [
+          {
+            "locator": "docs/issue-5-openapi-client-verification-plan.md",
+            "result": "requires implementation review after replacement of hand-written API DTOs"
+          }
+        ]
+      }
+    },
+    {
+      "id": "AC-4",
+      "status": "not_run",
+      "verification": {
+        "kind": "unit_or_service_test",
+        "references": [
+          {
+            "locator": "iOS/Tests/ColorMatchingLPSAppTests/APIClientTests.swift:49",
+            "result": "local URLProtocol test added but not executed because swift is unavailable"
+          },
+          {
+            "locator": "iOS/Tests/ColorMatchingLPSAppTests/APIClientTests.swift:70",
+            "result": "local URLProtocol test added but not executed because swift is unavailable"
+          }
+        ]
+      }
+    },
+    {
+      "id": "AC-5",
+      "status": "not_run",
+      "verification": {
+        "kind": "unit_or_service_test",
+        "references": [
+          {
+            "locator": "iOS/Package.swift",
+            "result": "swift test --disable-sandbox could not start: swift executable is unavailable"
+          }
+        ]
+      }
+    },
+    {
+      "id": "AC-6",
+      "status": "passed",
+      "verification": {
+        "kind": "human_or_external_evidence",
+        "references": [
+          {
+            "locator": "docs/issue-5-openapi-client-verification-plan.md",
+            "result": "records provider OpenAPI/prose-contract deltas and schema-completeness gaps"
+          }
+        ]
+      }
+    }
+  ]
+}
