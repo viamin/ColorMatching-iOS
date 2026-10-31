@@ -1,0 +1,95 @@
+{
+  "status": "failed",
+  "summary": "Tests-only red phase: local-stub coverage was added for the currently untested read operations, while generated-client configuration, a vendored upstream OpenAPI document, and ranked-results support remain intentionally failing implementation requirements. Swift is unavailable in this container.",
+  "acceptance_criteria": [
+    {
+      "id": "AC-1",
+      "status": "failed",
+      "verification": {
+        "kind": "unit_or_service_test",
+        "references": [
+          {
+            "locator": "iOS/Tests/ColorMatchingLPSAppTests/OpenAPIClientGenerationTests.swift:13",
+            "result": "red: Package.swift has no swift-openapi-generator/swift-openapi-runtime dependency or generator plugin"
+          },
+          {
+            "locator": "iOS/Tests/ColorMatchingLPSAppTests/OpenAPIClientGenerationTests.swift:21",
+            "result": "red: no vendored OpenAPI 3 document exists"
+          }
+        ]
+      }
+    },
+    {
+      "id": "AC-2",
+      "status": "failed",
+      "verification": {
+        "kind": "unit_or_service_test",
+        "references": [
+          {
+            "locator": "iOS/Tests/ColorMatchingLPSAppTests/APIClientTests.swift:49",
+            "result": "local URLProtocol manifest stub added"
+          },
+          {
+            "locator": "iOS/Tests/ColorMatchingLPSAppTests/APIClientTests.swift:68",
+            "result": "local URLProtocol recent-sheets stub added"
+          },
+          {
+            "locator": "iOS/Tests/ColorMatchingLPSAppTests/APIClientTests.swift:12",
+            "result": "existing capture stub retained"
+          },
+          {
+            "locator": "iOS/Tests/ColorMatchingLPSAppTests/APIClientTests.swift:83",
+            "result": "existing measurement stub retained"
+          },
+          {
+            "locator": "iOS/Tests/ColorMatchingLPSAppTests/APIClientTests.swift:108",
+            "result": "existing judgment stub retained"
+          },
+          {
+            "locator": "iOS/Tests/ColorMatchingLPSAppTests/OpenAPIClientGenerationTests.swift:30",
+            "result": "red: ranked-results API operation is absent"
+          }
+        ]
+      }
+    },
+    {
+      "id": "AC-3",
+      "status": "not_run",
+      "verification": {
+        "kind": "human_or_external_evidence",
+        "references": [
+          {
+            "locator": "docs/openapi-client-migration-evidence.md:11",
+            "result": "requires generated-source and MeasurementCore boundary inspection after implementation"
+          }
+        ]
+      }
+    },
+    {
+      "id": "AC-4",
+      "status": "not_run",
+      "verification": {
+        "kind": "unit_or_service_test",
+        "references": [
+          {
+            "locator": "iOS/Tests/ColorMatchingLPSAppTests/APIClientTests.swift:49",
+            "result": "not run: swift is not installed in this environment"
+          }
+        ]
+      }
+    },
+    {
+      "id": "AC-5",
+      "status": "passed",
+      "verification": {
+        "kind": "human_or_external_evidence",
+        "references": [
+          {
+            "locator": "docs/openapi-client-migration-evidence.md:17",
+            "result": "PR-ready published-contract deltas and endpoint-gap evidence recorded"
+          }
+        ]
+      }
+    }
+  ]
+}
