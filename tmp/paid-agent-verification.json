@@ -1,0 +1,68 @@
+{
+  "status": "passed",
+  "summary": "Tests-only red-phase run for issue #5. Verified the upstream published OpenAPI spec (viamin/color_matching#110, merged as #113, served at GET /api/v1/openapi.json) against docs/color-matching-api-contract.md, recorded all contract deltas and endpoint gaps in docs/color-matching-openapi-deltas.md, and committed permanent red-phase tests: OpenAPIDocumentTests (guards vendored document presence/content; compiles today and fails today because the document is not vendored yet) and GeneratedClientTests (exercises the swift-openapi-generator client for all six app surfaces against an in-memory stubbed ClientTransport; gated by #if canImport(OpenAPIRuntime) until the implementation run wires the dependencies/plugin). No Swift toolchain exists in this Linux container, so swift test could not be executed locally; CI (macos-latest) is the executor.",
+  "acceptance_criteria": [
+    {
+      "id": "AC-1",
+      "description": "swift-openapi-generator + swift-openapi-runtime added to the iOS package; OpenAPI document fetched/vendored from viamin/color_matching#110",
+      "status": "failed",
+      "verification": {
+        "kind": "unit_or_service_test",
+        "evidence": "iOS/Tests/ColorMatchingLPSAppTests/OpenAPIDocumentTests.swift:30-126 guards the vendored document at iOS/Sources/ColorMatchingLPSAppCore/openapi.json (existence, OpenAPI 3, six surfaces, bearerAuth, 13 schema components, versioned schema strings). Red phase: expected assertion failure because the document is not vendored yet (Package.swift changes are deferred to the implementation run by phase rules).",
+        "references": [
+          { "locator": "iOS/Tests/ColorMatchingLPSAppTests/OpenAPIDocumentTests.swift:30", "result": "red_phase_expected_failure" },
+          { "locator": "docs/color-matching-openapi-deltas.md", "result": "vendoring_plan_recorded" }
+        ]
+      }
+    },
+    {
+      "id": "AC-2",
+      "description": "Generated client covers the surfaces the app uses today: manifest, recent sheets, capture creation, measurement upload, judgment upload, ranked results",
+      "status": "failed",
+      "verification": {
+        "kind": "unit_or_service_test",
+        "evidence": "iOS/Tests/ColorMatchingLPSAppTests/GeneratedClientTests.swift exercises getTestSheetManifest, listRecentSheets, getRankedResults, createCapture, uploadMeasurements, uploadJudgments (request method/path/wire JSON + response decoding) via a stubbed ClientTransport; iOS/Tests/ColorMatchingLPSAppTests/OpenAPIDocumentTests.swift:43-50 enumerates the six surfaces. Red phase: tests are gated behind #if canImport(OpenAPIRuntime) and fail to activate until the generated client is wired.",
+        "references": [
+          { "locator": "iOS/Tests/ColorMatchingLPSAppTests/GeneratedClientTests.swift:37", "result": "red_phase_inactive_until_wired" },
+          { "locator": "iOS/Tests/ColorMatchingLPSAppTests/OpenAPIDocumentTests.swift:43", "result": "surfaces_enumerated" }
+        ]
+      }
+    },
+    {
+      "id": "AC-3",
+      "description": "Replace hand-written API models with generated types; keep purely client-side models",
+      "status": "not_run",
+      "verification": {
+        "kind": "human_or_external_evidence",
+        "evidence": "Implementation-phase work (Sources/ and Package.swift are outside this tests-only phase's allowlist). The bounded plan - which models become generated types, which stay client-side, and which stay hand-written pending upstream schema fixes - is recorded in docs/color-matching-openapi-deltas.md (section 'Implementation plan (follow-up run)' and per-surface gap notes).",
+        "references": [
+          { "locator": "docs/color-matching-openapi-deltas.md", "result": "plan_recorded" }
+        ]
+      }
+    },
+    {
+      "id": "AC-4",
+      "description": "Swift tests exercising the generated client against local stubbed responses (no live server in CI)",
+      "status": "skipped",
+      "verification": {
+        "kind": "unit_or_service_test",
+        "evidence": "Tests are written and committed (GeneratedClientTests.swift, in-memory StubTransport implementing ClientTransport - zero network use, mirroring server-rendered payloads from upstream TestSheetJSON). Execution is blocked in this phase: no generated client exists yet and this container has no Swift toolchain, so swift test --disable-sandbox cannot run here; CI (macos-latest, .github/workflows/ci.yml) is the executor for the implementation run.",
+        "references": [
+          { "locator": "iOS/Tests/ColorMatchingLPSAppTests/GeneratedClientTests.swift:288", "result": "written_not_executed_no_swift_toolchain" }
+        ]
+      }
+    },
+    {
+      "id": "AC-5",
+      "description": "PR description records contract deltas between docs/color-matching-api-contract.md and the published spec, and endpoint gaps discovered",
+      "status": "passed",
+      "verification": {
+        "kind": "human_or_external_evidence",
+        "evidence": "docs/color-matching-openapi-deltas.md contains the full delta analysis verified against upstream sources (api_spec.ex, api_schemas.ex, router.ex, controllers, TestSheetJSON): under-declared manifest/ranked-results schemas, CaptureRequest and PairScoreRequest properties+anyOf compositions that OpenAPIKit drops (blocking gaps), stats/scoring_algorithm_version dropped from measurement schema, response bodies for uploads (200+counts vs undocumented), renamed flat-variant fields, operationIds requiring nameOverrides, and unused extra endpoints to filter out.",
+        "references": [
+          { "locator": "docs/color-matching-openapi-deltas.md", "result": "passed" }
+        ]
+      }
+    }
+  ]
+}
