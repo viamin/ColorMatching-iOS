@@ -1,0 +1,863 @@
+{
+  "openapi": "3.0.3",
+  "info": {
+    "title": "Color Matching API",
+    "version": "v1"
+  },
+  "servers": [
+    {
+      "url": "/"
+    }
+  ],
+  "paths": {
+    "/api/v1/test_sheets/recent": {
+      "get": {
+        "operationId": "listRecentTestSheets",
+        "summary": "List recent test sheets",
+        "tags": [
+          "Test sheets"
+        ],
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RecentSheetsResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiErrorResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/test_sheets/{sheet_id}/manifest": {
+      "get": {
+        "operationId": "getTestSheetManifest",
+        "summary": "Fetch a test sheet manifest",
+        "tags": [
+          "Test sheets"
+        ],
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TestSheetManifest"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiErrorResponse"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiErrorResponse"
+                }
+              }
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "sheet_id",
+            "in": "path",
+            "required": true,
+            "description": "Test sheet lookup code",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ]
+      }
+    },
+    "/api/v1/test_sheets/{sheet_id}/ranked_results": {
+      "get": {
+        "operationId": "getRankedResults",
+        "summary": "Fetch ranked results for a test sheet",
+        "tags": [
+          "Test sheets"
+        ],
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RankedResults"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiErrorResponse"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiErrorResponse"
+                }
+              }
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "sheet_id",
+            "in": "path",
+            "required": true,
+            "description": "Test sheet lookup code",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ]
+      }
+    },
+    "/api/v1/test_sheets/{sheet_id}/captures": {
+      "post": {
+        "operationId": "createCapture",
+        "summary": "Create a capture for a test sheet",
+        "tags": [
+          "Captures"
+        ],
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "responses": {
+          "201": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CaptureCreatedResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiErrorResponse"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiErrorResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiErrorResponse"
+                }
+              }
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "sheet_id",
+            "in": "path",
+            "required": true,
+            "description": "Test sheet lookup code",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CaptureRequest"
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/captures/{capture_id}/measurements": {
+      "post": {
+        "operationId": "uploadMeasurements",
+        "summary": "Upload capture measurements",
+        "tags": [
+          "Captures"
+        ],
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MeasurementUploadResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiErrorResponse"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiErrorResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiErrorResponse"
+                }
+              }
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "capture_id",
+            "in": "path",
+            "required": true,
+            "description": "Capture identifier",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/MeasurementUploadRequest"
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/captures/{capture_id}/judgments": {
+      "post": {
+        "operationId": "uploadJudgments",
+        "summary": "Upload capture judgments",
+        "tags": [
+          "Captures"
+        ],
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/JudgmentUploadResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiErrorResponse"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiErrorResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiErrorResponse"
+                }
+              }
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "capture_id",
+            "in": "path",
+            "required": true,
+            "description": "Capture identifier",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/JudgmentUploadRequest"
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "securitySchemes": {
+      "bearerAuth": {
+        "type": "http",
+        "scheme": "bearer",
+        "bearerFormat": "API token"
+      }
+    },
+    "schemas": {
+      "TestSheetManifest": {
+        "type": "object",
+        "description": "Versioned sheet manifest consumed by the iOS companion application.",
+        "properties": {
+          "schema_version": {
+            "type": "string",
+            "enum": [
+              "lps-sheet-manifest/v1"
+            ],
+            "description": "Manifest compatibility version."
+          },
+          "sheet_id": {
+            "type": "string"
+          },
+          "capture_profile": {
+            "type": "object",
+            "properties": {
+              "scoring_algorithm_version": {
+                "type": "string",
+                "enum": [
+                  "lps-distance-v1"
+                ],
+                "description": "Distance-scoring compatibility version."
+              }
+            },
+            "required": [
+              "scoring_algorithm_version"
+            ]
+          }
+        },
+        "required": [
+          "schema_version",
+          "sheet_id",
+          "capture_profile"
+        ]
+      },
+      "RankedResults": {
+        "type": "object",
+        "properties": {
+          "schema_version": {
+            "type": "string",
+            "enum": [
+              "lps-ranked-results/v1"
+            ]
+          },
+          "sheet_id": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "schema_version",
+          "sheet_id"
+        ]
+      },
+      "ApiErrorResponse": {
+        "type": "object",
+        "properties": {
+          "errors": {
+            "oneOf": [
+              {
+                "type": "object",
+                "additionalProperties": true
+              },
+              {
+                "type": "array",
+                "items": {
+                  "type": "object",
+                  "properties": {
+                    "detail": {
+                      "type": "string"
+                    },
+                    "source": {
+                      "type": "object",
+                      "properties": {
+                        "pointer": {
+                          "type": "string"
+                        }
+                      },
+                      "required": [
+                        "pointer"
+                      ]
+                    }
+                  },
+                  "required": [
+                    "detail",
+                    "source"
+                  ]
+                }
+              }
+            ]
+          }
+        },
+        "required": [
+          "errors"
+        ]
+      },
+      "RecentSheetsResponse": {
+        "type": "object",
+        "properties": {
+          "sheets": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "sheet_id": {
+                  "type": "string"
+                },
+                "manifest_url": {
+                  "type": "string"
+                },
+                "title": {
+                  "type": "string",
+                  "nullable": true
+                }
+              },
+              "required": [
+                "sheet_id",
+                "manifest_url",
+                "title"
+              ]
+            }
+          }
+        },
+        "required": [
+          "sheets"
+        ]
+      },
+      "CaptureMetadata": {
+        "type": "object",
+        "properties": {
+          "device_model": {
+            "type": "string"
+          },
+          "lens": {
+            "type": "string"
+          },
+          "exposure_duration_seconds": {
+            "type": "number",
+            "minimum": 0,
+            "exclusiveMinimum": true
+          },
+          "iso": {
+            "type": "integer",
+            "minimum": 0,
+            "exclusiveMinimum": true
+          },
+          "focus_lens_position": {
+            "type": "number",
+            "minimum": 0
+          },
+          "white_balance_gains": {
+            "type": "object"
+          },
+          "image_width": {
+            "type": "integer",
+            "minimum": 0,
+            "exclusiveMinimum": true
+          },
+          "image_height": {
+            "type": "integer",
+            "minimum": 0,
+            "exclusiveMinimum": true
+          },
+          "app_version": {
+            "type": "string"
+          },
+          "timestamp": {
+            "type": "string",
+            "format": "date-time"
+          }
+        },
+        "required": [
+          "device_model",
+          "lens",
+          "image_width",
+          "image_height",
+          "app_version",
+          "timestamp"
+        ]
+      },
+      "CaptureRequest": {
+        "type": "object",
+        "properties": {
+          "device_model": {
+            "type": "string"
+          },
+          "lens": {
+            "type": "string"
+          },
+          "exposure_duration": {
+            "type": "number",
+            "minimum": 0,
+            "exclusiveMinimum": true
+          },
+          "iso": {
+            "type": "integer",
+            "minimum": 0,
+            "exclusiveMinimum": true
+          },
+          "focus_lens_position": {
+            "type": "number",
+            "minimum": 0
+          },
+          "white_balance_gains": {
+            "type": "object"
+          },
+          "image_width": {
+            "type": "integer",
+            "minimum": 0,
+            "exclusiveMinimum": true
+          },
+          "image_height": {
+            "type": "integer",
+            "minimum": 0,
+            "exclusiveMinimum": true
+          },
+          "app_version": {
+            "type": "string"
+          },
+          "timestamp": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "detected_marker_count": {
+            "type": "integer",
+            "minimum": 0
+          },
+          "blur_score": {
+            "type": "number",
+            "minimum": 0
+          },
+          "rejection_reasons": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "metadata": {
+            "$ref": "#/components/schemas/CaptureMetadata"
+          },
+          "quality": {
+            "type": "object",
+            "properties": {
+              "detected_marker_count": {
+                "type": "integer",
+                "minimum": 0
+              },
+              "blur_score": {
+                "type": "number",
+                "minimum": 0
+              },
+              "rejections": {
+                "type": "array",
+                "items": {
+                  "type": "string"
+                }
+              }
+            }
+          }
+        },
+        "anyOf": [
+          {
+            "required": [
+              "device_model",
+              "lens",
+              "image_width",
+              "image_height",
+              "app_version",
+              "timestamp"
+            ]
+          },
+          {
+            "required": [
+              "metadata"
+            ]
+          }
+        ]
+      },
+      "CaptureCreatedResponse": {
+        "type": "object",
+        "properties": {
+          "capture_id": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "capture_id"
+        ]
+      },
+      "RgbPayload": {
+        "description": "An RGB array, an object with r/g/b channels, or a JSON-encoded representation.",
+        "anyOf": [
+          {
+            "type": "array",
+            "items": {
+              "type": "number"
+            }
+          },
+          {
+            "type": "object",
+            "properties": {
+              "r": {
+                "type": "number"
+              },
+              "g": {
+                "type": "number"
+              },
+              "b": {
+                "type": "number"
+              }
+            },
+            "required": [
+              "r",
+              "g",
+              "b"
+            ]
+          },
+          {
+            "type": "string"
+          }
+        ]
+      },
+      "PairScoreRequest": {
+        "type": "object",
+        "description": "A score may be supplied directly, as a compatibility similarity, or as a compatibility distance.",
+        "properties": {
+          "pair_id": {
+            "type": "string"
+          },
+          "algorithm_version": {
+            "type": "string"
+          },
+          "score": {
+            "type": "number"
+          },
+          "similarity": {
+            "type": "number"
+          },
+          "distance": {
+            "type": "number"
+          }
+        },
+        "required": [
+          "pair_id",
+          "algorithm_version"
+        ],
+        "anyOf": [
+          {
+            "required": [
+              "score"
+            ]
+          },
+          {
+            "required": [
+              "similarity"
+            ]
+          },
+          {
+            "required": [
+              "distance"
+            ]
+          }
+        ]
+      },
+      "MeasurementUploadRequest": {
+        "type": "object",
+        "properties": {
+          "measurements": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "patch_id": {
+                  "type": "string"
+                },
+                "linear_rgb_median": {
+                  "$ref": "#/components/schemas/RgbPayload"
+                },
+                "normalized_linear_rgb_median": {
+                  "$ref": "#/components/schemas/RgbPayload"
+                }
+              },
+              "required": [
+                "patch_id",
+                "linear_rgb_median",
+                "normalized_linear_rgb_median"
+              ]
+            }
+          },
+          "pair_scores": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/PairScoreRequest"
+            }
+          }
+        }
+      },
+      "MeasurementUploadResponse": {
+        "type": "object",
+        "properties": {
+          "capture_id": {
+            "type": "string"
+          },
+          "measurement_count": {
+            "type": "integer"
+          },
+          "pair_score_count": {
+            "type": "integer"
+          }
+        },
+        "required": [
+          "capture_id",
+          "measurement_count",
+          "pair_score_count"
+        ]
+      },
+      "JudgmentUploadRequest": {
+        "type": "object",
+        "properties": {
+          "judgments": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "pair_id": {
+                  "type": "string"
+                },
+                "judgment": {
+                  "type": "string"
+                }
+              },
+              "required": [
+                "pair_id",
+                "judgment"
+              ]
+            }
+          }
+        },
+        "required": [
+          "judgments"
+        ]
+      },
+      "JudgmentUploadResponse": {
+        "type": "object",
+        "properties": {
+          "capture_id": {
+            "type": "string"
+          },
+          "judgment_count": {
+            "type": "integer"
+          }
+        },
+        "required": [
+          "capture_id",
+          "judgment_count"
+        ]
+      }
+    }
+  }
+}
