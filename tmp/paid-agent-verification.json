@@ -1,0 +1,83 @@
+{
+  "status": "failed",
+  "summary": "Blocked: the OpenAPI spec dependency (viamin/color_matching#110) is unreachable from this sandbox (GitHub proxy is scoped to this repo only) and no Swift toolchain is available here to compile/run swift-openapi-generator output. No generated client, replaced models, or new tests were added; a verification-plan/blocker doc was committed instead (docs/openapi-client-migration-plan.md). Existing hand-written APIClient and its tests are unchanged and unaffected.",
+  "acceptance_criteria": [
+    {
+      "id": "AC-1",
+      "description": "Add swift-openapi-generator + swift-openapi-runtime; fetch or vendor the OpenAPI document from viamin/color_matching#110",
+      "status": "not_run",
+      "verification": {
+        "kind": "human_or_external_evidence",
+        "references": [
+          { "locator": "docs/openapi-client-migration-plan.md#Blocker", "result": "blocked: cross-repo GitHub proxy access returns {\"error\":\"Repository mismatch\"} for viamin/color_matching" }
+        ]
+      }
+    },
+    {
+      "id": "AC-2",
+      "description": "Generate the client for manifest/recent-sheets/capture/measurement/judgment/ranked-results surfaces",
+      "status": "not_run",
+      "verification": {
+        "kind": "human_or_external_evidence",
+        "references": [
+          { "locator": "docs/openapi-client-migration-plan.md#Acceptance-Criterion--Verification-Mapping", "result": "depends on AC-1, not attempted" }
+        ]
+      }
+    },
+    {
+      "id": "AC-3",
+      "description": "Replace hand-written API models with generated types; keep client-only models as-is",
+      "status": "not_run",
+      "verification": {
+        "kind": "human_or_external_evidence",
+        "references": [
+          { "locator": "iOS/Sources/ColorMatchingLPSAppCore/APIClient.swift", "result": "unchanged in this run; depends on AC-1/AC-2" }
+        ]
+      }
+    },
+    {
+      "id": "AC-4",
+      "description": "Swift tests exercising the generated client against local stubbed responses",
+      "status": "skipped",
+      "verification": {
+        "kind": "unit_or_service_test",
+        "references": [
+          { "locator": "docs/openapi-client-migration-plan.md#Blocker", "result": "skipped deliberately: no Swift toolchain in this sandbox to confirm compilation, and no generated types exist to test against; adding such a test would break the whole-package build (syntax/infrastructure failure), which the run rules explicitly exclude from valid red-phase evidence" }
+        ]
+      }
+    },
+    {
+      "id": "AC-5",
+      "description": "PR description records prose-contract vs. published-spec deltas and endpoint gaps",
+      "status": "not_run",
+      "verification": {
+        "kind": "human_or_external_evidence",
+        "references": [
+          { "locator": "docs/openapi-client-migration-plan.md#Recommended-Next-Steps-Once-Unblocked", "result": "no real spec obtained, so no diff could be produced" }
+        ]
+      }
+    },
+    {
+      "id": "EXIT-1",
+      "description": "swift test --disable-sandbox green with generated types wired in",
+      "status": "not_run",
+      "verification": {
+        "kind": "human_or_external_evidence",
+        "references": [
+          { "locator": "shell: swift --version", "result": "command not found in this sandbox; cannot run swift test here at all" }
+        ]
+      }
+    },
+    {
+      "id": "EXIT-2",
+      "description": "Existing hand-written API layer and its tests remain unaffected by this blocked run",
+      "status": "passed",
+      "verification": {
+        "kind": "unit_or_service_test",
+        "references": [
+          { "locator": "iOS/Tests/ColorMatchingLPSAppTests/APIClientTests.swift", "result": "unchanged by this run; no new files added outside docs/ and tmp/" }
+        ]
+      }
+    }
+  ]
+}
