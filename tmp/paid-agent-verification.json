@@ -1,0 +1,91 @@
+{
+  "status": "failed",
+  "summary": "Red-phase test and contract-delta evidence for issue #5. Swift is unavailable in this container, so the suite could not run; generator configuration and vendored-spec checks intentionally remain red until implementation.",
+  "acceptance_criteria": [
+    {
+      "id": "AC-1",
+      "status": "failed",
+      "verification": {
+        "kind": "unit_or_service_test",
+        "references": [
+          {
+            "locator": "iOS/Tests/ColorMatchingLPSAppTests/APIClientTests.swift:testPackageConfiguresOpenAPIGeneratorAndRuntime",
+            "result": "red: Package.swift does not yet declare swift-openapi-generator or swift-openapi-runtime"
+          },
+          {
+            "locator": "iOS/Tests/ColorMatchingLPSAppTests/APIClientTests.swift:testVendoredOpenAPISpecIncludesEveryCompanionEndpoint",
+            "result": "red: iOS/OpenAPI/openapi.json is not yet vendored"
+          }
+        ]
+      }
+    },
+    {
+      "id": "AC-2",
+      "status": "not_run",
+      "verification": {
+        "kind": "permanent_system_test",
+        "references": [
+          {
+            "locator": "iOS/Tests/ColorMatchingLPSAppTests/APIClientTests.swift:testFetchManifestDecodesLocalStubResponse",
+            "result": "not run: swift executable is unavailable"
+          },
+          {
+            "locator": "iOS/Tests/ColorMatchingLPSAppTests/APIClientTests.swift:testFetchRecentSheetsDecodesLocalStubResponse",
+            "result": "not run: swift executable is unavailable"
+          },
+          {
+            "locator": "iOS/Tests/ColorMatchingLPSAppTests/APIClientTests.swift:testCreateCaptureEncodesMetadataAndQuality",
+            "result": "not run: swift executable is unavailable"
+          },
+          {
+            "locator": "iOS/Tests/ColorMatchingLPSAppTests/APIClientTests.swift:testUploadMeasurementsEncodesScoresWithAlgorithmVersion",
+            "result": "not run: swift executable is unavailable"
+          },
+          {
+            "locator": "iOS/Tests/ColorMatchingLPSAppTests/APIClientTests.swift:testUploadJudgmentsEncodesPathAndPayload",
+            "result": "not run: swift executable is unavailable"
+          }
+        ]
+      }
+    },
+    {
+      "id": "AC-3",
+      "status": "failed",
+      "verification": {
+        "kind": "human_or_external_evidence",
+        "references": [
+          {
+            "locator": "docs/issue-5-openapi-client-plan.md:Contract deltas found",
+            "result": "the published manifest and ranked-results schemas omit fields required for a typed replacement; implementation must resolve or preserve a boundary"
+          }
+        ]
+      }
+    },
+    {
+      "id": "AC-4",
+      "status": "passed",
+      "verification": {
+        "kind": "human_or_external_evidence",
+        "references": [
+          {
+            "locator": "docs/issue-5-openapi-client-plan.md:Contract deltas found",
+            "result": "documents the inspected upstream OpenAPI implementation deltas and endpoint schema gaps for the PR description"
+          }
+        ]
+      }
+    },
+    {
+      "id": "AC-5",
+      "status": "not_run",
+      "verification": {
+        "kind": "unit_or_service_test",
+        "references": [
+          {
+            "locator": "swift test --disable-sandbox --package-path iOS",
+            "result": "not run: swift executable is unavailable in the container"
+          }
+        ]
+      }
+    }
+  ]
+}
