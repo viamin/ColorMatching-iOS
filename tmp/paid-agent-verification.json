@@ -1,0 +1,74 @@
+{
+  "status": "failed",
+  "summary": "Tests-only red-phase PR for issue #5 (generated OpenAPI Swift client). 14 new tests: 10 spec/toolchain coverage tests in OpenAPIClientGenerationTests (red until the spec is vendored, deps declared, and client generated) and 4 stubbed-response wire-contract tests in APIClientWireContractTests (3 green characterization tests pinning current behavior through the swap; 1 red test for the missing fetchRankedResults surface, reached via a default-implementation protocol witness that flips green when APIClient gains the exact method). Criteria are intentionally not yet satisfied; the implementation run (after paid-tests-approved) turns them green. Swift toolchain is absent in the authoring container, so the suite was not executed locally; CI (macos-latest, swift test) is the executor and docs/openapi-client-test-plan.md records the expected red/green split per test.",
+  "acceptance_criteria": [
+    {
+      "id": "AC-1",
+      "status": "failed",
+      "verification": {
+        "kind": "unit_or_service_test",
+        "references": [
+          { "locator": "iOS/Tests/ColorMatchingLPSAppTests/OpenAPIClientGenerationTests.swift:17", "result": "expected red: iOS/OpenAPI/color-matching-api.json not vendored yet (depends on viamin/color_matching#110)" },
+          { "locator": "iOS/Tests/ColorMatchingLPSAppTests/OpenAPIClientGenerationTests.swift:23", "result": "expected red: Package.swift lacks swift-openapi-generator/swift-openapi-runtime and the GenerateOpenAPIClient plugin" }
+        ]
+      }
+    },
+    {
+      "id": "AC-2",
+      "status": "failed",
+      "verification": {
+        "kind": "unit_or_service_test",
+        "references": [
+          { "locator": "iOS/Tests/ColorMatchingLPSAppTests/OpenAPIClientGenerationTests.swift:30", "result": "expected red: no Sources/**/OpenAPIGenerated/ output yet" },
+          { "locator": "iOS/Tests/ColorMatchingLPSAppTests/OpenAPIClientGenerationTests.swift:40", "result": "expected red: spec missing; will verify all six surfaces (recent, manifest, captures, measurements, judgments, ranked_results) with operationIds" },
+          { "locator": "iOS/Tests/ColorMatchingLPSAppTests/APIClientWireContractTests.swift:190", "result": "expected red: APIClient.fetchRankedResults(sheetID:baseURL:) not implemented" }
+        ]
+      }
+    },
+    {
+      "id": "AC-3",
+      "status": "failed",
+      "verification": {
+        "kind": "unit_or_service_test",
+        "references": [
+          { "locator": "iOS/Tests/ColorMatchingLPSAppTests/APIClientWireContractTests.swift:30", "result": "wire characterization of manifest decoding (path, bearer auth, prose payload); passes at this head and must stay green after models are replaced" },
+          { "locator": "iOS/Tests/ColorMatchingLPSAppTests/APIClientWireContractTests.swift:141", "result": "wire characterization of recent sheets incl. null title; passes at this head" },
+          { "locator": "iOS/Tests/ColorMatchingLPSAppTests/APIClientTests.swift:12", "result": "pre-existing encoding tests for capture/measurement/judgment payloads; must stay green through the swap" }
+        ],
+        "note": "Deleting the hand-written Codable request/response types is verified by code review of the implementation PR; the automated half is the wire-compatibility suite above."
+      }
+    },
+    {
+      "id": "AC-4",
+      "status": "not_run",
+      "verification": {
+        "kind": "unit_or_service_test",
+        "references": [
+          { "locator": "iOS/Tests/ColorMatchingLPSAppTests/APIClientWireContractTests.swift:1", "result": "not_run locally: no Swift toolchain in the authoring container; four stubbed-response tests exist (WireStubURLProtocol, no live server) and run in CI via swift test" }
+        ]
+      }
+    },
+    {
+      "id": "AC-5",
+      "status": "not_run",
+      "verification": {
+        "kind": "human_or_external_evidence",
+        "references": [
+          { "locator": "docs/openapi-client-test-plan.md", "result": "delta-recording protocol defined: each spec-coverage failure names a prose-contract expectation the published spec misses; the implementation PR description must tabulate deltas and endpoint gaps" }
+        ],
+        "note": "The delta table itself is authored with the implementation PR; cannot exist at this tests-only head."
+      }
+    },
+    {
+      "id": "AC-6",
+      "status": "not_run",
+      "verification": {
+        "kind": "human_or_external_evidence",
+        "references": [
+          { "locator": ".github/workflows/ci.yml", "result": "swift test on macos-latest is the executor; expected red/green split per test recorded in docs/openapi-client-test-plan.md" }
+        ],
+        "note": "Exit criterion is evaluated on the implementation PR once generated types are wired in; no Swift toolchain exists in this container to run swift test here."
+      }
+    }
+  ]
+}
