@@ -1,0 +1,75 @@
+{
+  "status": "failed",
+  "summary": "Tests-only red phase: local stubs cover existing manifest and recent-sheet calls; ranked-results generated operation remains intentionally unimplemented. Swift is unavailable in the container, so the suite could not execute.",
+  "acceptance_criteria": [
+    {
+      "id": "AC-1",
+      "status": "not_run",
+      "verification": {
+        "kind": "human_or_external_evidence",
+        "references": [
+          {
+            "locator": "docs/issue-5-openapi-client-verification.md:13",
+            "result": "The upstream OpenAPI PR returned GitHub API 404 in this environment; dependency and document pinning await the implementation run."
+          }
+        ]
+      }
+    },
+    {
+      "id": "AC-2",
+      "status": "failed",
+      "verification": {
+        "kind": "unit_or_service_test",
+        "references": [
+          {
+            "locator": "iOS/Tests/ColorMatchingLPSAppTests/APIClientTests.swift:129",
+            "result": "Expected red-phase failure: no generated ranked-results operation exists."
+          }
+        ]
+      }
+    },
+    {
+      "id": "AC-3",
+      "status": "not_run",
+      "verification": {
+        "kind": "human_or_external_evidence",
+        "references": [
+          {
+            "locator": "docs/issue-5-openapi-client-verification.md:15",
+            "result": "Production migration is outside this tests-only run."
+          }
+        ]
+      }
+    },
+    {
+      "id": "AC-4",
+      "status": "not_run",
+      "verification": {
+        "kind": "unit_or_service_test",
+        "references": [
+          {
+            "locator": "iOS/Tests/ColorMatchingLPSAppTests/APIClientTests.swift:49",
+            "result": "MockURLProtocol-backed manifest test added, but swift test could not run because the Swift executable is unavailable."
+          },
+          {
+            "locator": "iOS/Tests/ColorMatchingLPSAppTests/APIClientTests.swift:68",
+            "result": "MockURLProtocol-backed recent-sheets test added, but swift test could not run because the Swift executable is unavailable."
+          }
+        ]
+      }
+    },
+    {
+      "id": "AC-5",
+      "status": "not_run",
+      "verification": {
+        "kind": "human_or_external_evidence",
+        "references": [
+          {
+            "locator": "docs/issue-5-openapi-client-verification.md:17",
+            "result": "Exact contract deltas require the unavailable published OpenAPI document and PR review."
+          }
+        ]
+      }
+    }
+  ]
+}
