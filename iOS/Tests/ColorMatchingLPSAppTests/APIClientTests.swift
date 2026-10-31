@@ -92,6 +92,52 @@ final class APIClientTests: XCTestCase {
         XCTAssertEqual((json["judgments"] as? [[String: Any]])?.first?["judgment"] as? String, "near_match")
     }
 
+    // Published spec: viamin/color_matching @ 094bd6d (PR #113, closes color_matching#110),
+    // lib/color_matching_web/api_schemas.ex `MeasurementUploadRequest`: top-level keys are only
+    // `measurements`/`pair_scores`; each measurement item requires patch_id, linear_rgb_median,
+    // AND normalized_linear_rgb_median (no `stats`). The hand-written client diverges on both counts.
+    func testUploadMeasurementsPayloadDriftsFromPublishedOpenAPISchema() async throws {
+        var capturedBody: Data?
+        MockURLProtocol.handler = { request in
+            capturedBody = request.httpBodyStream.flatMap(Self.readBody) ?? request.httpBody
+            return (HTTPURLResponse(url: request.url!, statusCode: 204, httpVersion: nil, headerFields: nil)!, Data())
+        }
+
+        let rgb = RGB(r: 0.2, g: 0.3, b: 0.4)
+        let stats = ChannelStats(median: rgb, mean: rgb, standardDeviation: RGB(r: 0.01, g: 0.01, b: 0.01), min: rgb, max: rgb, sampleCount: 9, clippingFraction: 0)
+        try await client().uploadMeasurements(
+            captureID: "cap_1",
+            baseURL: URL(string: "https://example.test")!,
+            measurements: [PatchMeasurement(patchID: "patch_1", linearRGBMedian: rgb, normalizedLinearRGBMedian: nil, stats: stats)],
+            scores: [PairScore(pairID: "pair_1", distance: 0.1, similarity: 0.9, algorithmVersion: LPSScorer.algorithmVersion)]
+        )
+
+        let json = try XCTUnwrap(Self.jsonObject(from: capturedBody) as? [String: Any])
+        XCTAssertEqual(Set(json.keys), ["measurements", "pair_scores"], "published schema has no top-level scoring_algorithm_version")
+        let measurement = try XCTUnwrap((json["measurements"] as? [[String: Any]])?.first)
+        XCTAssertEqual(
+            Set(measurement.keys),
+            ["patch_id", "linear_rgb_median", "normalized_linear_rgb_median"],
+            "published schema requires normalized_linear_rgb_median and has no stats object"
+        )
+    }
+
+    // Published spec's `TestSheetManifest` schema only requires schema_version, sheet_id, and
+    // capture_profile.scoring_algorithm_version — it does not type patches/pairs/page/
+    // registration_markers/manifest_url/sheet_version, which SheetManifest requires. A generated
+    // client built strictly from the published schema cannot fully replace this model yet.
+    func testManifestDecodeFailsWithOnlyPublishedSchemaFields() {
+        let minimalManifestJSON = Data("""
+        {
+          "schema_version": "lps-sheet-manifest/v1",
+          "sheet_id": "sheet_123",
+          "capture_profile": {"scoring_algorithm_version": "lps-distance-v1"}
+        }
+        """.utf8)
+
+        XCTAssertThrowsError(try JSONDecoder().decode(SheetManifest.self, from: minimalManifestJSON))
+    }
+
     private func client() -> APIClient {
         let configuration = URLSessionConfiguration.ephemeral
         configuration.protocolClasses = [MockURLProtocol.self]
