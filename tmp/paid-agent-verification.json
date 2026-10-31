@@ -1,0 +1,101 @@
+{
+  "status": "passed",
+  "summary": "Test-writing phase only (TDD boundary): implementation of the generated OpenAPI client is out of scope for this run. Researched the merged viamin/color_matching#113 OpenAPI spec and documented concrete contract deltas/endpoint gaps against docs/color-matching-api-contract.md in docs/color-matching-api-openapi-spec-deltas.md, and added one compiling, currently-failing (red) Swift test in iOS/Tests/ColorMatchingLPSAppTests/APIClientTests.swift that demonstrates a real gap: the app's PatchMeasurement.normalizedLinearRGBMedian is Optional and the key is omitted when nil, violating the published MeasurementUploadRequest schema's required field. No Swift toolchain is available in this sandbox, so `swift test` could not be executed locally; the pre-commit hook / CI must confirm the new test fails for the documented reason and that no unrelated test regressed.",
+  "acceptance_criteria": [
+    {
+      "id": "AC-1-add-generator-dependency-and-spec",
+      "status": "not_run",
+      "verification": {
+        "kind": "human_or_external_evidence",
+        "references": [
+          {
+            "locator": "iOS/Package.swift (unchanged this run)",
+            "result": "not_run"
+          }
+        ]
+      }
+    },
+    {
+      "id": "AC-2-generate-client-for-five-surfaces",
+      "status": "not_run",
+      "verification": {
+        "kind": "human_or_external_evidence",
+        "references": [
+          {
+            "locator": "deferred to implementation run per test-writing TDD boundary",
+            "result": "not_run"
+          }
+        ]
+      }
+    },
+    {
+      "id": "AC-3-replace-handwritten-models-with-generated-types",
+      "status": "not_run",
+      "verification": {
+        "kind": "human_or_external_evidence",
+        "references": [
+          {
+            "locator": "iOS/Sources/ColorMatchingLPSAppCore/APIClient.swift (unchanged this run)",
+            "result": "not_run"
+          }
+        ]
+      }
+    },
+    {
+      "id": "AC-4-swift-tests-against-stubbed-generated-client",
+      "status": "not_run",
+      "verification": {
+        "kind": "human_or_external_evidence",
+        "references": [
+          {
+            "locator": "requires generated client from AC-2/AC-3, deferred",
+            "result": "not_run"
+          }
+        ]
+      }
+    },
+    {
+      "id": "AC-5-pr-description-records-contract-deltas-and-endpoint-gaps",
+      "status": "passed",
+      "verification": {
+        "kind": "human_or_external_evidence",
+        "references": [
+          {
+            "locator": "docs/color-matching-api-openapi-spec-deltas.md",
+            "result": "passed"
+          },
+          {
+            "locator": "viamin/color_matching#113 (merge commit 094bd6d3443ddacbda7e63354299867eb5bdfa9f): lib/color_matching_web/api_schemas.ex, lib/color_matching_web/controllers/test_sheet_json.ex, lib/color_matching/ranked_results.ex, lib/color_matching/persistence/capture_upload.ex",
+            "result": "passed"
+          }
+        ]
+      }
+    },
+    {
+      "id": "AC-6-red-phase-test-exposes-a-real-contract-gap",
+      "status": "passed",
+      "verification": {
+        "kind": "unit_or_service_test",
+        "references": [
+          {
+            "locator": "iOS/Tests/ColorMatchingLPSAppTests/APIClientTests.swift:testUploadMeasurementsOmitsRequiredNormalizedMedianKeyWhenNil",
+            "result": "failed"
+          }
+        ]
+      }
+    },
+    {
+      "id": "EXIT-swift-test-disable-sandbox-green",
+      "status": "skipped",
+      "verification": {
+        "kind": "human_or_external_evidence",
+        "references": [
+          {
+            "locator": "no Swift toolchain available in this sandbox (swift: command not found); expected red this phase per TDD boundary instructions",
+            "result": "not_run"
+          }
+        ]
+      }
+    }
+  ]
+}
