@@ -92,6 +92,51 @@ final class APIClientTests: XCTestCase {
         XCTAssertEqual((json["judgments"] as? [[String: Any]])?.first?["judgment"] as? String, "near_match")
     }
 
+    func testFetchesManifestAndRecentSheetsFromLocalStubs() async throws {
+        MockURLProtocol.handler = { request in
+            let response = HTTPURLResponse(url: try XCTUnwrap(request.url), statusCode: 200, httpVersion: nil, headerFields: nil)!
+
+            switch request.url?.path {
+            case "/api/v1/test_sheets/sheet_1/manifest":
+                return (response, Data(Self.manifestFixture.utf8))
+            case "/api/v1/test_sheets/recent":
+                return (response, Data(#"{"sheets":[{"sheet_id":"sheet_1","manifest_url":"https://example.test/api/v1/test_sheets/sheet_1/manifest","title":null}]}"#.utf8))
+            default:
+                throw APIError.badStatus
+            }
+        }
+
+        let baseURL = try XCTUnwrap(URL(string: "https://example.test"))
+        let manifest = try await client().fetchManifest(baseURL: baseURL, sheetCode: "sheet_1")
+        let sheets = try await client().fetchRecentSheets(baseURL: baseURL)
+
+        XCTAssertEqual(manifest.schemaVersion, "lps-sheet-manifest/v1")
+        XCTAssertEqual(manifest.sheetID, "sheet_1")
+        XCTAssertEqual(sheets.map(\.sheetID), ["sheet_1"])
+        XCTAssertNil(sheets.first?.title)
+    }
+
+    func testVendoredOpenAPIDocumentDefinesEveryAppOperation() throws {
+        let documentURL = URL(fileURLWithPath: #filePath)
+            .deletingLastPathComponent()
+            .deletingLastPathComponent()
+            .deletingLastPathComponent()
+            .appending(path: "OpenAPI/color-matching-api.json")
+        let data = try XCTUnwrap(
+            try? Data(contentsOf: documentURL),
+            "Vendor the published OpenAPI document at \(documentURL.path) so generation and these contract tests are reproducible without a live server."
+        )
+        let document = try XCTUnwrap(try JSONSerialization.jsonObject(with: data) as? [String: Any])
+        let paths = try XCTUnwrap(document["paths"] as? [String: Any])
+
+        XCTAssertNotNil(paths["/api/v1/test_sheets/{sheet_id}/manifest"])
+        XCTAssertNotNil(paths["/api/v1/test_sheets/recent"])
+        XCTAssertNotNil(paths["/api/v1/test_sheets/{sheet_id}/captures"])
+        XCTAssertNotNil(paths["/api/v1/captures/{capture_id}/measurements"])
+        XCTAssertNotNil(paths["/api/v1/captures/{capture_id}/judgments"])
+        XCTAssertNotNil(paths["/api/v1/test_sheets/{sheet_id}/ranked_results"])
+    }
+
     private func client() -> APIClient {
         let configuration = URLSessionConfiguration.ephemeral
         configuration.protocolClasses = [MockURLProtocol.self]
@@ -117,6 +162,19 @@ final class APIClientTests: XCTestCase {
         }
         return data
     }
+
+    private static let manifestFixture = #"""
+    {
+      "schema_version": "lps-sheet-manifest/v1",
+      "sheet_version": "lps-letter-grid-v1",
+      "sheet_id": "sheet_1",
+      "manifest_url": "https://example.test/api/v1/test_sheets/sheet_1/manifest",
+      "page": {"units": "mm", "width": 215.9, "height": 279.4},
+      "registration_markers": [],
+      "patches": [],
+      "pairs": []
+    }
+    """#
 }
 
 private final class MockURLProtocol: URLProtocol {
