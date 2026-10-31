@@ -1,0 +1,88 @@
+{
+  "status": "failed",
+  "summary": "Tests and verification plan were added in the tests-only phase. The Swift toolchain is absent from this container, so no Swift tests could run; the OpenAPI-vendoring test is intentionally red until the implementation phase supplies the upstream document.",
+  "acceptance_criteria": [
+    {
+      "id": "AC-1",
+      "status": "failed",
+      "verification": {
+        "kind": "unit_or_service_test",
+        "references": [
+          {
+            "locator": "iOS/Tests/ColorMatchingLPSAppTests/APIClientTests.swift:testVendoredOpenAPIDocumentCoversEveryAppSurface",
+            "result": "red: iOS/OpenAPI/color-matching-api.json is not yet vendored"
+          },
+          {
+            "locator": "docs/issue-5-generated-openapi-client-verification.md",
+            "result": "records the dependency and artifact location"
+          }
+        ]
+      }
+    },
+    {
+      "id": "AC-2",
+      "status": "not_run",
+      "verification": {
+        "kind": "unit_or_service_test",
+        "references": [
+          {
+            "locator": "iOS/Tests/ColorMatchingLPSAppTests/APIClientTests.swift",
+            "result": "local-stub coverage added for manifest and recent sheets; existing coverage exercises writes; generated-client and ranked-results tests await implementation"
+          }
+        ]
+      }
+    },
+    {
+      "id": "AC-3",
+      "status": "not_run",
+      "verification": {
+        "kind": "human_or_external_evidence",
+        "references": [
+          {
+            "locator": "docs/issue-5-generated-openapi-client-verification.md",
+            "result": "implementation-phase code review and compile evidence required"
+          }
+        ]
+      }
+    },
+    {
+      "id": "AC-4",
+      "status": "not_run",
+      "verification": {
+        "kind": "unit_or_service_test",
+        "references": [
+          {
+            "locator": "iOS/Tests/ColorMatchingLPSAppTests/APIClientTests.swift:MockURLProtocol",
+            "result": "tests are designed with local URLProtocol stubs but were not executable because Swift is unavailable"
+          }
+        ]
+      }
+    },
+    {
+      "id": "AC-5",
+      "status": "not_run",
+      "verification": {
+        "kind": "unit_or_service_test",
+        "references": [
+          {
+            "locator": "iOS/Package.swift",
+            "result": "swift test --disable-sandbox could not start: Swift executable is absent"
+          }
+        ]
+      }
+    },
+    {
+      "id": "AC-6",
+      "status": "passed",
+      "verification": {
+        "kind": "human_or_external_evidence",
+        "references": [
+          {
+            "locator": "docs/issue-5-generated-openapi-client-verification.md:Upstream evidence and contract deltas",
+            "result": "records deltas from the live upstream router and issue #110"
+          }
+        ]
+      }
+    }
+  ]
+}
