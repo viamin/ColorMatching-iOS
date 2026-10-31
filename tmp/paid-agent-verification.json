@@ -1,0 +1,84 @@
+{
+  "status": "failed",
+  "summary": "Tests and migration evidence were added in the required red phase. The Swift toolchain is unavailable in this container, and the generation-input test intentionally fails until the OpenAPI dependency is wired.",
+  "acceptance_criteria": [
+    {
+      "id": "AC-1",
+      "status": "failed",
+      "verification": {
+        "kind": "unit_or_service_test",
+        "references": [
+          {
+            "locator": "iOS/Tests/ColorMatchingLPSAppTests/APIClientTests.swift:149",
+            "result": "red: requires the vendored OpenAPI contract plus swift-openapi-generator and swift-openapi-runtime configuration"
+          }
+        ]
+      }
+    },
+    {
+      "id": "AC-2",
+      "status": "failed",
+      "verification": {
+        "kind": "unit_or_service_test",
+        "references": [
+          {
+            "locator": "iOS/Tests/ColorMatchingLPSAppTests/APIClientTests.swift:165",
+            "result": "red: checks all six used OpenAPI operations, including ranked results"
+          }
+        ]
+      }
+    },
+    {
+      "id": "AC-3",
+      "status": "not_run",
+      "verification": {
+        "kind": "unit_or_service_test",
+        "references": [
+          {
+            "locator": "iOS/Tests/ColorMatchingLPSAppTests/APIClientTests.swift:13",
+            "result": "local-stub coverage added, but swift test could not start because the Swift executable is absent"
+          }
+        ]
+      }
+    },
+    {
+      "id": "AC-4",
+      "status": "not_run",
+      "verification": {
+        "kind": "human_or_external_evidence",
+        "references": [
+          {
+            "locator": "docs/openapi-client-migration.md",
+            "result": "requires implementation diff review after generated types replace server-owned models"
+          }
+        ]
+      }
+    },
+    {
+      "id": "AC-5",
+      "status": "passed",
+      "verification": {
+        "kind": "human_or_external_evidence",
+        "references": [
+          {
+            "locator": "docs/openapi-client-migration.md",
+            "result": "records inspectable upstream-spec/prose-contract deltas and blockers"
+          }
+        ]
+      }
+    },
+    {
+      "id": "AC-6",
+      "status": "not_run",
+      "verification": {
+        "kind": "unit_or_service_test",
+        "references": [
+          {
+            "locator": "iOS/Package.swift",
+            "result": "swift test --disable-sandbox cannot run: Swift toolchain is unavailable"
+          }
+        ]
+      }
+    }
+  ]
+}
