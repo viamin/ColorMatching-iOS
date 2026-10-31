@@ -1,0 +1,84 @@
+{
+  "status": "failed",
+  "summary": "Test-writing run committed focused local-stub coverage and a red package-generation check. The generated client is not yet implemented, and the container has no Swift executable, so the required Swift command could not run.",
+  "acceptance_criteria": [
+    {
+      "id": "AC-1",
+      "status": "failed",
+      "verification": {
+        "kind": "unit_or_service_test",
+        "references": [
+          {
+            "locator": "iOS/Tests/ColorMatchingLPSAppTests/APIClientTests.swift:testPackageConfiguresOpenAPIGenerationAndRuntime",
+            "result": "red by design: Package.swift has neither OpenAPI dependency nor generator plugin"
+          }
+        ]
+      }
+    },
+    {
+      "id": "AC-2",
+      "status": "failed",
+      "verification": {
+        "kind": "permanent_system_test",
+        "references": [
+          {
+            "locator": "docs/openapi-client-issue-5-verification.md:10",
+            "result": "ranked-results generated operation and stub test remain absent from the hand-written client"
+          }
+        ]
+      }
+    },
+    {
+      "id": "AC-3",
+      "status": "failed",
+      "verification": {
+        "kind": "human_or_external_evidence",
+        "references": [
+          {
+            "locator": "iOS/Sources/ColorMatchingLPSAppCore/APIClient.swift:87",
+            "result": "hand-written Codable API models remain; implementation is deferred to the next phase"
+          }
+        ]
+      }
+    },
+    {
+      "id": "AC-4",
+      "status": "not_run",
+      "verification": {
+        "kind": "permanent_system_test",
+        "references": [
+          {
+            "locator": "iOS/Tests/ColorMatchingLPSAppTests/APIClientTests.swift:12",
+            "result": "local URLProtocol stub tests were committed but not run: swift is unavailable in this container"
+          }
+        ]
+      }
+    },
+    {
+      "id": "AC-5",
+      "status": "passed",
+      "verification": {
+        "kind": "human_or_external_evidence",
+        "references": [
+          {
+            "locator": "docs/openapi-client-issue-5-verification.md:18",
+            "result": "documents observed deltas and the ranked-results schema gap against upstream PR #113"
+          }
+        ]
+      }
+    },
+    {
+      "id": "AC-6",
+      "status": "not_run",
+      "verification": {
+        "kind": "unit_or_service_test",
+        "references": [
+          {
+            "locator": "swift test --disable-sandbox",
+            "result": "not run: executable swift was not found"
+          }
+        ]
+      }
+    }
+  ]
+}
