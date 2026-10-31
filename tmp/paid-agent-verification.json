@@ -1,0 +1,77 @@
+{
+  "status": "passed",
+  "summary": "Test-writing (red-phase) run for issue #5. Compared docs/color-matching-api-contract.md against the real, merged OpenAPI work in viamin/color_matching#113 (no live server reachable from CI, so verified by reading the merged Elixir source directly) and recorded deltas in docs/openapi-contract-deltas.md. Added iOS/Tests/ColorMatchingLPSAppTests/OpenAPIContractDeltaTests.swift with tests grounded in that real source: two fail today against the current hand-written APIClient/SheetManifest (measurement-upload payload sends undocumented fields; SheetManifest drops printer_profile/capture_profile), one passes as a deliberate non-drifted counter-example (judgment upload), and one pins the real ranked-results response shape via a test-local fixture type (no production code touched). Per this run's TDD boundary, no implementation files (Package.swift, generated client, model replacement) were changed. Could not execute `swift test` in this environment: no Swift/Xcode toolchain is installed in this Linux sandbox, so tests were hand-verified against current type signatures rather than run.",
+  "acceptance_criteria": [
+    {
+      "id": "AC-1-contract-deltas-documented",
+      "status": "passed",
+      "verification": {
+        "kind": "human_or_external_evidence",
+        "references": [
+          { "locator": "docs/openapi-contract-deltas.md", "result": "created; cites viamin/color_matching#113 merge commit 094bd6d3443ddacbda7e63354299867eb5bdfa9f, lib/color_matching_web/api_schemas.ex, capture_controller.ex, test_sheet_controller.ex, test_sheet_json.ex" }
+        ]
+      }
+    },
+    {
+      "id": "AC-2-measurement-upload-request-drift-test",
+      "status": "not_run",
+      "verification": {
+        "kind": "unit_or_service_test",
+        "references": [
+          { "locator": "iOS/Tests/ColorMatchingLPSAppTests/OpenAPIContractDeltaTests.swift:51 testUploadMeasurementsRequestBodyMatchesPublishedMeasurementUploadSchema", "result": "not_run" }
+        ]
+      }
+    },
+    {
+      "id": "AC-3-manifest-printer-profile-capture-profile-drift-test",
+      "status": "not_run",
+      "verification": {
+        "kind": "unit_or_service_test",
+        "references": [
+          { "locator": "iOS/Tests/ColorMatchingLPSAppTests/OpenAPIContractDeltaTests.swift:34 testManifestDecodeDropsPrinterProfileAndCaptureProfileFromRealAPIResponse", "result": "not_run" }
+        ]
+      }
+    },
+    {
+      "id": "AC-4-judgment-upload-non-drift-counter-example",
+      "status": "not_run",
+      "verification": {
+        "kind": "unit_or_service_test",
+        "references": [
+          { "locator": "iOS/Tests/ColorMatchingLPSAppTests/OpenAPIContractDeltaTests.swift:85 testUploadJudgmentsRequestBodyMatchesPublishedJudgmentUploadSchema", "result": "not_run" }
+        ]
+      }
+    },
+    {
+      "id": "AC-5-ranked-results-endpoint-gap-and-fixture",
+      "status": "passed",
+      "verification": {
+        "kind": "human_or_external_evidence",
+        "references": [
+          { "locator": "docs/openapi-contract-deltas.md#6-ranked-results", "result": "documents that APIClient has zero code for this endpoint today" },
+          { "locator": "iOS/Tests/ColorMatchingLPSAppTests/OpenAPIContractDeltaTests.swift:106 testRankedResultsRealResponseShapeDecodesForFutureGeneratedClient", "result": "not_run (fixture-only test, no production code exercised)" }
+        ]
+      }
+    },
+    {
+      "id": "AC-6-swift-test-disable-sandbox-green",
+      "status": "skipped",
+      "verification": {
+        "kind": "human_or_external_evidence",
+        "references": [
+          { "locator": "environment check: `which swift` / `which swiftc`", "result": "no Swift or Xcode toolchain is installed in this Linux container, so `swift test --disable-sandbox` cannot be executed here" }
+        ]
+      }
+    },
+    {
+      "id": "AC-7-generated-client-wired-models-replaced",
+      "status": "skipped",
+      "verification": {
+        "kind": "human_or_external_evidence",
+        "references": [
+          { "locator": "run phase constraint", "result": "this run is scoped to tests/docs only (TDD red phase); adding swift-openapi-generator, vendoring the spec, generating the client, and replacing hand-written models are implementation changes deferred to the run that follows paid-tests-approved" }
+        ]
+      }
+    }
+  ]
+}
