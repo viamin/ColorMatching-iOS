@@ -1,0 +1,71 @@
+{
+  "status": "failed",
+  "summary": "Test-writing phase added permanent local-stub API coverage and a red package-architecture assertion. The Swift toolchain is unavailable in this container, and the OpenAPI spec is unavailable through the permitted cross-repository proxy.",
+  "acceptance_criteria": [
+    {
+      "id": "AC-1",
+      "status": "failed",
+      "verification": {
+        "kind": "unit_or_service_test",
+        "references": [
+          {
+            "locator": "iOS/Tests/ColorMatchingLPSAppTests/APIClientTests.swift:testPackageDeclaresGeneratedOpenAPIClientDependencies",
+            "result": "red by design: Package.swift does not declare swift-openapi-generator, swift-openapi-runtime, or OpenAPIGenerator"
+          }
+        ]
+      }
+    },
+    {
+      "id": "AC-2",
+      "status": "not_run",
+      "verification": {
+        "kind": "permanent_system_test",
+        "references": [
+          {
+            "locator": "iOS/Tests/ColorMatchingLPSAppTests/APIClientTests.swift",
+            "result": "local stubs cover manifest, recent sheets, capture, measurement, and judgment boundaries; generated operations and ranked-results endpoint are not implemented"
+          }
+        ]
+      }
+    },
+    {
+      "id": "AC-3",
+      "status": "not_run",
+      "verification": {
+        "kind": "unit_or_service_test",
+        "references": [
+          {
+            "locator": "iOS/Sources/ColorMatchingLPSAppCore/APIClient.swift",
+            "result": "hand-written transport models remain in this tests-only phase"
+          }
+        ]
+      }
+    },
+    {
+      "id": "AC-4",
+      "status": "not_run",
+      "verification": {
+        "kind": "permanent_system_test",
+        "references": [
+          {
+            "locator": "iOS/Tests/ColorMatchingLPSAppTests/APIClientTests.swift:12",
+            "result": "uses MockURLProtocol only; not executed because swift is unavailable in the container"
+          }
+        ]
+      }
+    },
+    {
+      "id": "AC-5",
+      "status": "skipped",
+      "verification": {
+        "kind": "human_or_external_evidence",
+        "references": [
+          {
+            "locator": "docs/issue-5-openapi-client-verification-plan.md",
+            "result": "cross-repository GitHub API request for viamin/color_matching#110 returned Repository mismatch; contract delta requires the published spec"
+          }
+        ]
+      }
+    }
+  ]
+}
