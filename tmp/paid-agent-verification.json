@@ -1,0 +1,63 @@
+{
+  "status": "passed",
+  "summary": "Test-writing phase only (TDD red phase). Added two currently-failing XCTest cases pinning the manifest decode/encode behavior the generated OpenAPI client must have, plus a delta doc comparing docs/color-matching-api-contract.md against the real published spec (viamin/color_matching#113, closing #110). No implementation files were touched, per the test-writing run's TDD boundary. No Swift toolchain is available in this container, so the tests could not be compiled or executed here; they are expected to fail (red) until the manifest model is updated or replaced by the generated client in the implementation run.",
+  "acceptance_criteria": [
+    {
+      "id": "AC-1",
+      "status": "skipped",
+      "verification": {
+        "kind": "unit_or_service_test",
+        "references": [
+          {
+            "locator": "iOS/Tests/ColorMatchingLPSAppTests/ManifestContractDeltaTests.swift:17",
+            "result": "not_run"
+          }
+        ]
+      },
+      "note": "testManifestDecodingPreservesServerDeclaredCaptureProfile pins that capture_profile.scoring_algorithm_version must survive decode/encode. Currently fails (field is silently dropped by SheetManifest) because no Swift toolchain exists in this environment to execute `swift test`; expected red-phase result per source inspection of iOS/Sources/MeasurementCore/Models.swift (SheetManifest has no capture_profile property)."
+    },
+    {
+      "id": "AC-2",
+      "status": "skipped",
+      "verification": {
+        "kind": "unit_or_service_test",
+        "references": [
+          {
+            "locator": "iOS/Tests/ColorMatchingLPSAppTests/ManifestContractDeltaTests.swift:27",
+            "result": "not_run"
+          }
+        ]
+      },
+      "note": "testManifestDecodingPreservesServerDeclaredPrinterProfile pins that printer_profile must survive decode/encode. Same no-toolchain caveat as AC-1."
+    },
+    {
+      "id": "AC-3-contract-deltas-documented",
+      "status": "passed",
+      "verification": {
+        "kind": "human_or_external_evidence",
+        "references": [
+          { "locator": "docs/openapi-contract-deltas.md", "result": "passed" }
+        ]
+      },
+      "note": "Deltas were derived by reading the actual merged source of viamin/color_matching#113 (api_spec.ex, api_schemas.ex, test_sheet_json.ex, capture_controller.ex, router.ex, plugs/api_auth.ex) via public GitHub raw/API access and diffing against docs/color-matching-api-contract.md. This is a documentation deliverable, not an automated test; evidence is the doc content itself plus the cited upstream commit 094bd6d3443ddacbda7e63354299867eb5bdfa9f."
+    },
+    {
+      "id": "AC-4-generated-client-and-package-changes",
+      "status": "not_run",
+      "verification": {
+        "kind": "human_or_external_evidence",
+        "references": []
+      },
+      "note": "Adding swift-openapi-generator/swift-openapi-runtime to Package.swift, vendoring the live openapi.json, generating the client, and replacing hand-written models are implementation-file changes explicitly out of scope for this test-writing run (TDD boundary restricts this run to test paths and docs/). Deferred to the implementation run gated on paid-tests-approved."
+    },
+    {
+      "id": "AC-5-swift-test-disable-sandbox-green",
+      "status": "not_run",
+      "verification": {
+        "kind": "human_or_external_evidence",
+        "references": []
+      },
+      "note": "`swift test --disable-sandbox` could not be run: no Swift toolchain is installed in this container (confirmed: `which swift` and `find / -iname *swift*` found no compiler, only Package.swift itself). This exit criterion must be verified in CI or a macOS/Swift-toolchain environment during/after the implementation run."
+    }
+  ]
+}
