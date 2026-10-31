@@ -1,0 +1,1719 @@
+{
+  "openapi": "3.0.3",
+  "info": {
+    "title": "Color Matching API",
+    "version": "v1"
+  },
+  "servers": [
+    {
+      "url": "/"
+    }
+  ],
+  "paths": {
+    "/api/v1/test_sheets/recent": {
+      "get": {
+        "tags": [
+          "Test sheets"
+        ],
+        "summary": "List recent test sheets",
+        "operationId": "ColorMatchingWeb.TestSheetController.recent",
+        "responses": {
+          "200": {
+            "description": "Recent sheets",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RecentSheetsResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiErrorResponse"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ]
+      }
+    },
+    "/api/v1/test_sheets/{sheet_id}/manifest": {
+      "get": {
+        "tags": [
+          "Test sheets"
+        ],
+        "summary": "Fetch a test sheet manifest",
+        "operationId": "ColorMatchingWeb.TestSheetController.manifest",
+        "responses": {
+          "200": {
+            "description": "Sheet manifest",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TestSheetManifest"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiErrorResponse"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Test sheet not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiErrorResponse"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "sheet_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ]
+      }
+    },
+    "/api/v1/test_sheets/{sheet_id}/ranked_results": {
+      "get": {
+        "tags": [
+          "Test sheets"
+        ],
+        "summary": "Fetch ranked results for a test sheet",
+        "operationId": "ColorMatchingWeb.TestSheetController.ranked_results",
+        "responses": {
+          "200": {
+            "description": "Ranked results",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RankedResults"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiErrorResponse"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Test sheet not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiErrorResponse"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "sheet_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ]
+      }
+    },
+    "/api/v1/test_sheets/{sheet_id}/captures": {
+      "post": {
+        "tags": [
+          "Captures"
+        ],
+        "summary": "Create a capture for a test sheet",
+        "operationId": "ColorMatchingWeb.CaptureController.create",
+        "responses": {
+          "201": {
+            "description": "Capture created",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CaptureCreatedResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiErrorResponse"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Test sheet not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiErrorResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Invalid capture attributes",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiErrorResponse"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "sheet_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CaptureRequest"
+              }
+            }
+          },
+          "required": true
+        }
+      }
+    },
+    "/api/v1/captures/{capture_id}/measurements": {
+      "post": {
+        "tags": [
+          "Captures"
+        ],
+        "summary": "Upload capture measurements",
+        "operationId": "ColorMatchingWeb.CaptureController.upload_measurements",
+        "responses": {
+          "200": {
+            "description": "Measurements accepted",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MeasurementUploadResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiErrorResponse"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Capture not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiErrorResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Invalid measurement upload",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiErrorResponse"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "capture_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/MeasurementUploadRequest"
+              }
+            }
+          },
+          "required": true
+        }
+      }
+    },
+    "/api/v1/captures/{capture_id}/judgments": {
+      "post": {
+        "tags": [
+          "Captures"
+        ],
+        "summary": "Upload capture judgments",
+        "operationId": "ColorMatchingWeb.CaptureController.upload_judgments",
+        "responses": {
+          "200": {
+            "description": "Judgments accepted",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/JudgmentUploadResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiErrorResponse"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Capture not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiErrorResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Invalid judgment upload",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiErrorResponse"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "capture_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/JudgmentUploadRequest"
+              }
+            }
+          },
+          "required": true
+        }
+      }
+    },
+    "/api/v1/printer_profiles": {
+      "get": {
+        "tags": [
+          "Palettes"
+        ],
+        "summary": "List printer profiles",
+        "operationId": "ColorMatchingWeb.ColorPaletteController.printer_profiles",
+        "responses": {
+          "200": {
+            "description": "Printer profiles",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PrinterProfilesResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiErrorResponse"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ]
+      }
+    },
+    "/api/v1/printer_profiles/{printer_profile_id}/colors": {
+      "get": {
+        "tags": [
+          "Palettes"
+        ],
+        "summary": "List profile colors",
+        "operationId": "ColorMatchingWeb.ColorPaletteController.profile_colors",
+        "responses": {
+          "200": {
+            "description": "Profile colors",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProfileColorsResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid printer profile ID",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiErrorResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiErrorResponse"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Printer profile not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiErrorResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Invalid printer profile ID",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiErrorResponse"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "printer_profile_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 9223372036854775807
+            }
+          }
+        ]
+      }
+    },
+    "/api/v1/printer_profiles/{printer_profile_id}/metamer_pairs": {
+      "get": {
+        "tags": [
+          "Palettes"
+        ],
+        "summary": "List confirmed metamer pairs",
+        "operationId": "ColorMatchingWeb.ColorPaletteController.metamer_pairs",
+        "responses": {
+          "200": {
+            "description": "Metamer pairs",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MetamerPairsResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid printer profile ID",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiErrorResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiErrorResponse"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Printer profile not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiErrorResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Invalid printer profile ID",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiErrorResponse"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "printer_profile_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 9223372036854775807
+            }
+          }
+        ]
+      }
+    },
+    "/api/v1/palettes": {
+      "get": {
+        "tags": [
+          "Palettes"
+        ],
+        "summary": "List palettes",
+        "operationId": "ColorMatchingWeb.ColorPaletteController.palettes",
+        "responses": {
+          "200": {
+            "description": "Palettes",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PalettesResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiErrorResponse"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ]
+      }
+    },
+    "/api/v1/colors": {
+      "get": {
+        "tags": [
+          "Palettes"
+        ],
+        "summary": "List palette colors and illuminant responses",
+        "operationId": "ColorMatchingWeb.ColorPaletteController.colors",
+        "responses": {
+          "200": {
+            "description": "Colors",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ColorsResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid palette or printer profile ID",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiErrorResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiErrorResponse"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Palette or printer profile not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiErrorResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Invalid query parameters",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiErrorResponse"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "printer_profile_id",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 9223372036854775807
+            }
+          },
+          {
+            "name": "palette_id",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 9223372036854775807
+            }
+          }
+        ]
+      }
+    },
+    "/api/illuminant_measurements": {
+      "post": {
+        "tags": [
+          "Illuminant measurements"
+        ],
+        "summary": "Create an illuminant measurement",
+        "operationId": "ColorMatchingWeb.IlluminantMeasurementController.create",
+        "responses": {
+          "201": {
+            "description": "Measurement created",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/IlluminantMeasurementResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Invalid measurement attributes",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiErrorResponse"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/IlluminantMeasurementRequest"
+              }
+            }
+          },
+          "required": true
+        }
+      }
+    },
+    "/api/illuminant_measurements/bulk": {
+      "post": {
+        "tags": [
+          "Illuminant measurements"
+        ],
+        "summary": "Create illuminant measurements in bulk",
+        "operationId": "ColorMatchingWeb.IlluminantMeasurementController.bulk_create",
+        "responses": {
+          "201": {
+            "description": "Measurements created",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BulkIlluminantMeasurementResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Invalid measurement attributes",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiErrorResponse"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/BulkIlluminantMeasurementRequest"
+              }
+            }
+          },
+          "required": true
+        }
+      }
+    },
+    "/api/multi_image_mapping": {
+      "post": {
+        "tags": [
+          "Image mapping"
+        ],
+        "summary": "Map grayscale images to a palette-colored PNG",
+        "operationId": "ColorMatchingWeb.MultiImageMappingController.create",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/MultiImageMappingRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Mapped PNG",
+            "content": {
+              "image/png": {
+                "schema": {
+                  "type": "string",
+                  "format": "binary"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Palette or printer profile not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiErrorResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Invalid mapping request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiErrorResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "TestSheetManifest": {
+        "type": "object",
+        "description": "Versioned sheet manifest consumed by the iOS companion application.",
+        "properties": {
+          "schema_version": {
+            "type": "string",
+            "enum": [
+              "lps-sheet-manifest/v1"
+            ],
+            "description": "Manifest compatibility version."
+          },
+          "sheet_id": {
+            "type": "string"
+          },
+          "capture_profile": {
+            "type": "object",
+            "properties": {
+              "scoring_algorithm_version": {
+                "type": "string",
+                "enum": [
+                  "lps-distance-v1"
+                ],
+                "description": "Distance-scoring compatibility version."
+              }
+            },
+            "required": [
+              "scoring_algorithm_version"
+            ]
+          }
+        },
+        "required": [
+          "schema_version",
+          "sheet_id",
+          "capture_profile"
+        ]
+      },
+      "RankedResults": {
+        "type": "object",
+        "properties": {
+          "schema_version": {
+            "type": "string",
+            "enum": [
+              "lps-ranked-results/v1"
+            ]
+          },
+          "sheet_id": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "schema_version",
+          "sheet_id"
+        ]
+      },
+      "MultiImageMappingRequest": {
+        "type": "object",
+        "required": [
+          "palette_id",
+          "printer_profile_id",
+          "weights",
+          "images"
+        ],
+        "properties": {
+          "palette_id": {
+            "type": "integer",
+            "minimum": 1
+          },
+          "printer_profile_id": {
+            "type": "integer",
+            "minimum": 1
+          },
+          "weights": {
+            "type": "object",
+            "additionalProperties": {
+              "type": "number"
+            }
+          },
+          "images": {
+            "type": "object",
+            "additionalProperties": {
+              "type": "string"
+            }
+          }
+        }
+      },
+      "ApiErrorResponse": {
+        "type": "object",
+        "properties": {
+          "errors": {
+            "oneOf": [
+              {
+                "type": "object",
+                "additionalProperties": true
+              },
+              {
+                "type": "array",
+                "items": {
+                  "type": "object",
+                  "properties": {
+                    "detail": {
+                      "type": "string"
+                    },
+                    "source": {
+                      "type": "object",
+                      "properties": {
+                        "pointer": {
+                          "type": "string"
+                        }
+                      },
+                      "required": [
+                        "pointer"
+                      ]
+                    }
+                  },
+                  "required": [
+                    "detail",
+                    "source"
+                  ]
+                }
+              }
+            ]
+          }
+        },
+        "required": [
+          "errors"
+        ]
+      },
+      "PrinterProfile": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer"
+          },
+          "printer_make_model": {
+            "type": "string"
+          },
+          "paper_type": {
+            "type": "string"
+          },
+          "ink_type": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "printer_make_model",
+          "paper_type",
+          "ink_type"
+        ]
+      },
+      "Rgb": {
+        "type": "object",
+        "properties": {
+          "r": {
+            "type": "integer"
+          },
+          "g": {
+            "type": "integer"
+          },
+          "b": {
+            "type": "integer"
+          }
+        },
+        "required": [
+          "r",
+          "g",
+          "b"
+        ]
+      },
+      "PrinterProfilesResponse": {
+        "type": "object",
+        "properties": {
+          "printer_profiles": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/PrinterProfile"
+            }
+          }
+        },
+        "required": [
+          "printer_profiles"
+        ]
+      },
+      "PalettesResponse": {
+        "type": "object",
+        "properties": {
+          "palettes": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "id": {
+                  "type": "integer"
+                },
+                "name": {
+                  "type": "string"
+                },
+                "is_preset": {
+                  "type": "boolean"
+                },
+                "color_count": {
+                  "type": "integer"
+                }
+              },
+              "required": [
+                "id",
+                "name",
+                "is_preset",
+                "color_count"
+              ]
+            }
+          }
+        },
+        "required": [
+          "palettes"
+        ]
+      },
+      "ProfileColorsResponse": {
+        "type": "object",
+        "properties": {
+          "printer_profile": {
+            "$ref": "#/components/schemas/PrinterProfile"
+          },
+          "colors": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "name": {
+                  "type": "string"
+                },
+                "hex": {
+                  "type": "string"
+                },
+                "rgb": {
+                  "$ref": "#/components/schemas/Rgb"
+                },
+                "responses": {
+                  "type": "object",
+                  "additionalProperties": true
+                }
+              },
+              "required": [
+                "name",
+                "hex",
+                "responses"
+              ]
+            }
+          }
+        },
+        "required": [
+          "printer_profile",
+          "colors"
+        ]
+      },
+      "ColorsResponse": {
+        "type": "object",
+        "properties": {
+          "printer_profile": {
+            "$ref": "#/components/schemas/PrinterProfile"
+          },
+          "colors": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "id": {
+                  "type": "integer"
+                },
+                "name": {
+                  "type": "string"
+                },
+                "hex": {
+                  "type": "string"
+                },
+                "rgb": {
+                  "$ref": "#/components/schemas/Rgb"
+                },
+                "palette_id": {
+                  "type": "integer"
+                },
+                "palette_name": {
+                  "type": "string",
+                  "nullable": true
+                },
+                "sort_order": {
+                  "type": "integer"
+                },
+                "responses": {
+                  "type": "object",
+                  "additionalProperties": true
+                }
+              },
+              "required": [
+                "id",
+                "name",
+                "hex",
+                "palette_id",
+                "sort_order",
+                "responses"
+              ]
+            }
+          }
+        },
+        "required": [
+          "printer_profile",
+          "colors"
+        ]
+      },
+      "MetamerPairsResponse": {
+        "type": "object",
+        "properties": {
+          "printer_profile": {
+            "$ref": "#/components/schemas/PrinterProfile"
+          },
+          "metamer_pairs": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "pair_id": {
+                  "type": "string"
+                },
+                "color_a_hex": {
+                  "type": "string"
+                },
+                "color_b_hex": {
+                  "type": "string"
+                },
+                "illuminant": {
+                  "type": "string"
+                },
+                "classification": {
+                  "type": "string"
+                },
+                "notes": {
+                  "type": "string",
+                  "nullable": true
+                },
+                "classified_at": {
+                  "type": "string",
+                  "format": "date-time",
+                  "nullable": true
+                }
+              },
+              "required": [
+                "pair_id",
+                "color_a_hex",
+                "color_b_hex",
+                "illuminant",
+                "classification"
+              ]
+            }
+          }
+        },
+        "required": [
+          "printer_profile",
+          "metamer_pairs"
+        ]
+      },
+      "RecentSheetsResponse": {
+        "type": "object",
+        "properties": {
+          "sheets": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "sheet_id": {
+                  "type": "string"
+                },
+                "manifest_url": {
+                  "type": "string"
+                },
+                "title": {
+                  "type": "string",
+                  "nullable": true
+                }
+              },
+              "required": [
+                "sheet_id",
+                "manifest_url",
+                "title"
+              ]
+            }
+          }
+        },
+        "required": [
+          "sheets"
+        ]
+      },
+      "CaptureMetadata": {
+        "type": "object",
+        "properties": {
+          "device_model": {
+            "type": "string"
+          },
+          "lens": {
+            "type": "string"
+          },
+          "exposure_duration_seconds": {
+            "type": "number",
+            "minimum": 0,
+            "exclusiveMinimum": true
+          },
+          "iso": {
+            "type": "integer",
+            "minimum": 0,
+            "exclusiveMinimum": true
+          },
+          "focus_lens_position": {
+            "type": "number",
+            "minimum": 0
+          },
+          "white_balance_gains": {
+            "type": "object"
+          },
+          "image_width": {
+            "type": "integer",
+            "minimum": 0,
+            "exclusiveMinimum": true
+          },
+          "image_height": {
+            "type": "integer",
+            "minimum": 0,
+            "exclusiveMinimum": true
+          },
+          "app_version": {
+            "type": "string"
+          },
+          "timestamp": {
+            "type": "string",
+            "format": "date-time"
+          }
+        },
+        "required": [
+          "device_model",
+          "lens",
+          "image_width",
+          "image_height",
+          "app_version",
+          "timestamp"
+        ]
+      },
+      "CaptureRequest": {
+        "type": "object",
+        "properties": {
+          "device_model": {
+            "type": "string"
+          },
+          "lens": {
+            "type": "string"
+          },
+          "exposure_duration": {
+            "type": "number",
+            "minimum": 0,
+            "exclusiveMinimum": true
+          },
+          "iso": {
+            "type": "integer",
+            "minimum": 0,
+            "exclusiveMinimum": true
+          },
+          "focus_lens_position": {
+            "type": "number",
+            "minimum": 0
+          },
+          "white_balance_gains": {
+            "type": "object"
+          },
+          "image_width": {
+            "type": "integer",
+            "minimum": 0,
+            "exclusiveMinimum": true
+          },
+          "image_height": {
+            "type": "integer",
+            "minimum": 0,
+            "exclusiveMinimum": true
+          },
+          "app_version": {
+            "type": "string"
+          },
+          "timestamp": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "detected_marker_count": {
+            "type": "integer",
+            "minimum": 0
+          },
+          "blur_score": {
+            "type": "number",
+            "minimum": 0
+          },
+          "rejection_reasons": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "metadata": {
+            "$ref": "#/components/schemas/CaptureMetadata"
+          },
+          "quality": {
+            "type": "object",
+            "properties": {
+              "detected_marker_count": {
+                "type": "integer",
+                "minimum": 0
+              },
+              "blur_score": {
+                "type": "number",
+                "minimum": 0
+              },
+              "rejections": {
+                "type": "array",
+                "items": {
+                  "type": "string"
+                }
+              }
+            }
+          }
+        },
+        "anyOf": [
+          {
+            "required": [
+              "device_model",
+              "lens",
+              "image_width",
+              "image_height",
+              "app_version",
+              "timestamp"
+            ]
+          },
+          {
+            "required": [
+              "metadata"
+            ]
+          }
+        ]
+      },
+      "CaptureCreatedResponse": {
+        "type": "object",
+        "properties": {
+          "capture_id": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "capture_id"
+        ]
+      },
+      "RgbPayload": {
+        "description": "An RGB array, an object with r/g/b channels, or a JSON-encoded representation.",
+        "anyOf": [
+          {
+            "type": "array",
+            "items": {
+              "type": "number"
+            }
+          },
+          {
+            "type": "object",
+            "properties": {
+              "r": {
+                "type": "number"
+              },
+              "g": {
+                "type": "number"
+              },
+              "b": {
+                "type": "number"
+              }
+            },
+            "required": [
+              "r",
+              "g",
+              "b"
+            ]
+          },
+          {
+            "type": "string"
+          }
+        ]
+      },
+      "PairScoreRequest": {
+        "type": "object",
+        "description": "A score may be supplied directly, as a compatibility similarity, or as a compatibility distance.",
+        "properties": {
+          "pair_id": {
+            "type": "string"
+          },
+          "algorithm_version": {
+            "type": "string"
+          },
+          "score": {
+            "type": "number"
+          },
+          "similarity": {
+            "type": "number"
+          },
+          "distance": {
+            "type": "number"
+          }
+        },
+        "required": [
+          "pair_id",
+          "algorithm_version"
+        ],
+        "anyOf": [
+          {
+            "required": [
+              "score"
+            ]
+          },
+          {
+            "required": [
+              "similarity"
+            ]
+          },
+          {
+            "required": [
+              "distance"
+            ]
+          }
+        ]
+      },
+      "MeasurementUploadRequest": {
+        "type": "object",
+        "properties": {
+          "measurements": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "patch_id": {
+                  "type": "string"
+                },
+                "linear_rgb_median": {
+                  "$ref": "#/components/schemas/RgbPayload"
+                },
+                "normalized_linear_rgb_median": {
+                  "$ref": "#/components/schemas/RgbPayload"
+                }
+              },
+              "required": [
+                "patch_id",
+                "linear_rgb_median",
+                "normalized_linear_rgb_median"
+              ]
+            }
+          },
+          "pair_scores": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/PairScoreRequest"
+            }
+          }
+        }
+      },
+      "MeasurementUploadResponse": {
+        "type": "object",
+        "properties": {
+          "capture_id": {
+            "type": "string"
+          },
+          "measurement_count": {
+            "type": "integer"
+          },
+          "pair_score_count": {
+            "type": "integer"
+          }
+        },
+        "required": [
+          "capture_id",
+          "measurement_count",
+          "pair_score_count"
+        ]
+      },
+      "JudgmentUploadRequest": {
+        "type": "object",
+        "properties": {
+          "judgments": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "pair_id": {
+                  "type": "string"
+                },
+                "judgment": {
+                  "type": "string"
+                }
+              },
+              "required": [
+                "pair_id",
+                "judgment"
+              ]
+            }
+          }
+        },
+        "required": [
+          "judgments"
+        ]
+      },
+      "JudgmentUploadResponse": {
+        "type": "object",
+        "properties": {
+          "capture_id": {
+            "type": "string"
+          },
+          "judgment_count": {
+            "type": "integer"
+          }
+        },
+        "required": [
+          "capture_id",
+          "judgment_count"
+        ]
+      },
+      "IlluminantMeasurementRequest": {
+        "type": "object",
+        "properties": {
+          "color_id": {
+            "type": "integer"
+          },
+          "printer_profile_id": {
+            "type": "integer"
+          },
+          "light_source": {
+            "type": "string",
+            "enum": [
+              "white",
+              "red",
+              "green",
+              "blue",
+              "lps"
+            ]
+          },
+          "brightness": {
+            "type": "number",
+            "minimum": 0,
+            "maximum": 1
+          }
+        },
+        "required": [
+          "color_id",
+          "printer_profile_id",
+          "light_source",
+          "brightness"
+        ]
+      },
+      "IlluminantMeasurementResponse": {
+        "type": "object",
+        "properties": {
+          "data": {
+            "type": "object",
+            "additionalProperties": true
+          }
+        },
+        "required": [
+          "data"
+        ]
+      },
+      "BulkIlluminantMeasurementRow": {
+        "type": "object",
+        "properties": {
+          "color_id": {
+            "type": "integer"
+          },
+          "brightness": {
+            "type": "number",
+            "minimum": 0,
+            "maximum": 1
+          },
+          "raw_value": {
+            "type": "number"
+          },
+          "raw_unit": {
+            "type": "string"
+          },
+          "notes": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "color_id",
+          "brightness"
+        ]
+      },
+      "BulkIlluminantMeasurementRequest": {
+        "type": "object",
+        "description": "Shared printer profile and light-source metadata apply to every measurement row.",
+        "properties": {
+          "printer_profile_id": {
+            "type": "integer"
+          },
+          "light_source": {
+            "type": "string",
+            "enum": [
+              "white",
+              "red",
+              "green",
+              "blue",
+              "lps"
+            ]
+          },
+          "raw_value": {
+            "type": "number"
+          },
+          "raw_unit": {
+            "type": "string"
+          },
+          "notes": {
+            "type": "string"
+          },
+          "measured_at": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "measurement_method": {
+            "type": "string"
+          },
+          "measurement_device": {
+            "type": "string"
+          },
+          "test_run_id": {
+            "type": "string"
+          },
+          "measurements": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/BulkIlluminantMeasurementRow"
+            }
+          }
+        },
+        "required": [
+          "printer_profile_id",
+          "light_source",
+          "measurements"
+        ]
+      },
+      "BulkIlluminantMeasurementResponse": {
+        "type": "object",
+        "properties": {
+          "data": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "additionalProperties": true
+            }
+          }
+        },
+        "required": [
+          "data"
+        ]
+      }
+    },
+    "securitySchemes": {
+      "bearerAuth": {
+        "type": "http",
+        "scheme": "bearer",
+        "bearerFormat": "API token"
+      }
+    }
+  }
+}
