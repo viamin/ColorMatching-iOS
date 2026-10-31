@@ -1,0 +1,70 @@
+{
+  "status": "failed",
+  "summary": "Tests-only red-phase run for issue #5 (generated OpenAPI client). Committed VendoredOpenAPISpecTests (assertion-red: spec not vendored yet) and GeneratedAPIClientTests (compile-red: imports missing ColorMatchingOpenAPI module and generated Components.Schemas.* types). Contract deltas and endpoint gaps between docs/color-matching-api-contract.md and the published spec (viamin/color_matching#110, merged as upstream PR #113) are recorded in docs/openapi-client-migration-plan.md. No Swift toolchain exists in this container, so tests could not be executed locally; they run in CI (.github/workflows/ci.yml, macOS swift test). Expected assertion/compile failures demonstrating missing behavior are permitted in this phase; existing APIClientTests were left untouched (their 204 upload stubs must be updated by the implementation run).",
+  "acceptance_criteria": [
+    {
+      "id": "AC-1",
+      "description": "swift-openapi-generator + swift-openapi-runtime added; OpenAPI document fetched/vendored",
+      "status": "failed",
+      "verification": {
+        "kind": "unit_or_service_test",
+        "references": [
+          { "locator": "iOS/Tests/MeasurementCoreTests/VendoredOpenAPISpecTests.swift:5", "result": "not_run", "note": "asserts vendored openapi.json exists, is OpenAPI 3, covers the six app surfaces and required schemas; cannot execute locally (no Swift toolchain); red until implementation vendors iOS/Sources/ColorMatchingOpenAPI/openapi.json" },
+          { "locator": "iOS/Tests/MeasurementCoreTests/VendoredOpenAPISpecTests.swift:48", "result": "not_run", "note": "asserts openapi-generator-config.yaml with public access exists" }
+        ]
+      }
+    },
+    {
+      "id": "AC-2",
+      "description": "Client generated for manifest, recent sheets, capture creation, measurement upload, judgment upload, ranked results",
+      "status": "failed",
+      "verification": {
+        "kind": "unit_or_service_test",
+        "references": [
+          { "locator": "iOS/Tests/ColorMatchingLPSAppTests/GeneratedAPIClientTests.swift:15", "result": "not_run", "note": "manifest surface (spec-guaranteed + beyond-spec fields); target does not compile until ColorMatchingOpenAPI module exists - intended compile-red" },
+          { "locator": "iOS/Tests/ColorMatchingLPSAppTests/GeneratedAPIClientTests.swift:42", "result": "not_run", "note": "recent sheets surface" },
+          { "locator": "iOS/Tests/ColorMatchingLPSAppTests/GeneratedAPIClientTests.swift:61", "result": "not_run", "note": "capture session creation surface (201 + spec request body)" },
+          { "locator": "iOS/Tests/ColorMatchingLPSAppTests/GeneratedAPIClientTests.swift:101", "result": "not_run", "note": "measurement upload surface (200 + counted JSON response per published spec)" },
+          { "locator": "iOS/Tests/ColorMatchingLPSAppTests/GeneratedAPIClientTests.swift:142", "result": "not_run", "note": "judgment upload surface (200 + counted JSON response per published spec)" },
+          { "locator": "iOS/Tests/ColorMatchingLPSAppTests/GeneratedAPIClientTests.swift:164", "result": "not_run", "note": "ranked results surface (new fetchRankedResults wrapper)" }
+        ]
+      }
+    },
+    {
+      "id": "AC-3",
+      "description": "Hand-written API models replaced with generated types; client-side models kept",
+      "status": "failed",
+      "verification": {
+        "kind": "unit_or_service_test",
+        "references": [
+          { "locator": "iOS/Tests/ColorMatchingLPSAppTests/GeneratedAPIClientTests.swift:48", "result": "not_run", "note": "explicit Components.Schemas.RecentSheetsResponse annotation forces generated types" },
+          { "locator": "iOS/Tests/ColorMatchingLPSAppTests/GeneratedAPIClientTests.swift:107", "result": "not_run", "note": "explicit Components.Schemas.MeasurementUploadResponse annotation" },
+          { "locator": "iOS/Tests/ColorMatchingLPSAppTests/GeneratedAPIClientTests.swift:127", "result": "not_run", "note": "asserts top-level scoring_algorithm_version no longer sent (spec moved it onto each pair score)" },
+          { "locator": "iOS/Tests/ColorMatchingLPSAppTests/GeneratedAPIClientTests.swift:26", "result": "not_run", "note": "SheetManifest.scoringAlgorithmVersion sourced from generated TestSheetManifest - property missing today (compile-red)" }
+        ]
+      }
+    },
+    {
+      "id": "AC-4",
+      "description": "Swift tests exercising the generated client against local stubbed responses (no live server in CI)",
+      "status": "failed",
+      "verification": {
+        "kind": "unit_or_service_test",
+        "references": [
+          { "locator": "iOS/Tests/ColorMatchingLPSAppTests/GeneratedAPIClientTests.swift:264", "result": "not_run", "note": "URLProtocol-based stubbing, zero network usage; all seven tests stub responses locally" }
+        ]
+      }
+    },
+    {
+      "id": "AC-5",
+      "description": "PR description records contract deltas between prose contract and published spec, and endpoint gaps",
+      "status": "not_run",
+      "verification": {
+        "kind": "human_or_external_evidence",
+        "references": [
+          { "locator": "docs/openapi-client-migration-plan.md", "result": "passed", "note": "full delta table (8 areas) and 5 endpoint gaps prepared from the real published spec (api_schemas.ex/api_spec.ex/controllers of viamin/color_matching at PR #113); PR description itself is authored by the implementation run" }
+        ]
+      }
+    }
+  ]
+}
