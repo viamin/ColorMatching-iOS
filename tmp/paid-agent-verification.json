@@ -1,0 +1,75 @@
+{
+  "status": "not_run",
+  "summary": "Tests-only red phase for generated OpenAPI client replacement. The container does not provide a Swift executable, so swift test --disable-sandbox could not start. Dependency and vendored-spec requirements are intentionally red until the implementation run.",
+  "acceptance_criteria": [
+    {
+      "id": "AC-1",
+      "status": "not_run",
+      "verification": {
+        "kind": "unit_or_service_test",
+        "references": [
+          {
+            "locator": "iOS/Tests/ColorMatchingLPSAppTests/OpenAPIClientIntegrationRequirementsTests.swift:5",
+            "result": "not run: Swift executable unavailable; expected red until Package.swift declares swift-openapi-generator and swift-openapi-runtime"
+          }
+        ]
+      }
+    },
+    {
+      "id": "AC-2",
+      "status": "not_run",
+      "verification": {
+        "kind": "unit_or_service_test",
+        "references": [
+          {
+            "locator": "iOS/Tests/ColorMatchingLPSAppTests/OpenAPIClientIntegrationRequirementsTests.swift:15",
+            "result": "not run: Swift executable unavailable; expected red until the published OpenAPI document is vendored"
+          }
+        ]
+      }
+    },
+    {
+      "id": "AC-3",
+      "status": "not_run",
+      "verification": {
+        "kind": "unit_or_service_test",
+        "references": [
+          {
+            "locator": "iOS/Tests/ColorMatchingLPSAppTests/APIClientTests.swift:62",
+            "result": "not run: Swift executable unavailable; test exercises local URLProtocol stubs for manifest and recent sheets once the runner is available"
+          }
+        ]
+      }
+    },
+    {
+      "id": "AC-4",
+      "status": "not_run",
+      "verification": {
+        "kind": "human_or_external_evidence",
+        "references": [
+          {
+            "locator": "docs/issue-5-openapi-client-pr-description.md:24",
+            "result": "implementation-head code review required to verify hand-written API models are removed"
+          }
+        ]
+      }
+    },
+    {
+      "id": "AC-5",
+      "status": "passed",
+      "verification": {
+        "kind": "human_or_external_evidence",
+        "references": [
+          {
+            "locator": "https://github.com/viamin/color_matching/issues/110",
+            "result": "provider issue is closed and current provider router exposes the six required routes"
+          },
+          {
+            "locator": "docs/issue-5-openapi-client-pr-description.md:18",
+            "result": "contract deltas and schema-detail gaps are recorded"
+          }
+        ]
+      }
+    }
+  ]
+}
