@@ -1,0 +1,131 @@
+{
+  "status": "failed",
+  "summary": "Tests-only red phase for issue #5 (generated OpenAPI Swift client). Two permanent test files and the vendoring/wiring contract doc were added and then reconciled onto the unified contract introduced by sibling commit 5bc09d3 (module ColorMatchingOpenAPI, defensive naming, listRecentSheets). Every acceptance criterion that depends on implementation is intentionally red (missing vendored spec artifact, missing ColorMatchingOpenAPI target) and the failures demonstrate the missing behavior per the phase rules. swift test could not be executed in this container: no Swift toolchain is installed (swift/swiftc not found); CI (macos-latest) runs it. The spec-test logic was validated by simulating all assertions against a synthetic vendored openapi.json matching docs/openapi-generated-client.md (all passed), and all stub JSON literals were verified to parse.",
+  "blocked_notes": [
+    "No Swift toolchain in this container (swift/swiftc absent), so swift test --disable-sandbox could not be run here; the suite compiles without new package dependencies today because the generated-client tests are canImport-guarded and the vendored-spec tests use Foundation only.",
+    "Upstream dependency viamin/color_matching#110 verified complete: spec served at GET /api/v1/openapi.json (upstream PR #113, inspected at SHA 14320c33f93258a331cf17af7323ce9035c8a44d); deltas and gaps recorded in docs/openapi-generated-client.md."
+  ],
+  "acceptance_criteria": [
+    {
+      "id": "AC-1",
+      "description": "Add swift-openapi-generator + swift-openapi-runtime to the iOS package; fetch or vendor the OpenAPI document from viamin/color_matching#110",
+      "status": "failed",
+      "verification": {
+        "kind": "unit_or_service_test",
+        "evidence": [
+          {
+            "locator": "iOS/Tests/ColorMatchingLPSAppTests/VendoredOpenAPISpecTests.swift:14",
+            "result": "red",
+            "note": "loadSpec() XCTUnwraps iOS/Sources/ColorMatchingOpenAPI/openapi.json; file is absent at this head (expected red-phase assertion failure)"
+          },
+          {
+            "locator": "iOS/Tests/ColorMatchingLPSAppTests/GeneratedAPIClientTests.swift:395",
+            "result": "red",
+            "note": "GeneratedAPIClientSentinelTests fails until the ColorMatchingOpenAPI target is wired into iOS/Package.swift (red-phase sentinel; package wiring is out of scope for this tests-only run)"
+          },
+          {
+            "locator": "iOS/Tests/ColorMatchingLPSAppTests/OpenAPIPackageWiringTests.swift:9",
+            "result": "red",
+            "note": "Sibling-commit test requiring swift-openapi-generator/runtime in Package.swift"
+          },
+          {
+            "locator": "docs/openapi-generated-client.md",
+            "result": "reference",
+            "note": "Records the exact vendoring steps, pinned upstream SHA, and package wiring the implementation run must land"
+          }
+        ]
+      }
+    },
+    {
+      "id": "AC-2",
+      "description": "Generate the client for the surfaces the app uses today: manifest, recent sheets, capture creation, measurement upload, judgment upload, ranked results",
+      "status": "failed",
+      "verification": {
+        "kind": "unit_or_service_test",
+        "evidence": [
+          {
+            "locator": "iOS/Tests/ColorMatchingLPSAppTests/GeneratedAPIClientTests.swift:24",
+            "result": "compiled-out-red (sentinel at :395)",
+            "note": "testGetTestSheetManifestDecodesSpecEnvelopeAndIgnoresUndocumentedFields"
+          },
+          {
+            "locator": "iOS/Tests/ColorMatchingLPSAppTests/GeneratedAPIClientTests.swift:72",
+            "result": "compiled-out-red (sentinel at :395)",
+            "note": "testListRecentSheetsDecodesSheetsAndOptionalTitle"
+          },
+          {
+            "locator": "iOS/Tests/ColorMatchingLPSAppTests/GeneratedAPIClientTests.swift:107",
+            "result": "compiled-out-red (sentinel at :395)",
+            "note": "testCreateCaptureEncodesNestedMetadataAndQuality"
+          },
+          {
+            "locator": "iOS/Tests/ColorMatchingLPSAppTests/GeneratedAPIClientTests.swift:167",
+            "result": "compiled-out-red (sentinel at :395)",
+            "note": "testUploadMeasurementsEncodesRgbObjectsAndPairScores"
+          },
+          {
+            "locator": "iOS/Tests/ColorMatchingLPSAppTests/GeneratedAPIClientTests.swift:234",
+            "result": "compiled-out-red (sentinel at :395)",
+            "note": "testUploadJudgmentsEncodesJudgmentRows"
+          },
+          {
+            "locator": "iOS/Tests/ColorMatchingLPSAppTests/GeneratedAPIClientTests.swift:272",
+            "result": "compiled-out-red (sentinel at :395)",
+            "note": "testGetRankedResultsDecodesSchemaVersionEnvelope"
+          },
+          {
+            "locator": "iOS/Tests/ColorMatchingLPSAppTests/VendoredOpenAPISpecTests.swift:47-105",
+            "result": "red (missing vendored artifact)",
+            "note": "Six operation-coverage assertions for the vendored document (operationIds, methods, statuses, path params, request bodies, bearer security)"
+          }
+        ]
+      }
+    },
+    {
+      "id": "AC-3",
+      "description": "Replace the app's hand-written API models with generated types; keep purely client-side models as-is",
+      "status": "not_run",
+      "reason": "Implementation-phase criterion. Regression pin in place: iOS/Tests/ColorMatchingLPSAppTests/APIClientTests.swift is unchanged and must stay green through the rewire; generated-type usage is exercised by GeneratedAPIClientTests; MeasurementCore models are client-side and untouched."
+    },
+    {
+      "id": "AC-4",
+      "description": "Swift tests exercising the generated client against local stubbed responses (no live server in CI)",
+      "status": "failed",
+      "verification": {
+        "kind": "unit_or_service_test",
+        "evidence": [
+          {
+            "locator": "iOS/Tests/ColorMatchingLPSAppTests/GeneratedAPIClientTests.swift:344",
+            "result": "compiled-out-red (sentinel at :395)",
+            "note": "StubTransport implements OpenAPIRuntime.ClientTransport; all eight generated-client tests drive it offline (no URLSession, no network)"
+          },
+          {
+            "locator": "iOS/Tests/ColorMatchingLPSAppTests/GeneratedAPIClientTests.swift:299",
+            "result": "compiled-out-red (sentinel at :395)",
+            "note": "BearerAuthMiddleware header-injection test (with and without middleware)"
+          }
+        ]
+      }
+    },
+    {
+      "id": "AC-5",
+      "description": "PR description records what changed between the prose contract and the published spec, and any endpoint gaps discovered",
+      "status": "passed",
+      "verification": {
+        "kind": "human_or_external_evidence",
+        "evidence": [
+          {
+            "locator": "docs/openapi-generated-client.md",
+            "result": "passed",
+            "note": "11-row contract-delta table (prose vs published spec, derived from upstream api_schemas.ex/test_sheet_json.ex at SHA 14320c3), 4 upstream endpoint gaps, 3 recorded vendor normalizations, and the acceptance-criteria mapping; to be carried verbatim into the PR description"
+          },
+          {
+            "locator": "iOS/Tests/ColorMatchingLPSAppTests/VendoredOpenAPISpecTests.swift:107",
+            "result": "red (missing vendored artifact)",
+            "note": "Gap pins keep the deltas machine-visible in CI: manifest envelope (testManifestSchemaDocumentsOnlyTheVersionedEnvelope), ranked-results envelope (:130), missing stats + moved scoring_algorithm_version (:145)"
+          }
+        ]
+      }
+    }
+  ]
+}
