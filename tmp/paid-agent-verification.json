@@ -1,0 +1,88 @@
+{
+  "status": "not_run",
+  "summary": "Red-phase OpenAPI contract coverage was added. Swift tests could not run because this container does not provide the swift executable; the new vendored-document test is intentionally red until the implementation run vendors the upstream document.",
+  "acceptance_criteria": [
+    {
+      "id": "AC-1",
+      "status": "not_run",
+      "verification": {
+        "kind": "unit_or_service_test",
+        "references": [
+          {
+            "locator": "iOS/Tests/ColorMatchingLPSAppTests/APIClientTests.swift:testVendoredOpenAPIDocumentDefinesEveryAppOperation",
+            "result": "not run: swift executable is unavailable; expected red until iOS/OpenAPI/color-matching-api.json is vendored"
+          }
+        ]
+      }
+    },
+    {
+      "id": "AC-2",
+      "status": "not_run",
+      "verification": {
+        "kind": "unit_or_service_test",
+        "references": [
+          {
+            "locator": "iOS/Tests/ColorMatchingLPSAppTests/APIClientTests.swift:testFetchesManifestAndRecentSheetsFromLocalStubs",
+            "result": "not run: swift executable is unavailable"
+          },
+          {
+            "locator": "docs/issue-5-openapi-client-test-plan.md",
+            "result": "ranked-results generated-operation test deferred until generated response type exists; published schema gap documented"
+          }
+        ]
+      }
+    },
+    {
+      "id": "AC-3",
+      "status": "not_run",
+      "verification": {
+        "kind": "human_or_external_evidence",
+        "references": [
+          {
+            "locator": "docs/issue-5-openapi-client-test-plan.md",
+            "result": "implementation/code-review evidence pending the implementation phase"
+          }
+        ]
+      }
+    },
+    {
+      "id": "AC-4",
+      "status": "not_run",
+      "verification": {
+        "kind": "unit_or_service_test",
+        "references": [
+          {
+            "locator": "iOS/Tests/ColorMatchingLPSAppTests/APIClientTests.swift:MockURLProtocol",
+            "result": "not run: permanent local URLProtocol test seam is present; no live-server dependency"
+          }
+        ]
+      }
+    },
+    {
+      "id": "AC-5",
+      "status": "not_run",
+      "verification": {
+        "kind": "unit_or_service_test",
+        "references": [
+          {
+            "locator": "iOS/Package.swift",
+            "result": "not run: swift test --disable-sandbox could not start because swift is unavailable"
+          }
+        ]
+      }
+    },
+    {
+      "id": "AC-6",
+      "status": "passed",
+      "verification": {
+        "kind": "human_or_external_evidence",
+        "references": [
+          {
+            "locator": "docs/issue-5-openapi-client-test-plan.md",
+            "result": "records the prose-versus-published-spec deltas and endpoint schema gaps from viamin/color_matching#113"
+          }
+        ]
+      }
+    }
+  ]
+}
