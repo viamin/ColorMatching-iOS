@@ -92,6 +92,33 @@ final class APIClientTests: XCTestCase {
         XCTAssertEqual((json["judgments"] as? [[String: Any]])?.first?["judgment"] as? String, "near_match")
     }
 
+    func testGeneratedOpenAPIClientConfigurationTracksEveryAppSurface() throws {
+        let repository = URL(fileURLWithPath: #filePath)
+            .deletingLastPathComponent()
+            .deletingLastPathComponent()
+            .deletingLastPathComponent()
+            .deletingLastPathComponent()
+        let package = try String(contentsOf: repository.appending(path: "iOS/Package.swift"))
+        let specification = repository.appending(path: "iOS/OpenAPI/openapi.json")
+
+        XCTAssertTrue(package.contains("swift-openapi-generator"))
+        XCTAssertTrue(package.contains("swift-openapi-runtime"))
+        XCTAssertTrue(FileManager.default.fileExists(atPath: specification.path))
+
+        let document = try XCTUnwrap(
+            try JSONSerialization.jsonObject(with: Data(contentsOf: specification)) as? [String: Any]
+        )
+        let paths = try XCTUnwrap(document["paths"] as? [String: Any])
+        [
+            "/api/v1/test_sheets/recent",
+            "/api/v1/test_sheets/{sheet_id}/manifest",
+            "/api/v1/test_sheets/{sheet_id}/captures",
+            "/api/v1/captures/{capture_id}/measurements",
+            "/api/v1/captures/{capture_id}/judgments",
+            "/api/v1/test_sheets/{sheet_id}/ranked_results"
+        ].forEach { XCTAssertNotNil(paths[$0], "missing OpenAPI path: \($0)") }
+    }
+
     private func client() -> APIClient {
         let configuration = URLSessionConfiguration.ephemeral
         configuration.protocolClasses = [MockURLProtocol.self]
