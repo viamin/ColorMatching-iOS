@@ -92,6 +92,43 @@ final class APIClientTests: XCTestCase {
         XCTAssertEqual((json["judgments"] as? [[String: Any]])?.first?["judgment"] as? String, "near_match")
     }
 
+    func testFetchManifestAndRecentSheetsDecodePublishedResponseShapes() async throws {
+        MockURLProtocol.handler = { request in
+            let response = HTTPURLResponse(url: request.url!, statusCode: 200, httpVersion: nil, headerFields: nil)!
+
+            switch request.url?.path {
+            case "/api/v1/test_sheets/sheet_1/manifest":
+                return (response, Self.manifestResponse)
+            case "/api/v1/test_sheets/recent":
+                return (response, Self.recentSheetsResponse)
+            default:
+                throw URLError(.badURL)
+            }
+        }
+
+        let baseURL = URL(string: "https://example.test")!
+        let manifest = try await client().fetchManifest(baseURL: baseURL, sheetCode: "sheet_1")
+        let sheets = try await client().fetchRecentSheets(baseURL: baseURL)
+
+        XCTAssertEqual(manifest.schemaVersion, "lps-sheet-manifest/v1")
+        XCTAssertEqual(manifest.patches.first?.pairID, "pair_1")
+        XCTAssertEqual(sheets.map(\.sheetID), ["sheet_1"])
+        XCTAssertNil(sheets.first?.title)
+    }
+
+    func testGeneratedClientDependenciesAndReplacementAreCheckedIn() throws {
+        let package = try String(contentsOf: packageURL)
+        let apiClient = try String(contentsOf: apiClientURL)
+
+        XCTAssertTrue(package.contains("swift-openapi-generator"))
+        XCTAssertTrue(package.contains("swift-openapi-runtime"))
+        XCTAssertTrue(package.contains("OpenAPIGenerator"))
+        XCTAssertTrue(package.contains("OpenAPIRuntime"))
+        XCTAssertFalse(apiClient.contains("public struct CaptureMetadata"))
+        XCTAssertFalse(apiClient.contains("private struct MeasurementUploadRequest"))
+        XCTAssertFalse(apiClient.contains("private struct JudgmentUploadRequest"))
+    }
+
     private func client() -> APIClient {
         let configuration = URLSessionConfiguration.ephemeral
         configuration.protocolClasses = [MockURLProtocol.self]
@@ -117,6 +154,51 @@ final class APIClientTests: XCTestCase {
         }
         return data
     }
+
+    private var packageURL: URL {
+        sourceRoot.appending(path: "Package.swift")
+    }
+
+    private var apiClientURL: URL {
+        sourceRoot.appending(path: "Sources/ColorMatchingLPSAppCore/APIClient.swift")
+    }
+
+    private var sourceRoot: URL {
+        URL(fileURLWithPath: #filePath)
+            .deletingLastPathComponent()
+            .deletingLastPathComponent()
+            .deletingLastPathComponent()
+    }
+
+    private static let manifestResponse = Data(#"""
+    {
+      "schema_version": "lps-sheet-manifest/v1",
+      "sheet_version": "lps-letter-grid-v1",
+      "sheet_id": "sheet_1",
+      "manifest_url": "https://example.test/api/v1/test_sheets/sheet_1/manifest",
+      "page": {"units": "mm", "width": 215.9, "height": 279.4},
+      "registration_markers": [],
+      "patches": [{
+        "id": "patch_1", "role": "pair_color", "pair_id": "pair_1",
+        "pair_side": "first", "reference_role": null, "source_color": "#FF0000",
+        "safe_inset_mm": 1.5, "rect": {"x": 16, "y": 38, "width": 16, "height": 10}
+      }],
+      "pairs": [{
+        "id": "pair_1", "first_patch_id": "patch_1", "second_patch_id": "patch_2",
+        "source_colors": ["#FF0000", "#00FF00"], "grid_row": 0, "grid_col": 1
+      }]
+    }
+    """#.utf8)
+
+    private static let recentSheetsResponse = Data(#"""
+    {
+      "sheets": [{
+        "sheet_id": "sheet_1",
+        "manifest_url": "https://example.test/api/v1/test_sheets/sheet_1/manifest",
+        "title": null
+      }]
+    }
+    """#.utf8)
 }
 
 private final class MockURLProtocol: URLProtocol {
