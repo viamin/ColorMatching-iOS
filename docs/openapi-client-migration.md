@@ -12,10 +12,10 @@ should carry the delta table below verbatim.
 | AC | Verification | Locator |
 | ---- | ---- | ---- |
 | Add `swift-openapi-generator` + `swift-openapi-runtime`; vendor the OpenAPI document | Focused unit tests asserting `Package.swift` wiring and the vendored JSON document (red now, green after implementation) | `iOS/Tests/ColorMatchingLPSAppTests/OpenAPIPackageWiringTests.swift`, `iOS/Tests/ColorMatchingLPSAppTests/VendoredOpenAPISpecTests.swift` |
-| Generate the client for the surfaces the app uses (manifest, recent sheets, capture creation, measurement upload, judgment upload, ranked results) | Spec-coverage tests pin the six path/method pairs and the payload schema titles (red now) | `VendoredOpenAPISpecTests.testVendoredSpecCoversEveryAppSurface`, `VendoredOpenAPISchemaTests` |
-| Replace hand-written API models with generated types; keep client-only models | Stubbed-response tests pin the app-facing wire format through `APIClient` so the swap cannot change payloads unnoticed (green now, must stay green) | `iOS/Tests/ColorMatchingLPSAppTests/APIClientContractTests.swift` |
+| Generate the client for the surfaces the app uses (manifest, recent sheets, capture creation, measurement upload, judgment upload, ranked results) | Spec-coverage tests pin the six path/method pairs, per-operation success status + JSON body + bearer security, and the payload schema titles and shapes (red now) | `VendoredOpenAPISpecTests.testVendoredSpecCoversEveryAppSurface`, `VendoredOpenAPISpecTests.testEveryAppOperationDeclaresSpecSuccessStatusWithJSONBody`, `VendoredOpenAPISpecTests.testUploadOperationsDeclareJSONRequestBody`, `VendoredOpenAPISpecTests.testEveryAppOperationRequiresBearerAuth`, `VendoredOpenAPISchemaTests` |
+| Replace hand-written API models with generated types; keep client-only models | Stubbed-response tests pin the app-facing wire format through `APIClient` so the swap cannot change payloads unnoticed (green now, must stay green). Stub fixtures use the spec's real response shapes — 201 + numeric-string `capture_id` for capture creation, 200 + count bodies for uploads — so they stay valid when the generated client decodes those bodies | `iOS/Tests/ColorMatchingLPSAppTests/APIClientContractTests.swift`, `iOS/Tests/ColorMatchingLPSAppTests/APIClientTests.swift` |
 | Swift tests exercising the generated client against stubbed responses, no live server in CI | `ContractStubURLProtocol` (URLProtocol stub) serves fixtures; no network in tests | `iOS/Tests/ColorMatchingLPSAppTests/TestSupport/ContractStubURLProtocol.swift` |
-| PR description records contract deltas and endpoint gaps | Delta table below, derived from upstream `api_schemas.ex`, `capture_controller.ex`, `test_sheet_controller.ex`, `router.ex` | This document; upstream sources cited per row |
+| PR description records contract deltas and endpoint gaps | Delta table below, re-verified this run against upstream `api_schemas.ex`, `capture_controller.ex`, `test_sheet_controller.ex`, `router.ex` at `viamin/color_matching` main (PR #113) | This document; upstream sources cited per row |
 
 Vendored-document contract enforced by the tests: a JSON OpenAPI 3 document at
 `iOS/OpenAPI/color-matching-openapi.json` (or `openapi.json`, either there or
@@ -42,25 +42,31 @@ Verified against `viamin/color_matching` main (PR #113):
    pairs/scores/labels/capture provenance the issue text expects are not yet
    machine-visible.
 3. Measurement upload request. Spec omits the prose contract's top-level
-   `scoring_algorithm_version` (each `pair_scores` item requires
-   `pair_id` + `algorithm_version` + one of `score`/`similarity`/`distance`).
+   `scoring_algorithm_version`; `MeasurementUploadRequest` declares
+   `measurements` + `pair_scores` properties with no top-level `required`
+   list. Each `pair_scores` item (`PairScoreRequest`) requires `pair_id` +
+   `algorithm_version` and one of `score`/`similarity`/`distance`.
    `normalized_linear_rgb_median` is required per measurement (optional in
    prose). The prose `stats` block (`sample_count`, `clipping_fraction`,
    `mean`, `standard_deviation`) is not in the spec; the app currently uploads
    it — undocumented extra field, drift risk to raise upstream.
    `linear_rgb_median` is `RgbPayload` (anyOf: `[r,g,b]` array, `{r,g,b}`
    object, or string), looser than prose's fixed object.
-4. Upload responses now have bodies. Prose (and the current iOS tests) assumed
-   empty `204` responses. The spec declares `200` with
+4. Upload responses now have bodies. Prose assumed empty `204` responses.
+   The spec declares `200` with
    `MeasurementUploadResponse {capture_id, measurement_count, pair_score_count}`
-   and `JudgmentUploadResponse {capture_id, judgment_count}`. The generated
-   client will decode these bodies; stubs must change from empty `204` to `200`
-   + JSON.
+   and `JudgmentUploadResponse {capture_id, judgment_count}` (all required;
+   `capture_controller.ex` renders `Integer.to_string(capture_id)` plus row
+   counts). The generated client will decode these bodies; `APIClientTests`
+   stubs now serve those 200 bodies.
 5. Capture creation. Spec `CaptureRequest` accepts a flat legacy shape or the
-   prose's nested `{metadata, quality}` via `anyOf`. Response is `201`
-   `CaptureCreatedResponse {capture_id}` where `capture_id` is the numeric
-   record ID as a string (prose example showed `capture_123`). The subsequent
-   upload paths must use that numeric-string capture id.
+   prose's nested `{metadata, quality}` via `anyOf` (a branch requiring only
+   `[:metadata]`; the nested `quality` object itself has no required fields).
+   Response is `201` `CaptureCreatedResponse {capture_id}` where `capture_id`
+   is the numeric record ID as a string (`capture_controller.ex`:
+   `Integer.to_string(capture.id)`; prose example showed `capture_123`). The
+   subsequent upload paths must use that numeric-string capture id, and the
+   controller rejects non-integer capture ids with `404`.
 6. Rejection and judgment enums are not machine-visible. Prose enumerates
    capture rejection strings (`missingRegistrationMarks`, ...) and judgments
    (`match`, `near_match`, `no_match`); the spec types both as free-form
@@ -68,7 +74,8 @@ Verified against `viamin/color_matching` main (PR #113):
 7. Recent sheets matches prose (`sheets[{sheet_id, manifest_url, title}]`,
    `title` required-but-nullable, limit 20 upstream).
 8. Auth matches prose: `bearerAuth` (HTTP bearer) security scheme is declared
-   and applied per-operation.
+   in components and applied per-operation (`security [%{"bearerAuth" => []}]`
+   on both controllers), so every generated client call carries it.
 
 ## Endpoint gaps discovered (spec contains, prose does not)
 
@@ -84,11 +91,21 @@ generated client surfaces but explain spec size.
 ## Red-phase status (this commit)
 
 - Red (expected failures driving the implementation run): every test in
-  `VendoredOpenAPISpecTests`, `VendoredOpenAPISchemaTests`, and
-  `OpenAPIPackageWiringTests` — the spec is not vendored and the package is not
-  wired yet.
+  `VendoredOpenAPISpecTests` (document presence, OpenAPI 3, six-surface
+  coverage, per-operation success status + JSON body, JSON request bodies,
+  per-operation bearer security), every test in `VendoredOpenAPISchemaTests`
+  (schema titles, compatibility enums, required-field pins, upload response
+  bodies, nested capture shape, RgbPayload anyOf, pair-score shape, nullable
+  recent-sheets title), and `OpenAPIPackageWiringTests` — the spec is not
+  vendored and the package is not wired yet.
 - Green and load-bearing: `APIClientContractTests` pins the manifest and
-  recent-sheets wire format via stubbed responses with no live server.
+  recent-sheets wire format via stubbed responses with no live server;
+  `APIClientTests` pins capture-creation and upload wire format. Its stub
+  fixtures were updated this run to the published spec's response shapes
+  (201 + numeric-string `capture_id`; 200 + `MeasurementUploadResponse` /
+  `JudgmentUploadResponse` count bodies), so the same fixtures exercise the
+  generated client once it replaces the hand-written one — no live server at
+  any point.
 - Not expressible until the generated module exists: a compile-safe client-call
   test for `GET /test_sheets/{sheet_id}/ranked_results` (no method to call).
   Its spec coverage is enforced now; the call test lands with the

@@ -15,7 +15,8 @@ final class APIClientTests: XCTestCase {
         MockURLProtocol.handler = { request in
             capturedRequest = request
             capturedBody = request.httpBodyStream.flatMap(Self.readBody) ?? request.httpBody
-            return (HTTPURLResponse(url: request.url!, statusCode: 201, httpVersion: nil, headerFields: nil)!, Data(#"{"capture_id":"cap_1"}"#.utf8))
+            // Spec (CaptureCreatedResponse): 201 with a numeric capture id as a string.
+            return (HTTPURLResponse(url: request.url!, statusCode: 201, httpVersion: nil, headerFields: nil)!, Data(#"{"capture_id":"42"}"#.utf8))
         }
 
         let response = try await client().createCapture(
@@ -36,9 +37,10 @@ final class APIClientTests: XCTestCase {
             quality: CaptureQuality(detectedMarkerCount: 4, blurScore: 0.75, rejections: [])
         )
 
-        XCTAssertEqual(response.captureID, "cap_1")
+        XCTAssertEqual(response.captureID, "42")
         XCTAssertEqual(capturedRequest?.url?.path, "/api/v1/test_sheets/sheet_1/captures")
         XCTAssertEqual(capturedRequest?.value(forHTTPHeaderField: "Authorization"), "Bearer token")
+        XCTAssertEqual(capturedRequest?.value(forHTTPHeaderField: "Content-Type"), "application/json")
         let json = try XCTUnwrap(Self.jsonObject(from: capturedBody) as? [String: Any])
         XCTAssertNotNil(json["metadata"])
         let quality = try XCTUnwrap(json["quality"] as? [String: Any])
@@ -50,13 +52,14 @@ final class APIClientTests: XCTestCase {
         var capturedBody: Data?
         MockURLProtocol.handler = { request in
             capturedBody = request.httpBodyStream.flatMap(Self.readBody) ?? request.httpBody
-            return (HTTPURLResponse(url: request.url!, statusCode: 204, httpVersion: nil, headerFields: nil)!, Data())
+            // Spec (MeasurementUploadResponse): 200 with counts, not an empty 204.
+            return (HTTPURLResponse(url: request.url!, statusCode: 200, httpVersion: nil, headerFields: ["Content-Type": "application/json"])!, Data(#"{"capture_id":"42","measurement_count":1,"pair_score_count":1}"#.utf8))
         }
 
         let rgb = RGB(r: 0.2, g: 0.3, b: 0.4)
         let stats = ChannelStats(median: rgb, mean: rgb, standardDeviation: RGB(r: 0.01, g: 0.01, b: 0.01), min: rgb, max: rgb, sampleCount: 9, clippingFraction: 0)
         try await client().uploadMeasurements(
-            captureID: "cap_1",
+            captureID: "42",
             baseURL: URL(string: "https://example.test")!,
             measurements: [PatchMeasurement(patchID: "patch_1", linearRGBMedian: rgb, normalizedLinearRGBMedian: rgb, stats: stats)],
             scores: [PairScore(pairID: "pair_1", distance: 0.1, similarity: 0.9, algorithmVersion: LPSScorer.algorithmVersion)]
@@ -77,17 +80,18 @@ final class APIClientTests: XCTestCase {
         MockURLProtocol.handler = { request in
             capturedRequest = request
             capturedBody = request.httpBodyStream.flatMap(Self.readBody) ?? request.httpBody
-            return (HTTPURLResponse(url: request.url!, statusCode: 204, httpVersion: nil, headerFields: nil)!, Data())
+            // Spec (JudgmentUploadResponse): 200 with a count body, not an empty 204.
+            return (HTTPURLResponse(url: request.url!, statusCode: 200, httpVersion: nil, headerFields: ["Content-Type": "application/json"])!, Data(#"{"capture_id":"42","judgment_count":1}"#.utf8))
         }
 
         try await client().uploadJudgments(
-            captureID: "cap_1",
+            captureID: "42",
             baseURL: URL(string: "https://example.test")!,
             judgments: [PairJudgment(pairID: "pair_1", judgment: "near_match")]
         )
 
         XCTAssertEqual(capturedRequest?.httpMethod, "POST")
-        XCTAssertEqual(capturedRequest?.url?.path, "/api/v1/captures/cap_1/judgments")
+        XCTAssertEqual(capturedRequest?.url?.path, "/api/v1/captures/42/judgments")
         let json = try XCTUnwrap(Self.jsonObject(from: capturedBody) as? [String: Any])
         XCTAssertEqual((json["judgments"] as? [[String: Any]])?.first?["judgment"] as? String, "near_match")
     }
