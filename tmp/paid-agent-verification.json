@@ -1,0 +1,71 @@
+{
+  "status": "failed",
+  "summary": "Tests-only red phase: local-stub coverage and a generated-client configuration guard were added. Swift is unavailable in this container, and the generator/runtime dependencies and vendored specification have not yet been implemented.",
+  "acceptance_criteria": [
+    {
+      "id": "AC-1",
+      "status": "not_run",
+      "verification": {
+        "kind": "unit_or_service_test",
+        "references": [
+          {
+            "locator": "iOS/Tests/ColorMatchingLPSAppTests/OpenAPIClientConfigurationTests.swift:5",
+            "result": "Red by design: asserts the absent generator/runtime dependencies, plugin, and vendored OpenAPI JSON. Runtime execution was blocked because swift is not installed."
+          }
+        ]
+      }
+    },
+    {
+      "id": "AC-2",
+      "status": "not_run",
+      "verification": {
+        "kind": "unit_or_service_test",
+        "references": [
+          {
+            "locator": "iOS/Tests/ColorMatchingLPSAppTests/OpenAPIClientConfigurationTests.swift:19",
+            "result": "Red by design: will parse the vendored OpenAPI document and require all six app paths after implementation."
+          }
+        ]
+      }
+    },
+    {
+      "id": "AC-3",
+      "status": "not_run",
+      "verification": {
+        "kind": "human_or_external_evidence",
+        "references": [
+          {
+            "locator": "docs/solutions/api/generated-openapi-client-migration.md:21",
+            "result": "Requires implementation review and app-core compilation after generated symbols exist."
+          }
+        ]
+      }
+    },
+    {
+      "id": "AC-4",
+      "status": "not_run",
+      "verification": {
+        "kind": "unit_or_service_test",
+        "references": [
+          {
+            "locator": "iOS/Tests/ColorMatchingLPSAppTests/APIClientTests.swift:49",
+            "result": "Local MockURLProtocol stub test added for recent-sheet discovery. It could not run because swift is unavailable; generated-operation stubs remain implementation work."
+          }
+        ]
+      }
+    },
+    {
+      "id": "AC-5",
+      "status": "passed",
+      "verification": {
+        "kind": "human_or_external_evidence",
+        "references": [
+          {
+            "locator": "docs/solutions/api/generated-openapi-client-migration.md:29",
+            "result": "Records deltas and endpoint gaps from merged provider PR viamin/color_matching#113."
+          }
+        ]
+      }
+    }
+  ]
+}
