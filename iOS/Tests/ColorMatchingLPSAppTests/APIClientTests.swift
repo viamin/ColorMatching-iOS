@@ -92,6 +92,41 @@ final class APIClientTests: XCTestCase {
         XCTAssertEqual((json["judgments"] as? [[String: Any]])?.first?["judgment"] as? String, "near_match")
     }
 
+    // viamin/color_matching#110 (merged as #113) publishes an OpenAPI schema
+    // for `POST /api/v1/captures/:capture_id/measurements` that marks
+    // `normalized_linear_rgb_median` as *required* on every measurement
+    // (`ColorMatchingWeb.ApiSchemas.MeasurementUploadRequest`, no
+    // `nullable: true`). `PatchMeasurement.normalizedLinearRGBMedian` is
+    // `RGB?`, and Swift's synthesized `Encodable` conformance calls
+    // `encodeIfPresent` for Optional stored properties, so a `nil` value is
+    // omitted from the JSON body entirely instead of being sent as `null`
+    // or a placeholder value. Per the published contract that is an invalid
+    // request. See docs/color-matching-api-openapi-spec-deltas.md.
+    func testUploadMeasurementsOmitsRequiredNormalizedMedianKeyWhenNil() async throws {
+        var capturedBody: Data?
+        MockURLProtocol.handler = { request in
+            capturedBody = request.httpBodyStream.flatMap(Self.readBody) ?? request.httpBody
+            return (HTTPURLResponse(url: request.url!, statusCode: 200, httpVersion: nil, headerFields: nil)!, Data(#"{"capture_id":"cap_1","measurement_count":1,"pair_score_count":0}"#.utf8))
+        }
+
+        let rgb = RGB(r: 0.2, g: 0.3, b: 0.4)
+        let stats = ChannelStats(median: rgb, mean: rgb, standardDeviation: RGB(r: 0.01, g: 0.01, b: 0.01), min: rgb, max: rgb, sampleCount: 9, clippingFraction: 0)
+
+        try await client().uploadMeasurements(
+            captureID: "cap_1",
+            baseURL: URL(string: "https://example.test")!,
+            measurements: [PatchMeasurement(patchID: "patch_1", linearRGBMedian: rgb, normalizedLinearRGBMedian: nil, stats: stats)],
+            scores: []
+        )
+
+        let json = try XCTUnwrap(Self.jsonObject(from: capturedBody) as? [String: Any])
+        let measurement = try XCTUnwrap((json["measurements"] as? [[String: Any]])?.first)
+        XCTAssertTrue(
+            measurement.keys.contains("normalized_linear_rgb_median"),
+            "published MeasurementUploadRequest schema requires normalized_linear_rgb_median on every measurement, but the key was omitted"
+        )
+    }
+
     private func client() -> APIClient {
         let configuration = URLSessionConfiguration.ephemeral
         configuration.protocolClasses = [MockURLProtocol.self]
