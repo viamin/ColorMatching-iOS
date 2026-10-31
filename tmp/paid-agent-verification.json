@@ -1,0 +1,71 @@
+{
+  "status": "failed",
+  "summary": "Red-phase tests and contract-delta record committed; generated-client implementation is intentionally absent and Swift is unavailable in this environment.",
+  "acceptance_criteria": [
+    {
+      "id": "AC-1",
+      "status": "failed",
+      "verification": {
+        "kind": "unit_or_service_test",
+        "references": [
+          {
+            "locator": "iOS/Tests/ColorMatchingLPSAppTests/APIClientTests.swift:testGeneratedClientDependenciesAndReplacementAreCheckedIn",
+            "result": "red: package has no swift-openapi dependencies and handwritten DTOs remain"
+          }
+        ]
+      }
+    },
+    {
+      "id": "AC-2",
+      "status": "not_run",
+      "verification": {
+        "kind": "unit_or_service_test",
+        "references": [
+          {
+            "locator": "docs/issue-5-generated-client-test-plan.md",
+            "result": "ranked-results generated operation remains an implementation gap; Swift toolchain unavailable"
+          }
+        ]
+      }
+    },
+    {
+      "id": "AC-3",
+      "status": "failed",
+      "verification": {
+        "kind": "unit_or_service_test",
+        "references": [
+          {
+            "locator": "iOS/Tests/ColorMatchingLPSAppTests/APIClientTests.swift:testGeneratedClientDependenciesAndReplacementAreCheckedIn",
+            "result": "red: handwritten API request models remain"
+          }
+        ]
+      }
+    },
+    {
+      "id": "AC-4",
+      "status": "not_run",
+      "verification": {
+        "kind": "unit_or_service_test",
+        "references": [
+          {
+            "locator": "iOS/Tests/ColorMatchingLPSAppTests/APIClientTests.swift:testFetchManifestAndRecentSheetsDecodePublishedResponseShapes",
+            "result": "uses MockURLProtocol only; not executed because swift is unavailable"
+          }
+        ]
+      }
+    },
+    {
+      "id": "AC-5",
+      "status": "skipped",
+      "verification": {
+        "kind": "human_or_external_evidence",
+        "references": [
+          {
+            "locator": "docs/issue-5-generated-client-test-plan.md",
+            "result": "contract deltas are recorded; final PR description still requires human-visible confirmation"
+          }
+        ]
+      }
+    }
+  ]
+}
