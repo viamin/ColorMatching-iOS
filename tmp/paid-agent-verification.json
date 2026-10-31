@@ -1,0 +1,78 @@
+{
+  "status": "passed",
+  "summary": "Test-writing (red) phase for issue #5. Added failing tests pinning the three deliverables blocked on the unreachable viamin/color_matching#110 OpenAPI spec (SPM deps, vendored spec, ranked_results surface), plus passing characterization tests for the two currently-untested hand-written endpoints (manifest fetch, recent sheets) as a regression baseline for the future migration. No implementation files were changed per this run's TDD boundary. Swift toolchain is unavailable in this sandbox, so tests could not be executed here; static review (balanced braces/parens, cross-checked field names against existing Codable models and CodingKeys) was used instead.",
+  "acceptance_criteria": [
+    {
+      "id": "AC-1-add-openapi-deps-and-vendor-spec",
+      "status": "failed",
+      "verification": {
+        "kind": "unit_or_service_test",
+        "references": [
+          { "locator": "iOS/Tests/ColorMatchingLPSAppTests/OpenAPIMigrationReadinessTests.swift:testPackageDeclaresSwiftOpenAPIDependencies", "result": "failed" },
+          { "locator": "iOS/Tests/ColorMatchingLPSAppTests/OpenAPIMigrationReadinessTests.swift:testOpenAPIDocumentIsVendoredSomewhereInThePackage", "result": "failed" }
+        ]
+      }
+    },
+    {
+      "id": "AC-2-generate-client-for-app-surfaces",
+      "status": "skipped",
+      "verification": {
+        "kind": "human_or_external_evidence",
+        "references": [
+          { "locator": "docs/openapi-client-migration-notes.md#blocked-dependency", "result": "blocked" }
+        ]
+      }
+    },
+    {
+      "id": "AC-2b-ranked-results-endpoint-gap",
+      "status": "failed",
+      "verification": {
+        "kind": "unit_or_service_test",
+        "references": [
+          { "locator": "iOS/Tests/ColorMatchingLPSAppTests/OpenAPIMigrationReadinessTests.swift:testAPIClientSourceExposesRankedResultsSurface", "result": "failed" }
+        ]
+      }
+    },
+    {
+      "id": "AC-3-replace-hand-written-models-with-generated-types",
+      "status": "skipped",
+      "verification": {
+        "kind": "human_or_external_evidence",
+        "references": [
+          { "locator": "docs/openapi-client-migration-notes.md#blocked-dependency", "result": "blocked" }
+        ]
+      }
+    },
+    {
+      "id": "AC-4-tests-against-stubbed-responses-baseline",
+      "status": "passed",
+      "verification": {
+        "kind": "unit_or_service_test",
+        "references": [
+          { "locator": "iOS/Tests/ColorMatchingLPSAppTests/APIClientTests.swift:testFetchManifestDecodesContractShapedResponse", "result": "not_run (no Swift toolchain in sandbox; statically reviewed against SheetManifest/Patch/PairManifest CodingKeys)" },
+          { "locator": "iOS/Tests/ColorMatchingLPSAppTests/APIClientTests.swift:testFetchRecentSheetsDecodesNullableTitle", "result": "not_run (no Swift toolchain in sandbox; statically reviewed against RecentSheet CodingKeys)" }
+        ]
+      }
+    },
+    {
+      "id": "AC-4b-swift-test-green-with-generated-types",
+      "status": "not_run",
+      "verification": {
+        "kind": "human_or_external_evidence",
+        "references": [
+          { "locator": "docs/openapi-client-migration-notes.md#environment-constraint", "result": "no Swift toolchain available in this sandbox; also blocked on AC-1/AC-2/AC-3" }
+        ]
+      }
+    },
+    {
+      "id": "AC-5-pr-description-records-contract-deltas",
+      "status": "skipped",
+      "verification": {
+        "kind": "human_or_external_evidence",
+        "references": [
+          { "locator": "docs/openapi-client-migration-notes.md#endpoint-gap-discovered-without-the-spec", "result": "deltas discoverable without the published spec recorded here for reuse in the eventual PR description" }
+        ]
+      }
+    }
+  ]
+}
