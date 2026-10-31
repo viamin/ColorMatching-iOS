@@ -1,0 +1,84 @@
+{
+  "status": "failed",
+  "summary": "Tests-first red phase for issue #5 (generated OpenAPI Swift client). Four permanent test files + a migration-plan doc were added under allowed paths. Contract deltas between docs/color-matching-api-contract.md and the published spec (viamin/color_matching#110/#113) were verified against upstream sources and recorded in docs/openapi-client-migration-plan.md. No Swift toolchain exists in this container, so swift test could not be executed locally; red/green expectations per file are documented. Implementation criteria (AC-1..AC-4, AC-6) remain red/blocked pending the paid implementation run, as intended for a tests-only draft PR.",
+  "acceptance_criteria": [
+    {
+      "id": "AC-1",
+      "description": "swift-openapi-generator + swift-openapi-runtime added to the iOS package; OpenAPI document fetched or vendored from viamin/color_matching#110",
+      "status": "failed",
+      "verification": {
+        "kind": "unit_or_service_test",
+        "references": [
+          { "locator": "iOS/Tests/ColorMatchingLPSAppTests/OpenAPISpecArtifactTests.swift:11", "result": "written; fails at runtime (Package.swift has no swift-openapi-generator/runtime dependencies) - expected red-phase failure" },
+          { "locator": "iOS/Tests/ColorMatchingLPSAppTests/OpenAPISpecArtifactTests.swift:23", "result": "written; fails at runtime (no vendored openapi.yaml/yml/json under iOS/) - expected red-phase failure" },
+          { "locator": "iOS/Tests/ColorMatchingLPSAppTests/OpenAPISpecArtifactTests.swift:39", "result": "written; fails at runtime (no vendored document to assert six app paths + nine schema titles against)" }
+        ]
+      }
+    },
+    {
+      "id": "AC-2",
+      "description": "Generated client for: sheet manifest, recent sheets, capture session creation, measurement upload, judgment upload, ranked results",
+      "status": "not_run",
+      "verification": {
+        "kind": "unit_or_service_test",
+        "references": [
+          { "locator": "iOS/Tests/ColorMatchingLPSAppTests/GeneratedClientStubbedResponseTests.swift:7", "result": "written; does not compile until ColorMatchingLPSAPI module is generated (missing behavior, compile-level red)" },
+          { "locator": "iOS/Tests/ColorMatchingLPSAppTests/GeneratedClientStubbedResponseTests.swift:102", "result": "written; end-to-end generated client call through stubbed ClientTransport (operationId pinned to 'manifest'); blocked on missing module" },
+          { "locator": "iOS/Tests/ColorMatchingLPSAppTests/RankedResultsClientSurfaceTests.swift:10", "result": "written; does not compile until APIClient.fetchRankedResults(sheetID:baseURL:) exists (ranked-results surface missing from hand-written client)" }
+        ],
+        "reason": "Code generation requires Package.swift + vendored spec changes, which are implementation files outside the permitted test/LID paths for this run"
+      }
+    },
+    {
+      "id": "AC-3",
+      "description": "Replace hand-written API models with generated types; keep purely client-side models as-is",
+      "status": "not_run",
+      "verification": {
+        "kind": "unit_or_service_test",
+        "references": [
+          { "locator": "iOS/Tests/ColorMatchingLPSAppTests/APIClientWireContractTests.swift:12", "result": "written; passes against current hand-written client and pins app-facing behavior that must survive the swap to generated types" },
+          { "locator": "iOS/Tests/ColorMatchingLPSAppTests/APIClientWireContractTests.swift:56", "result": "written; passes today; pins spec-required normalized_linear_rgb_median and 200-with-JSON-body wire behavior" },
+          { "locator": "iOS/Tests/ColorMatchingLPSAppTests/GeneratedClientStubbedResponseTests.swift:58", "result": "written; snake_case wire-key roundtrip for generated CaptureMetadata; blocked on missing module" }
+        ],
+        "reason": "Model replacement is implementation work, blocked for this tests-only run; drift guards are in place"
+      }
+    },
+    {
+      "id": "AC-4",
+      "description": "Swift tests exercising the generated client against local stubbed responses (no live server in CI)",
+      "status": "not_run",
+      "verification": {
+        "kind": "unit_or_service_test",
+        "references": [
+          { "locator": "iOS/Tests/ColorMatchingLPSAppTests/GeneratedClientStubbedResponseTests.swift:6", "result": "written; stubs HTTP at the ClientTransport level (StubClientTransport matching swift-openapi-runtime 1.3.0+); cannot execute until the module exists" },
+          { "locator": "iOS/Tests/ColorMatchingLPSAppTests/TestSupport.swift:138", "result": "shared URLProtocol stub + real-shape response fixtures captured from upstream controllers; all tests use local stubs, no live server" },
+          { "locator": "iOS/Tests/ColorMatchingLPSAppTests/APIClientWireContractTests.swift:6", "result": "written; runs green today against the current client with stubbed URLProtocol responses" }
+        ],
+        "reason": "Tests are authored; execution is blocked on the generated module from the implementation run (compile-level red by design)"
+      }
+    },
+    {
+      "id": "AC-5",
+      "description": "PR description records what changed between the prose contract and the published spec, and any endpoint gaps discovered",
+      "status": "passed",
+      "verification": {
+        "kind": "human_or_external_evidence",
+        "references": [
+          { "locator": "docs/openapi-client-migration-plan.md", "result": "deltas G-1..G-4 and D-1..D-10 recorded, verified against viamin/color_matching main (api_schemas.ex, capture_controller.ex, test_sheet_controller.ex, test_sheet_json.ex, router.ex) fetched 2026-10-31; PR description should summarize from this file" }
+        ]
+      }
+    },
+    {
+      "id": "AC-6",
+      "description": "Exit criterion: swift test --disable-sandbox green with generated types wired in",
+      "status": "not_run",
+      "verification": {
+        "kind": "unit_or_service_test",
+        "references": [
+          { "locator": "iOS/Tests/ColorMatchingLPSAppTests", "result": "suite cannot run in this container: no Swift toolchain installed (swift: command not found). CI (GitHub Actions macos-latest) runs 'swift test' on PRs. Red-phase expectation at this commit: OpenAPISpecArtifactTests fail at runtime; RankedResultsClientSurfaceTests and GeneratedClientStubbedResponseTests fail to compile; APIClientWireContractTests and pre-existing tests pass" }
+        ],
+        "reason": "No Swift toolchain in the isolated container; final green run belongs to the implementation phase"
+      }
+    }
+  ]
+}
