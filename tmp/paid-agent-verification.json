@@ -1,0 +1,57 @@
+{
+  "status": "not_run",
+  "summary": "Red-phase OpenAPI client adoption tests and verification plan are present. The required Swift test command could not run because no Swift executable is installed in this container.",
+  "acceptance_criteria": [
+    {
+      "id": "AC-1",
+      "status": "not_run",
+      "verification": {
+        "kind": "unit_or_service_test",
+        "references": [
+          {
+            "locator": "iOS/Tests/ColorMatchingLPSAppTests/APIClientTests.swift:testGeneratedOpenAPIClientReplacesLegacyTransportModelsAndCoversAllAppEndpoints",
+            "result": "red test written; not run because `swift` is unavailable in the container"
+          }
+        ]
+      }
+    },
+    {
+      "id": "AC-2",
+      "status": "not_run",
+      "verification": {
+        "kind": "unit_or_service_test",
+        "references": [
+          {
+            "locator": "iOS/Tests/ColorMatchingLPSAppTests/APIClientTests.swift:testFetchManifestAndRecentSheetsDecodePublishedResponseShapes",
+            "result": "local-stub test written; not run because `swift` is unavailable in the container"
+          },
+          {
+            "locator": "iOS/Tests/ColorMatchingLPSAppTests/APIClientTests.swift:testCreateCaptureEncodesMetadataAndQuality",
+            "result": "local-stub test retained; not run because `swift` is unavailable in the container"
+          },
+          {
+            "locator": "iOS/Tests/ColorMatchingLPSAppTests/APIClientTests.swift:testUploadMeasurementsEncodesScoresWithAlgorithmVersion",
+            "result": "local-stub test updated to published 200 response; not run because `swift` is unavailable in the container"
+          },
+          {
+            "locator": "iOS/Tests/ColorMatchingLPSAppTests/APIClientTests.swift:testUploadJudgmentsEncodesPathAndPayload",
+            "result": "local-stub test updated to published 200 response; not run because `swift` is unavailable in the container"
+          }
+        ]
+      }
+    },
+    {
+      "id": "AC-3",
+      "status": "passed",
+      "verification": {
+        "kind": "human_or_external_evidence",
+        "references": [
+          {
+            "locator": "docs/openapi-client-adoption-verification.md:19",
+            "result": "records upstream issue #110 source inspection, prose-contract deltas, and the manifest/ranked-results schema gap"
+          }
+        ]
+      }
+    }
+  ]
+}
