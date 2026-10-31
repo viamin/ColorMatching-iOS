@@ -46,11 +46,14 @@ final class APIClientTests: XCTestCase {
         XCTAssertEqual(quality["rejections"] as? [String], [])
     }
 
-    func testUploadMeasurementsEncodesScoresWithAlgorithmVersion() async throws {
+    func testUploadMeasurementsMatchesPublishedSpecShape() async throws {
         var capturedBody: Data?
         MockURLProtocol.handler = { request in
             capturedBody = request.httpBodyStream.flatMap(Self.readBody) ?? request.httpBody
-            return (HTTPURLResponse(url: request.url!, statusCode: 204, httpVersion: nil, headerFields: nil)!, Data())
+            return (
+                HTTPURLResponse(url: request.url!, statusCode: 200, httpVersion: nil, headerFields: nil)!,
+                Data(#"{"capture_id": "cap_1", "measurement_count": 1, "pair_score_count": 1}"#.utf8)
+            )
         }
 
         let rgb = RGB(r: 0.2, g: 0.3, b: 0.4)
@@ -63,12 +66,14 @@ final class APIClientTests: XCTestCase {
         )
 
         let json = try XCTUnwrap(Self.jsonObject(from: capturedBody) as? [String: Any])
-        XCTAssertEqual(json["scoring_algorithm_version"] as? String, "lps-distance-v1")
+        XCTAssertNil(json["scoring_algorithm_version"], "published spec carries the algorithm version per pair score, not top level")
         let measurement = try XCTUnwrap((json["measurements"] as? [[String: Any]])?.first)
         XCTAssertEqual(measurement["patch_id"] as? String, "patch_1")
-        let statsPayload = try XCTUnwrap(measurement["stats"] as? [String: Any])
-        XCTAssertEqual(Set(statsPayload.keys), ["sample_count", "clipping_fraction", "mean", "standard_deviation"])
-        XCTAssertEqual((json["pair_scores"] as? [[String: Any]])?.first?["pair_id"] as? String, "pair_1")
+        XCTAssertNotNil(measurement["normalized_linear_rgb_median"], "published spec requires normalized_linear_rgb_median")
+        XCTAssertNil(measurement["stats"], "published spec does not declare stats; tracked as an endpoint gap")
+        let score = try XCTUnwrap((json["pair_scores"] as? [[String: Any]])?.first)
+        XCTAssertEqual(score["algorithm_version"] as? String, "lps-distance-v1")
+        XCTAssertEqual(score["pair_id"] as? String, "pair_1")
     }
 
     func testUploadJudgmentsEncodesPathAndPayload() async throws {
@@ -77,7 +82,10 @@ final class APIClientTests: XCTestCase {
         MockURLProtocol.handler = { request in
             capturedRequest = request
             capturedBody = request.httpBodyStream.flatMap(Self.readBody) ?? request.httpBody
-            return (HTTPURLResponse(url: request.url!, statusCode: 204, httpVersion: nil, headerFields: nil)!, Data())
+            return (
+                HTTPURLResponse(url: request.url!, statusCode: 200, httpVersion: nil, headerFields: nil)!,
+                Data(#"{"capture_id": "cap_1", "judgment_count": 1}"#.utf8)
+            )
         }
 
         try await client().uploadJudgments(
