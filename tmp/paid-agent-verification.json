@@ -1,0 +1,75 @@
+{
+  "status": "not_run",
+  "summary": "Added permanent local-stub XCTest coverage for manifest and recent-sheet retrieval. Swift is unavailable in this container, and the upstream OpenAPI pull request cannot be retrieved here.",
+  "acceptance_criteria": [
+    {
+      "id": "AC-1",
+      "status": "not_run",
+      "verification": {
+        "kind": "human_or_external_evidence",
+        "references": [
+          {
+            "locator": "docs/openapi-client-migration-verification.md",
+            "result": "The dependency and published-spec inspection is deferred until viamin/color_matching#110 is accessible."
+          }
+        ]
+      }
+    },
+    {
+      "id": "AC-2",
+      "status": "not_run",
+      "verification": {
+        "kind": "unit_or_service_test",
+        "references": [
+          {
+            "locator": "iOS/Tests/ColorMatchingLPSAppTests/APIClientTests.swift:49",
+            "result": "Manifest local-stub test added; test execution not run because swift is unavailable."
+          },
+          {
+            "locator": "iOS/Tests/ColorMatchingLPSAppTests/APIClientTests.swift:70",
+            "result": "Recent-sheets local-stub test added; ranked-results remains blocked by the absent response schema."
+          }
+        ]
+      }
+    },
+    {
+      "id": "AC-3",
+      "status": "not_run",
+      "verification": {
+        "kind": "human_or_external_evidence",
+        "references": [
+          {
+            "locator": "docs/openapi-client-migration-verification.md",
+            "result": "Generated-type replacement requires the implementation-phase compile and source review."
+          }
+        ]
+      }
+    },
+    {
+      "id": "AC-4",
+      "status": "not_run",
+      "verification": {
+        "kind": "unit_or_service_test",
+        "references": [
+          {
+            "locator": "iOS/Tests/ColorMatchingLPSAppTests/APIClientTests.swift",
+            "result": "All current API tests use MockURLProtocol; execution not run because swift is unavailable."
+          }
+        ]
+      }
+    },
+    {
+      "id": "AC-5",
+      "status": "not_run",
+      "verification": {
+        "kind": "human_or_external_evidence",
+        "references": [
+          {
+            "locator": "docs/openapi-client-migration-verification.md",
+            "result": "The delta comparison is blocked until the published OpenAPI document is available."
+          }
+        ]
+      }
+    }
+  ]
+}
