@@ -46,6 +46,60 @@ final class APIClientTests: XCTestCase {
         XCTAssertEqual(quality["rejections"] as? [String], [])
     }
 
+    func testFetchManifestDecodesPublishedContractResponse() async throws {
+        MockURLProtocol.handler = { request in
+            XCTAssertEqual(request.url?.path, "/api/v1/test_sheets/SHEET-123/manifest")
+            XCTAssertEqual(request.value(forHTTPHeaderField: "Authorization"), "Bearer token")
+            return (
+                HTTPURLResponse(url: request.url!, statusCode: 200, httpVersion: nil, headerFields: nil)!,
+                Data("""
+                {
+                  "schema_version": "lps-sheet-manifest/v1",
+                  "sheet_version": "lps-letter-grid-v1",
+                  "sheet_id": "SHEET-123",
+                  "manifest_url": "https://example.test/api/v1/test_sheets/SHEET-123/manifest",
+                  "page": {"units": "mm", "width": 215.9, "height": 279.4},
+                  "registration_markers": [],
+                  "patches": [],
+                  "pairs": []
+                }
+                """.utf8)
+            )
+        }
+
+        let manifest = try await client().fetchManifest(
+            baseURL: URL(string: "https://example.test")!,
+            sheetCode: "SHEET-123"
+        )
+
+        XCTAssertEqual(manifest.schemaVersion, "lps-sheet-manifest/v1")
+        XCTAssertEqual(manifest.sheetID, "SHEET-123")
+        XCTAssertEqual(manifest.manifestURL.absoluteString, "https://example.test/api/v1/test_sheets/SHEET-123/manifest")
+    }
+
+    func testFetchRecentSheetsDecodesPublishedContractResponse() async throws {
+        MockURLProtocol.handler = { request in
+            XCTAssertEqual(request.url?.path, "/api/v1/test_sheets/recent")
+            return (
+                HTTPURLResponse(url: request.url!, statusCode: 200, httpVersion: nil, headerFields: nil)!,
+                Data("""
+                {
+                  "sheets": [{
+                    "sheet_id": "SHEET-123",
+                    "manifest_url": "https://example.test/api/v1/test_sheets/SHEET-123/manifest",
+                    "title": null
+                  }]
+                }
+                """.utf8)
+            )
+        }
+
+        let sheets = try await client().fetchRecentSheets(baseURL: URL(string: "https://example.test")!)
+
+        XCTAssertEqual(sheets.map(\.sheetID), ["SHEET-123"])
+        XCTAssertNil(sheets.first?.title)
+    }
+
     func testUploadMeasurementsEncodesScoresWithAlgorithmVersion() async throws {
         var capturedBody: Data?
         MockURLProtocol.handler = { request in
@@ -90,6 +144,37 @@ final class APIClientTests: XCTestCase {
         XCTAssertEqual(capturedRequest?.url?.path, "/api/v1/captures/cap_1/judgments")
         let json = try XCTUnwrap(Self.jsonObject(from: capturedBody) as? [String: Any])
         XCTAssertEqual((json["judgments"] as? [[String: Any]])?.first?["judgment"] as? String, "near_match")
+    }
+
+    func testOpenAPIGenerationInputsCoverEveryUsedOperation() throws {
+        let repositoryRoot = URL(fileURLWithPath: #filePath)
+            .deletingLastPathComponent()
+            .deletingLastPathComponent()
+            .deletingLastPathComponent()
+        let package = try String(contentsOf: repositoryRoot.appending(path: "Package.swift"), encoding: .utf8)
+        let specificationURL = repositoryRoot.appending(path: "Sources/ColorMatchingLPSAppCore/openapi.yaml")
+
+        guard FileManager.default.fileExists(atPath: specificationURL.path) else {
+            XCTFail("The vendored OpenAPI contract is missing at \(specificationURL.path)")
+            return
+        }
+
+        let specification = try String(contentsOf: specificationURL, encoding: .utf8)
+
+        XCTAssertTrue(package.contains("swift-openapi-generator"))
+        XCTAssertTrue(package.contains("swift-openapi-runtime"))
+        XCTAssertTrue(package.contains("OpenAPIGenerator"))
+
+        [
+            "/api/v1/test_sheets/recent",
+            "/api/v1/test_sheets/{sheet_id}/manifest",
+            "/api/v1/test_sheets/{sheet_id}/captures",
+            "/api/v1/captures/{capture_id}/measurements",
+            "/api/v1/captures/{capture_id}/judgments",
+            "/api/v1/test_sheets/{sheet_id}/ranked_results"
+        ].forEach { operation in
+            XCTAssertTrue(specification.contains(operation), "Missing generated-client operation: \(operation)")
+        }
     }
 
     private func client() -> APIClient {
