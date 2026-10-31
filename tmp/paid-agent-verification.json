@@ -1,0 +1,82 @@
+{
+  "status": "failed",
+  "summary": "Test-writing (red) phase for #5 'Replace hand-written API layer with a generated OpenAPI Swift client'. Added always-on failing contract tests for the vendored OpenAPI document (iOS/openapi.yaml) and Package.swift wiring (swift-openapi-generator/runtime, OpenAPIGeneratorTarget plugin, ColorMatchingOpenAPI module, AppCore import), plus compile-gated GeneratedClientTests (#if canImport(ColorMatchingOpenAPI)) exercising all six surfaces against an in-process StubTransport with no live server. Contract deltas between docs/color-matching-api-contract.md and the hand-written layer are recorded in docs/generated-openapi-client-verification.md for the PR description. All implementation-dependent criteria are intentionally red/not_run pending the implementation run; no Swift toolchain exists in this container (CI runs swift test on macos-latest), so statuses reflect static evidence at this PR head.",
+  "acceptance_criteria": [
+    {
+      "id": "AC-1",
+      "description": "swift-openapi-generator + swift-openapi-runtime added to the iOS package; OpenAPI document vendored from viamin/color_matching#110",
+      "status": "failed",
+      "verification": {
+        "kind": "unit_or_service_test",
+        "references": [
+          { "locator": "iOS/Tests/ColorMatchingLPSAppTests/OpenAPIDocumentTests.swift:25", "result": "failed (red phase: iOS/openapi.yaml not vendored yet)" },
+          { "locator": "iOS/Tests/ColorMatchingLPSAppTests/OpenAPIDocumentTests.swift:33", "result": "failed (red phase: spec paths/operationIds missing)" },
+          { "locator": "iOS/Tests/ColorMatchingLPSAppTests/OpenAPIPackageIntegrationTests.swift:12", "result": "failed (red phase: Package.swift does not reference swift-openapi-generator/runtime)" },
+          { "locator": "docs/generated-openapi-client-verification.md", "result": "records artifact contract: iOS/openapi.yaml, ColorMatchingOpenAPI module, operation IDs" }
+        ],
+        "note": "Expected red-phase assertion failures demonstrating missing behavior; they turn green when the implementation run vendors the spec and updates Package.swift. Upstream PR viamin/color_matching#110 was not reachable from this container (GitHub API 404), so the spec could not be fetched here."
+      }
+    },
+    {
+      "id": "AC-2",
+      "description": "Generated client covering manifest, recent sheets, capture creation, measurement upload, judgment upload, ranked results",
+      "status": "failed",
+      "verification": {
+        "kind": "unit_or_service_test",
+        "references": [
+          { "locator": "iOS/Tests/ColorMatchingLPSAppTests/OpenAPIDocumentTests.swift:33", "result": "failed (red phase: verifies all 6 path+operationId pairs in the vendored spec)" },
+          { "locator": "iOS/Tests/ColorMatchingLPSAppTests/GeneratedClientTests.swift:8", "result": "not_run (compile-gated behind #if canImport(ColorMatchingOpenAPI); activates when the module is generated)" },
+          { "locator": "docs/generated-openapi-client-verification.md", "result": "operation-ID table and status-code/schema decisions the spec must pin (201 capture, 204 uploads, ranked-results shape)" }
+        ]
+      }
+    },
+    {
+      "id": "AC-3",
+      "description": "Hand-written API models replaced with generated types; purely client-side models kept as-is",
+      "status": "failed",
+      "verification": {
+        "kind": "unit_or_service_test",
+        "references": [
+          { "locator": "iOS/Tests/ColorMatchingLPSAppTests/OpenAPIPackageIntegrationTests.swift:36", "result": "failed (red phase: ColorMatchingLPSAppCore does not import ColorMatchingOpenAPI yet)" }
+        ]
+      }
+    },
+    {
+      "id": "AC-4",
+      "description": "Swift tests exercising the generated client against local stubbed responses, no live server in CI",
+      "status": "not_run",
+      "verification": {
+        "kind": "unit_or_service_test",
+        "references": [
+          { "locator": "iOS/Tests/ColorMatchingLPSAppTests/GeneratedClientTests.swift:212", "result": "StubTransport: ClientTransport returns canned (status, Data) in-process; no network or live server" },
+          { "locator": "iOS/Tests/ColorMatchingLPSAppTests/GeneratedClientTests.swift:8", "result": "not_run: 6 test methods (one per surface) are compile-gated until the ColorMatchingOpenAPI module exists in the implementation run" }
+        ],
+        "note": "Tests are written but intentionally inert so the existing ColorMatchingLPSAppTests suite keeps compiling and passing at this red-phase head."
+      }
+    },
+    {
+      "id": "AC-5",
+      "description": "PR description records what changed between the prose contract and the published spec, and endpoint gaps discovered",
+      "status": "not_run",
+      "verification": {
+        "kind": "human_or_external_evidence",
+        "references": [
+          { "locator": "docs/generated-openapi-client-verification.md", "result": "10 documented contract deltas/gaps (dropped manifest provenance fields, unspecified ranked_results schema, no error contract, unpinned status codes, prose-only enums, nullable title, optional metadata, optional auth, route collision, manifest_url handling) prepared for the PR body" }
+        ],
+        "note": "The PR body itself is assembled when Paid publishes the tests-only draft PR / at implementation; the delta analysis is inspectable in the referenced doc."
+      }
+    },
+    {
+      "id": "EXIT-1",
+      "description": "swift test --disable-sandbox green with generated types wired in",
+      "status": "not_run",
+      "verification": {
+        "kind": "human_or_external_evidence",
+        "references": [
+          { "locator": ".github/workflows/ci.yml:25", "result": "swift test runs on macos-latest at PR time; this container has no Swift toolchain (swift: command not found)" }
+        ],
+        "note": "Cannot execute Swift here; always-on new tests are expected to fail (red) until the implementation run lands. Existing MeasurementCoreTests and APIClientTests are untouched."
+      }
+    }
+  ]
+}
