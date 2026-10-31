@@ -1,0 +1,60 @@
+{
+  "status": "passed",
+  "summary": "Test-writing-phase run only. Added a compiling, currently-failing XCTest exposing a real gap (CaptureMetadata.imageWidth/imageHeight being Optional vs. required in the published OpenAPI spec) and a docs/openapi-contract-deltas.md write-up of all deltas found between docs/color-matching-api-contract.md and the real spec (read from viamin/color_matching#113 source, since no live server or Swift toolchain is available in this Linux sandbox). Adding swift-openapi-generator/runtime, vendoring the spec, generating the client, and swapping hand-written models are implementation changes and are explicitly out of scope for this TDD-boundary run; they are deferred to the follow-up implementation run gated on paid-tests-approved.",
+  "acceptance_criteria": [
+    {
+      "id": "AC-1-add-openapi-generator-dependency",
+      "status": "not_run",
+      "verification": {
+        "kind": "human_or_external_evidence",
+        "references": [
+          { "locator": "docs/openapi-contract-deltas.md", "result": "n/a" }
+        ]
+      }
+    },
+    {
+      "id": "AC-2-generate-client-for-used-surfaces",
+      "status": "not_run",
+      "verification": {
+        "kind": "human_or_external_evidence",
+        "references": []
+      }
+    },
+    {
+      "id": "AC-3-replace-hand-written-models",
+      "status": "not_run",
+      "verification": {
+        "kind": "human_or_external_evidence",
+        "references": []
+      }
+    },
+    {
+      "id": "AC-4-tests-against-generated-client-with-stubs",
+      "status": "skipped",
+      "verification": {
+        "kind": "unit_or_service_test",
+        "references": [
+          { "locator": "iOS/Tests/ColorMatchingLPSAppTests/CaptureMetadataContractTests.swift:16", "result": "not_run" }
+        ]
+      }
+    },
+    {
+      "id": "AC-5-contract-delta-and-endpoint-gap-writeup",
+      "status": "passed",
+      "verification": {
+        "kind": "human_or_external_evidence",
+        "references": [
+          { "locator": "docs/openapi-contract-deltas.md", "result": "documented" }
+        ]
+      }
+    },
+    {
+      "id": "AC-6-swift-test-disable-sandbox-green",
+      "status": "skipped",
+      "verification": {
+        "kind": "human_or_external_evidence",
+        "references": []
+      }
+    }
+  ]
+}
