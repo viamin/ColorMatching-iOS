@@ -1,0 +1,75 @@
+{
+  "status": "not_run",
+  "summary": "Added permanent local-stub coverage for manifest and recent-sheet API reads; Swift is unavailable in this container, so the required suite could not run.",
+  "acceptance_criteria": [
+    {
+      "id": "AC-1",
+      "status": "not_run",
+      "verification": {
+        "kind": "unit_or_service_test",
+        "references": [
+          {
+            "locator": "iOS/Package.swift",
+            "result": "The generated dependency and vendored OpenAPI document are intentionally deferred to the implementation phase."
+          }
+        ]
+      }
+    },
+    {
+      "id": "AC-2",
+      "status": "not_run",
+      "verification": {
+        "kind": "unit_or_service_test",
+        "references": [
+          {
+            "locator": "iOS/Tests/ColorMatchingLPSAppTests/APIClientTests.swift:49",
+            "result": "Local-stub manifest coverage added; suite not run because swift is unavailable."
+          },
+          {
+            "locator": "iOS/Tests/ColorMatchingLPSAppTests/APIClientTests.swift:72",
+            "result": "Local-stub recent-sheet coverage added; ranked-results remains an implementation-phase gap."
+          }
+        ]
+      }
+    },
+    {
+      "id": "AC-3",
+      "status": "not_run",
+      "verification": {
+        "kind": "unit_or_service_test",
+        "references": [
+          {
+            "locator": "docs/issue-5-verification-plan.md:19",
+            "result": "Requires implementation-phase compile evidence against generated schema types."
+          }
+        ]
+      }
+    },
+    {
+      "id": "AC-4",
+      "status": "not_run",
+      "verification": {
+        "kind": "unit_or_service_test",
+        "references": [
+          {
+            "locator": "iOS/Tests/ColorMatchingLPSAppTests/APIClientTests.swift:6",
+            "result": "All current API tests use MockURLProtocol; swift test --disable-sandbox could not execute because swift is unavailable."
+          }
+        ]
+      }
+    },
+    {
+      "id": "AC-5",
+      "status": "not_run",
+      "verification": {
+        "kind": "human_or_external_evidence",
+        "references": [
+          {
+            "locator": "docs/issue-5-verification-plan.md:21",
+            "result": "Exact contract deltas await the vendored published OpenAPI document."
+          }
+        ]
+      }
+    }
+  ]
+}
