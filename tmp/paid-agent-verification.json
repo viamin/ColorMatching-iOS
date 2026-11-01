@@ -1,0 +1,83 @@
+{
+  "status": "not_run",
+  "summary": "Red-phase tests and migration evidence were added. Swift is not installed in this container, and generated-client implementation is intentionally deferred to the post-approval implementation run.",
+  "acceptance_criteria": [
+    {
+      "id": "AC-1",
+      "status": "not_run",
+      "verification": {
+        "kind": "unit_or_service_test",
+        "references": [
+          {
+            "locator": "iOS/Tests/ColorMatchingLPSAppTests/OpenAPIContractTests.swift:15",
+            "result": "intentionally red: package does not yet declare swift-openapi-generator or swift-openapi-runtime"
+          }
+        ]
+      }
+    },
+    {
+      "id": "AC-2",
+      "status": "not_run",
+      "verification": {
+        "kind": "unit_or_service_test",
+        "references": [
+          {
+            "locator": "iOS/Tests/ColorMatchingLPSAppTests/OpenAPIContractTests.swift:5",
+            "result": "intentionally red: provider OpenAPI snapshot has not yet been vendored"
+          }
+        ]
+      }
+    },
+    {
+      "id": "AC-3",
+      "status": "not_run",
+      "verification": {
+        "kind": "permanent_system_test",
+        "references": [
+          {
+            "locator": "iOS/Tests/ColorMatchingLPSAppTests/APIClientTests.swift:49",
+            "result": "local-stub manifest regression test added; not executed because Swift is unavailable"
+          },
+          {
+            "locator": "iOS/Tests/ColorMatchingLPSAppTests/APIClientTests.swift:70",
+            "result": "local-stub recent-sheets regression test added; not executed because Swift is unavailable"
+          }
+        ]
+      }
+    },
+    {
+      "id": "AC-4",
+      "status": "not_run",
+      "verification": {
+        "kind": "permanent_system_test",
+        "references": [
+          {
+            "locator": "iOS/Tests/ColorMatchingLPSAppTests/APIClientTests.swift:12",
+            "result": "local-stub capture creation test exists; not executed because Swift is unavailable"
+          },
+          {
+            "locator": "iOS/Tests/ColorMatchingLPSAppTests/APIClientTests.swift:89",
+            "result": "local-stub measurement upload test exists; not executed because Swift is unavailable"
+          },
+          {
+            "locator": "iOS/Tests/ColorMatchingLPSAppTests/APIClientTests.swift:114",
+            "result": "local-stub judgment upload test exists; not executed because Swift is unavailable"
+          }
+        ]
+      }
+    },
+    {
+      "id": "AC-5",
+      "status": "not_run",
+      "verification": {
+        "kind": "human_or_external_evidence",
+        "references": [
+          {
+            "locator": "docs/openapi-client-red-phase.md:25",
+            "result": "provider-spec inspection found under-specified manifest, ranked-results, measurement, capture-quality, and judgment schemas"
+          }
+        ]
+      }
+    }
+  ]
+}
