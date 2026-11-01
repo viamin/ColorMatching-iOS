@@ -1,0 +1,80 @@
+{
+  "status": "passed",
+  "summary": "Test-writing run for #5. No swift-openapi-generator/-runtime wiring or generated client exists yet because Package.swift is an implementation file out of scope for this run, and this environment has no network path to a running color_matching instance (or clone of viamin/color_matching) to fetch the real OpenAPI document. Closed the pre-existing fetchManifest/fetchRecentSheets test gap against the hand-written client as a migration regression net, added tracked XCTSkip placeholders referencing #5 for the parts that need the generated client to exist, and recorded contract deltas discovered from GitHub research into docs/openapi-contract-deltas.md for the PR description. No Swift toolchain is available in this container, so swift test could not be executed locally; CI (macos-latest) runs it per iOS/.github/workflows/ci.yml.",
+  "acceptance_criteria": [
+    {
+      "id": "AC-1-add-openapi-deps-and-spec",
+      "status": "not_run",
+      "verification": {
+        "kind": "human_or_external_evidence",
+        "references": [
+          { "locator": "docs/openapi-contract-deltas.md#what-this-means-for-the-implementation-run", "result": "not_run" }
+        ]
+      }
+    },
+    {
+      "id": "AC-2-generate-client-for-used-surfaces",
+      "status": "not_run",
+      "verification": {
+        "kind": "human_or_external_evidence",
+        "references": [
+          { "locator": "docs/openapi-contract-deltas.md#what-this-means-for-the-implementation-run", "result": "not_run" }
+        ]
+      }
+    },
+    {
+      "id": "AC-3-replace-hand-written-models",
+      "status": "not_run",
+      "verification": {
+        "kind": "human_or_external_evidence",
+        "references": [
+          { "locator": "docs/openapi-contract-deltas.md#what-this-means-for-the-implementation-run", "result": "not_run" }
+        ]
+      }
+    },
+    {
+      "id": "AC-4-tests-exercise-generated-client-against-stubs",
+      "status": "skipped",
+      "verification": {
+        "kind": "unit_or_service_test",
+        "references": [
+          { "locator": "iOS/Tests/ColorMatchingLPSAppTests/GeneratedClientMigrationTests.swift:11", "result": "skipped" },
+          { "locator": "iOS/Tests/ColorMatchingLPSAppTests/GeneratedClientMigrationTests.swift:15", "result": "skipped" },
+          { "locator": "iOS/Tests/ColorMatchingLPSAppTests/APIClientReadEndpointsTests.swift:16", "result": "not_run" },
+          { "locator": "iOS/Tests/ColorMatchingLPSAppTests/APIClientReadEndpointsTests.swift:40", "result": "not_run" },
+          { "locator": "iOS/Tests/ColorMatchingLPSAppTests/APIClientReadEndpointsTests.swift:56", "result": "not_run" }
+        ]
+      }
+    },
+    {
+      "id": "AC-5-pr-records-contract-deltas-and-endpoint-gaps",
+      "status": "passed",
+      "verification": {
+        "kind": "human_or_external_evidence",
+        "references": [
+          { "locator": "docs/openapi-contract-deltas.md", "result": "passed" }
+        ]
+      }
+    },
+    {
+      "id": "EXIT-swift-test-green-with-generated-types",
+      "status": "not_run",
+      "verification": {
+        "kind": "human_or_external_evidence",
+        "references": [
+          { "locator": "iOS/.github/workflows/ci.yml", "result": "not_run" }
+        ]
+      }
+    },
+    {
+      "id": "EXIT-pr-captures-contract-deltas",
+      "status": "passed",
+      "verification": {
+        "kind": "human_or_external_evidence",
+        "references": [
+          { "locator": "docs/openapi-contract-deltas.md", "result": "passed" }
+        ]
+      }
+    }
+  ]
+}
