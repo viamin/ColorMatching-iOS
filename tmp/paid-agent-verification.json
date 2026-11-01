@@ -1,0 +1,60 @@
+{
+  "status": "passed",
+  "summary": "Test-writing pass for #5 (generated OpenAPI Swift client). TDD-boundary hook restricts this run to iOS/Tests and docs/ paths, so the generator package/plugin, vendored spec, and generated-type replacement are not implemented here. Added one compiling, intentionally-failing (red) unit test on the existing hand-written APIClient that encodes a real contract gap discovered by reading viamin/color_matching's router/schema source directly (no live server reachable in this sandbox), and wrote docs/openapi-contract-deltas.md recording all contract deltas and endpoint gaps found, for the implementation PR to carry into its description.",
+  "acceptance_criteria": [
+    {
+      "id": "AC-1-add-openapi-generator-package-and-spec",
+      "status": "not_run",
+      "verification": {
+        "kind": "human_or_external_evidence",
+        "references": [
+          { "locator": "Package.swift (unmodified)", "result": "not_run" }
+        ]
+      },
+      "notes": "Adding swift-openapi-generator/runtime and vendoring the OpenAPI document is an implementation-file change; this run's pre-commit hook only allows iOS/Tests and docs/ paths (test-writing phase). Deferred to the implementation run, which should fetch GET /api/v1/openapi.json from a live color_matching server (route confirmed at lib/color_matching_web/router.ex:55 on viamin/color_matching@main)."
+    },
+    {
+      "id": "AC-2-generate-client-for-app-surfaces",
+      "status": "not_run",
+      "verification": {
+        "kind": "human_or_external_evidence",
+        "references": []
+      },
+      "notes": "Requires the generator plugin wired into Package.swift (implementation). Also surfaces a pre-existing gap worth folding in: the app has no client method at all today for GET /api/v1/test_sheets/:sheet_id/ranked_results, despite it being documented and server-implemented (docs/openapi-contract-deltas.md, 'Route coverage')."
+    },
+    {
+      "id": "AC-3-replace-handwritten-models-with-generated-types",
+      "status": "not_run",
+      "verification": {
+        "kind": "human_or_external_evidence",
+        "references": []
+      },
+      "notes": "Implementation-file change; deferred. docs/openapi-contract-deltas.md flags a specific risk to check before replacing SheetManifest/ranked-results models: the real ApiSchemas.Manifest and ApiSchemas.RankedResults modules are thinly specified (few required fields) relative to this app's rich models, so naive generated types may need a thin hand-written layer kept on top."
+    },
+    {
+      "id": "AC-4-tests-exercise-generated-client-against-stubbed-responses",
+      "status": "failed",
+      "verification": {
+        "kind": "unit_or_service_test",
+        "references": [
+          {
+            "locator": "iOS/Tests/ColorMatchingLPSAppTests/APIClientTests.swift:testUploadMeasurementsAlwaysSendsNormalizedMedianKeyPerRealServerContract",
+            "result": "failed"
+          }
+        ]
+      },
+      "notes": "Full generated-client stub tests require the generated types (implementation, out of scope this run). Added instead a compiling regression test against the current hand-written APIClient that is EXPECTED to fail in this red phase: it shows PatchMeasurement's optional normalizedLinearRGBMedian lets uploadMeasurements() omit a JSON key (normalized_linear_rgb_median) that color_matching's real MeasurementUploadRequest schema marks required. No Swift toolchain is available in this sandbox (swift: command not found), so this was verified by reading the synthesized Codable semantics (Optional stored properties encode via encodeIfPresent, omitting nil keys) rather than by executing `swift test`; the implementation run must run `swift test --disable-sandbox` to confirm red-then-green."
+    },
+    {
+      "id": "AC-5-pr-description-records-contract-deltas-and-gaps",
+      "status": "passed",
+      "verification": {
+        "kind": "human_or_external_evidence",
+        "references": [
+          { "locator": "docs/openapi-contract-deltas.md", "result": "passed" }
+        ]
+      },
+      "notes": "Findings derived by fetching viamin/color_matching's router.ex, api_spec.ex, and api_schemas.ex directly from main (viamin/color_matching#110 closed via #113; the app's own GET /api/v1/openapi.json needs a live server not available here). Seven schema/route-level deltas and one pre-existing endpoint gap (missing ranked_results client method) are documented for the implementation PR to copy into its description, plus an explicit re-diff-against-the-real-document action item."
+    }
+  ]
+}
