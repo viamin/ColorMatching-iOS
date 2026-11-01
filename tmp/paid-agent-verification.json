@@ -1,0 +1,79 @@
+{
+  "status": "failed",
+  "summary": "Test-writing (red) phase for issue #5: added permanent generated-client contract tests and the normative migration/delta LID doc. No Swift toolchain exists in this container, so tests could not be executed locally; the new tests are red by design (fail to build until the ColorMatchingOpenAPI target is generated, per the phase rules). Contract deltas and endpoint gaps against the real published spec (viamin/color_matching#113, closed via PR #113 on 2026-10-30) are recorded in docs/openapi-client-migration.md from the upstream api_spec.ex/api_schemas.ex/controllers/test_sheet_json.ex sources fetched from GitHub during this run.",
+  "acceptance_criteria": [
+    {
+      "id": "D1-add-generator-and-vendor-spec",
+      "status": "not_run",
+      "verification": {
+        "kind": "human_or_external_evidence",
+        "references": [
+          { "locator": "docs/openapi-client-migration.md#provenance-of-the-published-spec", "result": "documented fetch/vendor instructions; Package.swift and openapi.yaml wiring is implementation-phase work (outside test-path allowlist this run)" },
+          { "locator": "upstream viamin/color_matching#113 (merged 2026-10-30)", "result": "spec published at GET /api/v1/openapi.json; verified during this run" }
+        ]
+      }
+    },
+    {
+      "id": "D2-generate-client-for-six-surfaces",
+      "status": "failed",
+      "verification": {
+        "kind": "unit_or_service_test",
+        "references": [
+          { "locator": "iOS/Tests/ColorMatchingLPSAppTests/GeneratedClientContractTests.swift:testManifestDecodesFullSheetManifest", "result": "red (module ColorMatchingOpenAPI not generated yet - expected missing-behavior failure)" },
+          { "locator": "iOS/Tests/ColorMatchingLPSAppTests/GeneratedClientContractTests.swift:testRecentSheetsDecodesSheetsWithNullableTitle", "result": "red (same)" },
+          { "locator": "iOS/Tests/ColorMatchingLPSAppTests/GeneratedClientContractTests.swift:testRankedResultsDecodesAggregatePayload", "result": "red (same)" },
+          { "locator": "iOS/Tests/ColorMatchingLPSAppTests/GeneratedClientContractTests.swift:testCreateCaptureSendsNestedMetadataAndQualityAndDecodesCaptureID", "result": "red (same)" },
+          { "locator": "iOS/Tests/ColorMatchingLPSAppTests/GeneratedClientContractTests.swift:testUploadMeasurementsSendsChannelPayloadsStatsAndScores", "result": "red (same)" },
+          { "locator": "iOS/Tests/ColorMatchingLPSAppTests/GeneratedClientContractTests.swift:testUploadJudgmentsSendsPairJudgmentsAndDecodesCounters", "result": "red (same)" },
+          { "locator": "docs/openapi-client-migration.md#pinned-naming-and-wiring-decisions", "result": "generated names derived and pinned from swift-openapi-generator 1.14.x source (SafeNameGenerator/HTTPStatusCodes/TypeAssigner verified upstream)" }
+        ]
+      }
+    },
+    {
+      "id": "D3-replace-handwritten-models-with-generated-types",
+      "status": "not_run",
+      "verification": {
+        "kind": "human_or_external_evidence",
+        "references": [
+          { "locator": "docs/openapi-client-migration.md#acceptance-criterion--verification-mapping", "result": "implementation-phase deliverable; existing APIClientTests and MeasurementCoreTests remain the green-suite guard" }
+        ]
+      }
+    },
+    {
+      "id": "D4-tests-against-local-stubbed-responses",
+      "status": "failed",
+      "verification": {
+        "kind": "unit_or_service_test",
+        "references": [
+          { "locator": "iOS/Tests/ColorMatchingLPSAppTests/GeneratedClientContractTests.swift:StubTransport", "result": "actor-based ClientTransport stub keyed by OpenAPI operation ID; no live server dependency; red until generation (expected)" },
+          { "locator": "iOS/Tests/ColorMatchingLPSAppTests/GeneratedClientContractTests.swift:testManifestSurfacesNotFoundAsTypedResponseCase", "result": "red (same)" },
+          { "locator": "iOS/Tests/ColorMatchingLPSAppTests/GeneratedClientContractTests.swift:testRecentSheetsSurfacesUnauthorizedAsTypedResponseCase", "result": "red (same)" },
+          { "locator": "iOS/Tests/ColorMatchingLPSAppTests/GeneratedClientContractTests.swift:testUploadJudgmentsSurfacesValidationErrorAsTypedResponseCase", "result": "red (same)" },
+          { "locator": "fixtures validated in this run", "result": "all 9 embedded JSON stubs and both multiline fixtures parse as valid JSON; doc YAML fences parse as valid YAML and cross-check against fixtures passed (required fields + types)" }
+        ]
+      }
+    },
+    {
+      "id": "D5-pr-description-records-deltas-and-gaps",
+      "status": "passed",
+      "verification": {
+        "kind": "human_or_external_evidence",
+        "references": [
+          { "locator": "docs/openapi-client-migration.md#contract-deltas-prose-contract-vs-published-spec-vs-actual-payloads", "result": "14-row delta table built from upstream source files fetched during this run (api_schemas.ex, test_sheet_controller.ex, capture_controller.ex, test_sheet_json.ex)" },
+          { "locator": "docs/openapi-client-migration.md#endpoint-gaps-discovered", "result": "unused spec routes enumerated; no app route missing from spec; under-typing and anyOf codegen blockers identified" },
+          { "locator": "docs/openapi-client-migration.md#codegen-blockers-in-the-as-published-document", "result": "OpenAPIKit sibling-key dropping and fragment anyOf branches documented as the two upstream spec defects" }
+        ]
+      }
+    },
+    {
+      "id": "exit-criterion-swift-test-green",
+      "status": "skipped",
+      "verification": {
+        "kind": "human_or_external_evidence",
+        "references": [
+          { "locator": "environment", "result": "no Swift toolchain installed in this container (swift: command not found); swift test --disable-sandbox cannot run here. The suite runs on macOS CI. In this red phase the ColorMatchingLPSAppTests target intentionally fails to compile (no such module 'ColorMatchingOpenAPI'); MeasurementCoreTests is an independent target and remains green." }
+        ]
+      }
+    }
+  ]
+}
