@@ -46,6 +46,42 @@ final class APIClientTests: XCTestCase {
         XCTAssertEqual(quality["rejections"] as? [String], [])
     }
 
+    func testFetchManifestDecodesOpenAPIStubResponse() async throws {
+        MockURLProtocol.handler = { request in
+            XCTAssertEqual(request.url?.path, "/api/v1/test_sheets/ABCD-1234/manifest")
+            XCTAssertEqual(request.value(forHTTPHeaderField: "Authorization"), "Bearer token")
+            return (
+                HTTPURLResponse(url: try XCTUnwrap(request.url), statusCode: 200, httpVersion: nil, headerFields: nil)!,
+                Data(Self.manifestResponse.utf8)
+            )
+        }
+
+        let manifest = try await client().fetchManifest(
+            baseURL: URL(string: "https://example.test")!,
+            sheetCode: "ABCD-1234"
+        )
+
+        XCTAssertEqual(manifest.schemaVersion, "lps-sheet-manifest/v1")
+        XCTAssertEqual(manifest.sheetID, "ABCD-1234")
+        XCTAssertEqual(manifest.patches.map(\.id), ["pair-1##first", "pair-1##second"])
+        XCTAssertEqual(manifest.pairs.first?.sourceColors, ["#112233", "#445566"])
+    }
+
+    func testFetchRecentSheetsDecodesOpenAPIStubResponse() async throws {
+        MockURLProtocol.handler = { request in
+            XCTAssertEqual(request.url?.path, "/api/v1/test_sheets/recent")
+            return (
+                HTTPURLResponse(url: try XCTUnwrap(request.url), statusCode: 200, httpVersion: nil, headerFields: nil)!,
+                Data(#"{"sheets":[{"sheet_id":"ABCD-1234","manifest_url":"https://example.test/api/v1/test_sheets/ABCD-1234/manifest","title":null}]}"#.utf8)
+            )
+        }
+
+        let sheets = try await client().fetchRecentSheets(baseURL: URL(string: "https://example.test")!)
+
+        XCTAssertEqual(sheets.map(\.sheetID), ["ABCD-1234"])
+        XCTAssertNil(sheets.first?.title)
+    }
+
     func testUploadMeasurementsEncodesScoresWithAlgorithmVersion() async throws {
         var capturedBody: Data?
         MockURLProtocol.handler = { request in
@@ -117,6 +153,32 @@ final class APIClientTests: XCTestCase {
         }
         return data
     }
+
+    private static let manifestResponse = #"""
+    {
+      "schema_version": "lps-sheet-manifest/v1",
+      "sheet_id": "ABCD-1234",
+      "sheet_version": "lps-letter-grid-v1",
+      "manifest_url": "https://example.test/api/v1/test_sheets/ABCD-1234/manifest",
+      "created_at": "2026-10-30T12:00:00Z",
+      "page": {"units": "mm", "width": 215.9, "height": 279.4},
+      "registration_markers": [
+        {"role": "top_left", "shape": "solid_square", "rect": {"x": 12, "y": 12, "width": 8, "height": 8}}
+      ],
+      "capture_profile": {
+        "expected_illuminant": "low_pressure_sodium",
+        "preferred_camera": "built_in_wide_angle_rear",
+        "scoring_algorithm_version": "lps-distance-v1"
+      },
+      "patches": [
+        {"id": "pair-1##first", "role": "pair_color", "pair_id": "pair-1", "pair_side": "first", "reference_role": null, "source_color": "#112233", "safe_inset_mm": 1.5, "rect": {"x": 16, "y": 38, "width": 16, "height": 10}},
+        {"id": "pair-1##second", "role": "pair_color", "pair_id": "pair-1", "pair_side": "second", "reference_role": null, "source_color": "#445566", "safe_inset_mm": 1.5, "rect": {"x": 34, "y": 38, "width": 16, "height": 10}}
+      ],
+      "pairs": [
+        {"id": "pair-1", "first_patch_id": "pair-1##first", "second_patch_id": "pair-1##second", "source_colors": ["#112233", "#445566"], "grid_row": 0, "grid_col": 0}
+      ]
+    }
+    """
 }
 
 private final class MockURLProtocol: URLProtocol {
