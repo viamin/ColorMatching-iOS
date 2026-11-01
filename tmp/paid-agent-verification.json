@@ -1,0 +1,71 @@
+{
+  "status": "not_run",
+  "summary": "Tests-only phase: permanent local-stub coverage and a vendored-spec red gate were added. The container has no Swift toolchain, so Swift tests could not run.",
+  "acceptance_criteria": [
+    {
+      "id": "AC-1",
+      "status": "not_run",
+      "verification": {
+        "kind": "unit_or_service_test",
+        "references": [
+          {
+            "locator": "iOS/Tests/ColorMatchingLPSAppTests/APIClientTests.swift:testVendoredOpenAPIDocumentDeclaresEveryCaptureFlowEndpoint",
+            "result": "not_run: requires the implementation-phase vendored document at iOS/openapi/color-matching-api.json; swift is unavailable in this container"
+          }
+        ]
+      }
+    },
+    {
+      "id": "AC-2",
+      "status": "not_run",
+      "verification": {
+        "kind": "permanent_system_test",
+        "references": [
+          {
+            "locator": "iOS/Tests/ColorMatchingLPSAppTests/APIClientTests.swift",
+            "result": "not_run: local URLProtocol fixtures cover manifest, recent sheets, capture creation, measurement upload, and judgment upload; ranked results is gated by the vendored OpenAPI document"
+          }
+        ]
+      }
+    },
+    {
+      "id": "AC-3",
+      "status": "not_run",
+      "verification": {
+        "kind": "unit_or_service_test",
+        "references": [
+          {
+            "locator": "docs/issue-5-openapi-client-verification-plan.md",
+            "result": "not_run: model replacement is reserved for the implementation phase"
+          }
+        ]
+      }
+    },
+    {
+      "id": "AC-4",
+      "status": "not_run",
+      "verification": {
+        "kind": "permanent_system_test",
+        "references": [
+          {
+            "locator": "iOS/Tests/ColorMatchingLPSAppTests/APIClientTests.swift:6",
+            "result": "not_run: the suite uses URLProtocol and has no live-server dependency"
+          }
+        ]
+      }
+    },
+    {
+      "id": "AC-5",
+      "status": "skipped",
+      "verification": {
+        "kind": "human_or_external_evidence",
+        "references": [
+          {
+            "locator": "docs/issue-5-openapi-client-verification-plan.md",
+            "result": "The provider's current ApiSpec/controller sources were inspected; deltas are recorded for transfer into the implementation PR description. No PR exists in this tests-only run."
+          }
+        ]
+      }
+    }
+  ]
+}
