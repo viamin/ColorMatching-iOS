@@ -1,0 +1,71 @@
+{
+  "status": "failed",
+  "summary": "Test-writing phase: permanent red contract tests and an implementation handoff were added. Swift is not installed in this environment, so the suite could not run.",
+  "acceptance_criteria": [
+    {
+      "id": "AC-1",
+      "status": "failed",
+      "verification": {
+        "kind": "unit_or_service_test",
+        "references": [
+          {
+            "locator": "iOS/Tests/ColorMatchingLPSAppTests/OpenAPIClientAdoptionTests.swift:15",
+            "result": "red: generator/runtime dependencies and vendored spec are absent"
+          }
+        ]
+      }
+    },
+    {
+      "id": "AC-2",
+      "status": "failed",
+      "verification": {
+        "kind": "unit_or_service_test",
+        "references": [
+          {
+            "locator": "iOS/Tests/ColorMatchingLPSAppTests/OpenAPIClientAdoptionTests.swift:24",
+            "result": "red: local generated-client stub coverage is absent for the six endpoint surfaces"
+          }
+        ]
+      }
+    },
+    {
+      "id": "AC-3",
+      "status": "failed",
+      "verification": {
+        "kind": "unit_or_service_test",
+        "references": [
+          {
+            "locator": "iOS/Tests/ColorMatchingLPSAppTests/OpenAPIClientAdoptionTests.swift:34",
+            "result": "red: hand-written API boundary models remain"
+          }
+        ]
+      }
+    },
+    {
+      "id": "AC-4",
+      "status": "not_run",
+      "verification": {
+        "kind": "permanent_system_test",
+        "references": [
+          {
+            "locator": "iOS/Tests/ColorMatchingLPSAppTests/APIClientTests.swift",
+            "result": "not run: swift executable is unavailable; replacement generated-client stubs are specified by OpenAPIClientAdoptionTests.swift:24"
+          }
+        ]
+      }
+    },
+    {
+      "id": "AC-5",
+      "status": "not_run",
+      "verification": {
+        "kind": "human_or_external_evidence",
+        "references": [
+          {
+            "locator": "docs/issue-5-openapi-client-plan.md:17",
+            "result": "requires reviewer comparison with the deployed upstream /api/v1/openapi.json document"
+          }
+        ]
+      }
+    }
+  ]
+}
