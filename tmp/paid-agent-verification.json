@@ -1,0 +1,88 @@
+{
+  "status": "failed",
+  "summary": "Tests and verification plan were added in the required red phase. The Swift toolchain is unavailable in this container, and the generated client inputs are intentionally absent until the implementation run.",
+  "acceptance_criteria": [
+    {
+      "id": "AC-1",
+      "status": "not_run",
+      "verification": {
+        "kind": "unit_or_service_test",
+        "references": [
+          {
+            "locator": "iOS/Tests/ColorMatchingLPSAppTests/APIClientTests.swift:testOpenAPIGenerationInputsCoverEveryAppSurface",
+            "result": "not run: Swift is unavailable; test is intentionally red until Package.swift and OpenAPI/color_matching.yaml are added"
+          }
+        ]
+      }
+    },
+    {
+      "id": "AC-2",
+      "status": "not_run",
+      "verification": {
+        "kind": "unit_or_service_test",
+        "references": [
+          {
+            "locator": "iOS/Tests/ColorMatchingLPSAppTests/APIClientTests.swift:testFetchManifestDecodesGeneratedClientResponseFromStub",
+            "result": "not run: local URLProtocol test is ready for generated-client wiring"
+          },
+          {
+            "locator": "iOS/Tests/ColorMatchingLPSAppTests/APIClientTests.swift:testFetchRecentSheetsDecodesGeneratedClientResponseFromStub",
+            "result": "not run: local URLProtocol test is ready for generated-client wiring"
+          }
+        ]
+      }
+    },
+    {
+      "id": "AC-3",
+      "status": "skipped",
+      "verification": {
+        "kind": "human_or_external_evidence",
+        "references": [
+          {
+            "locator": "docs/issue-5-verification-plan.md",
+            "result": "requires implementation diff review to distinguish generated API types from client-only models"
+          }
+        ]
+      }
+    },
+    {
+      "id": "AC-4",
+      "status": "not_run",
+      "verification": {
+        "kind": "unit_or_service_test",
+        "references": [
+          {
+            "locator": "iOS/Tests/ColorMatchingLPSAppTests/APIClientTests.swift:MockURLProtocol",
+            "result": "not run: stubs require no live server when the Swift suite can execute"
+          }
+        ]
+      }
+    },
+    {
+      "id": "AC-5",
+      "status": "skipped",
+      "verification": {
+        "kind": "human_or_external_evidence",
+        "references": [
+          {
+            "locator": "docs/issue-5-verification-plan.md",
+            "result": "requires the published viamin/color_matching#110 specification and implementation PR description"
+          }
+        ]
+      }
+    },
+    {
+      "id": "AC-6",
+      "status": "not_run",
+      "verification": {
+        "kind": "unit_or_service_test",
+        "references": [
+          {
+            "locator": "iOS/Package.swift",
+            "result": "swift test --disable-sandbox could not start because swift is not installed"
+          }
+        ]
+      }
+    }
+  ]
+}
