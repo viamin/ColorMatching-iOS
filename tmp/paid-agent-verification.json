@@ -1,0 +1,45 @@
+{
+  "status": "not_run",
+  "summary": "Red-phase tests and verification plan added; Swift is unavailable in this container and the published upstream OpenAPI document could not be retrieved.",
+  "acceptance_criteria": [
+    {
+      "id": "AC-1",
+      "status": "not_run",
+      "verification": {
+        "kind": "unit_or_service_test",
+        "references": [
+          {
+            "locator": "iOS/Tests/ColorMatchingLPSAppTests/OpenAPIClientGenerationTests.swift:5",
+            "result": "not run: swift executable is unavailable"
+          }
+        ]
+      }
+    },
+    {
+      "id": "AC-2",
+      "status": "not_run",
+      "verification": {
+        "kind": "unit_or_service_test",
+        "references": [
+          {
+            "locator": "iOS/Tests/ColorMatchingLPSAppTests/APIClientTests.swift:49",
+            "result": "not run: swift executable is unavailable"
+          }
+        ]
+      }
+    },
+    {
+      "id": "AC-3",
+      "status": "not_run",
+      "verification": {
+        "kind": "human_or_external_evidence",
+        "references": [
+          {
+            "locator": "docs/issue-5-openapi-client-verification.md",
+            "result": "blocked: upstream pull request 110 returned HTTP 404 from GitHub"
+          }
+        ]
+      }
+    }
+  ]
+}
