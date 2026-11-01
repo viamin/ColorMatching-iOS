@@ -1,0 +1,563 @@
+{
+  "openapi": "3.0.3",
+  "info": {
+    "title": "Color Matching API (iOS companion surface)",
+    "version": "v1",
+    "description": "Hand-vendored subset of the OpenAPI 3 contract published by viamin/color_matching PR #113 (closing viamin/color_matching#110), limited to the six operations ColorMatching-iOS calls today. Reconstructed from lib/color_matching_web/{api_schemas.ex,api_spec.ex,controllers/test_sheet_json.ex,controllers/capture_controller.ex} and their controller tests at commit 094bd6d3443ddacbda7e63354299867eb5bdfa9f, because the upstream OpenApiSpex schemas for Manifest and RankedResults are intentionally minimal placeholders (schema_version/sheet_id only) and do not describe the full response bodies the JSON views actually render. See docs/openapi-contract-deltas.md for the full list of deltas against docs/color-matching-api-contract.md."
+  },
+  "servers": [{ "url": "/" }],
+  "components": {
+    "securitySchemes": {
+      "bearerAuth": { "type": "http", "scheme": "bearer", "bearerFormat": "API token" }
+    },
+    "schemas": {
+      "ErrorResponse": {
+        "title": "ApiErrorResponse",
+        "type": "object",
+        "required": ["errors"],
+        "properties": {
+          "errors": {
+            "description": "Either a free-form field-error map or a list of json:api-style detail/source objects, depending on which plug rejected the request.",
+            "oneOf": [
+              { "type": "object", "additionalProperties": true },
+              {
+                "type": "array",
+                "items": {
+                  "type": "object",
+                  "required": ["detail", "source"],
+                  "properties": {
+                    "detail": { "type": "string" },
+                    "source": {
+                      "type": "object",
+                      "required": ["pointer"],
+                      "properties": { "pointer": { "type": "string" } }
+                    }
+                  }
+                }
+              }
+            ]
+          }
+        }
+      },
+      "Rect": {
+        "title": "Rect",
+        "type": "object",
+        "required": ["x", "y", "width", "height"],
+        "properties": {
+          "x": { "type": "number" },
+          "y": { "type": "number" },
+          "width": { "type": "number" },
+          "height": { "type": "number" }
+        }
+      },
+      "RegistrationMarker": {
+        "title": "RegistrationMarker",
+        "type": "object",
+        "required": ["role", "shape", "rect"],
+        "properties": {
+          "role": { "type": "string", "enum": ["top_left", "top_right", "bottom_right", "bottom_left"] },
+          "shape": { "type": "string", "enum": ["solid_square"] },
+          "rect": { "$ref": "#/components/schemas/Rect" }
+        }
+      },
+      "Page": {
+        "title": "Page",
+        "type": "object",
+        "required": ["units", "width", "height"],
+        "properties": {
+          "units": { "type": "string" },
+          "width": { "type": "number" },
+          "height": { "type": "number" }
+        }
+      },
+      "PrinterProfile": {
+        "title": "PrinterProfile",
+        "description": "Field names/shape differ from docs/color-matching-api-contract.md, which documented {id, name, paper, ink, settings}. The real renderer (TestSheetJSON.render_printer_profile/1) never emits an `id`.",
+        "type": "object",
+        "required": ["printer_make_model", "paper_type", "ink_type"],
+        "properties": {
+          "printer_make_model": { "type": "string" },
+          "paper_type": { "type": "string" },
+          "ink_type": { "type": "string" },
+          "icc_profile": { "type": "string", "nullable": true },
+          "print_settings": { "type": "object", "additionalProperties": true, "nullable": true },
+          "driver_name": { "type": "string", "nullable": true },
+          "driver_version": { "type": "string", "nullable": true },
+          "calibration_date": { "type": "string", "format": "date", "nullable": true },
+          "calibration_version": { "type": "string", "nullable": true },
+          "notes": { "type": "string", "nullable": true }
+        }
+      },
+      "CaptureProfile": {
+        "title": "CaptureProfile",
+        "type": "object",
+        "required": ["expected_illuminant", "preferred_camera", "scoring_algorithm_version"],
+        "properties": {
+          "expected_illuminant": { "type": "string", "enum": ["low_pressure_sodium"] },
+          "preferred_camera": { "type": "string", "enum": ["built_in_wide_angle_rear"] },
+          "scoring_algorithm_version": { "type": "string", "enum": ["lps-distance-v1"] }
+        }
+      },
+      "Patch": {
+        "title": "Patch",
+        "type": "object",
+        "required": ["id", "role", "pair_id", "pair_side", "reference_role", "source_color", "safe_inset_mm", "rect"],
+        "properties": {
+          "id": { "type": "string" },
+          "role": { "type": "string", "enum": ["pair_color", "reference"] },
+          "pair_id": { "type": "string" },
+          "pair_side": { "type": "string", "enum": ["first", "second"], "nullable": true },
+          "reference_role": { "type": "string", "enum": ["white", "gray", "black", "blank_paper"], "nullable": true },
+          "source_color": { "type": "string" },
+          "safe_inset_mm": { "type": "number" },
+          "rect": { "$ref": "#/components/schemas/Rect" }
+        }
+      },
+      "Pair": {
+        "title": "Pair",
+        "type": "object",
+        "required": ["id", "first_patch_id", "second_patch_id", "source_colors", "grid_row", "grid_col"],
+        "properties": {
+          "id": { "type": "string" },
+          "first_patch_id": { "type": "string" },
+          "second_patch_id": { "type": "string" },
+          "source_colors": { "type": "array", "items": { "type": "string" }, "minItems": 2, "maxItems": 2 },
+          "grid_row": { "type": "integer" },
+          "grid_col": { "type": "integer" }
+        }
+      },
+      "TestSheetManifest": {
+        "title": "TestSheetManifest",
+        "description": "Full shape rendered by TestSheetJSON.manifest/1. The published OpenApiSpex schema only asserts {schema_version, sheet_id, capture_profile.scoring_algorithm_version}; this reconstructs the rest from the view code and test/color_matching_web/controllers/test_sheet_controller_test.exs.",
+        "type": "object",
+        "required": [
+          "schema_version", "sheet_id", "sheet_version", "manifest_url", "created_at",
+          "page", "registration_markers", "printer_profile", "capture_profile", "patches", "pairs"
+        ],
+        "properties": {
+          "schema_version": { "type": "string", "enum": ["lps-sheet-manifest/v1"] },
+          "sheet_id": { "type": "string" },
+          "sheet_version": { "type": "string" },
+          "manifest_url": { "type": "string", "format": "uri" },
+          "created_at": { "type": "string", "format": "date-time" },
+          "page": { "$ref": "#/components/schemas/Page" },
+          "registration_markers": { "type": "array", "items": { "$ref": "#/components/schemas/RegistrationMarker" } },
+          "printer_profile": { "$ref": "#/components/schemas/PrinterProfile" },
+          "capture_profile": { "$ref": "#/components/schemas/CaptureProfile" },
+          "patches": { "type": "array", "items": { "$ref": "#/components/schemas/Patch" } },
+          "pairs": { "type": "array", "items": { "$ref": "#/components/schemas/Pair" } }
+        }
+      },
+      "RecentSheet": {
+        "title": "RecentSheet",
+        "description": "title is always null today: TestSheetJSON.render_recent_sheet/1 hardcodes `title: nil` because the server has no sheet-title field yet, not merely an optional one as the prose contract implied.",
+        "type": "object",
+        "required": ["sheet_id", "manifest_url", "title"],
+        "properties": {
+          "sheet_id": { "type": "string" },
+          "manifest_url": { "type": "string", "format": "uri" },
+          "title": { "type": "string", "nullable": true }
+        }
+      },
+      "RecentSheetsResponse": {
+        "title": "RecentSheetsResponse",
+        "type": "object",
+        "required": ["sheets"],
+        "properties": {
+          "sheets": { "type": "array", "items": { "$ref": "#/components/schemas/RecentSheet" } }
+        }
+      },
+      "WhiteBalanceGains": {
+        "title": "WhiteBalanceGains",
+        "type": "object",
+        "required": ["red", "green", "blue"],
+        "properties": {
+          "red": { "type": "number" },
+          "green": { "type": "number" },
+          "blue": { "type": "number" }
+        }
+      },
+      "CaptureMetadata": {
+        "title": "CaptureMetadata",
+        "type": "object",
+        "required": ["device_model", "lens", "app_version", "timestamp"],
+        "properties": {
+          "device_model": { "type": "string" },
+          "lens": { "type": "string" },
+          "exposure_duration_seconds": { "type": "number", "minimum": 0, "exclusiveMinimum": true, "nullable": true },
+          "iso": { "type": "number", "minimum": 0, "exclusiveMinimum": true, "nullable": true },
+          "focus_lens_position": { "type": "number", "minimum": 0, "nullable": true },
+          "white_balance_gains": { "$ref": "#/components/schemas/WhiteBalanceGains", "nullable": true },
+          "image_width": { "type": "integer", "minimum": 0, "exclusiveMinimum": true, "nullable": true },
+          "image_height": { "type": "integer", "minimum": 0, "exclusiveMinimum": true, "nullable": true },
+          "app_version": { "type": "string" },
+          "timestamp": { "type": "string", "format": "date-time" }
+        }
+      },
+      "CaptureQuality": {
+        "title": "CaptureQuality",
+        "type": "object",
+        "properties": {
+          "detected_marker_count": { "type": "integer", "minimum": 0 },
+          "blur_score": { "type": "number", "minimum": 0 },
+          "rejections": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "enum": [
+                "missingRegistrationMarks", "incompleteSheetCoverage", "clipping",
+                "excessiveBlur", "glare", "poorReferencePatch"
+              ]
+            }
+          }
+        }
+      },
+      "CaptureRequest": {
+        "title": "CaptureRequest",
+        "description": "The app sends the nested {metadata, quality} shape, which satisfies the `required: [metadata]` branch of the real anyOf (the server also independently accepts a flattened top-level field set; see docs/openapi-contract-deltas.md).",
+        "type": "object",
+        "required": ["metadata"],
+        "properties": {
+          "metadata": { "$ref": "#/components/schemas/CaptureMetadata" },
+          "quality": { "$ref": "#/components/schemas/CaptureQuality" }
+        }
+      },
+      "CaptureCreatedResponse": {
+        "title": "CaptureCreatedResponse",
+        "type": "object",
+        "required": ["capture_id"],
+        "properties": {
+          "capture_id": { "type": "string", "description": "Stringified integer capture id." }
+        }
+      },
+      "Rgb": {
+        "title": "Rgb",
+        "type": "object",
+        "required": ["r", "g", "b"],
+        "properties": {
+          "r": { "type": "number" },
+          "g": { "type": "number" },
+          "b": { "type": "number" }
+        }
+      },
+      "MeasurementStats": {
+        "title": "MeasurementStats",
+        "type": "object",
+        "required": ["sample_count", "clipping_fraction", "mean", "standard_deviation"],
+        "properties": {
+          "sample_count": { "type": "integer" },
+          "clipping_fraction": { "type": "number" },
+          "mean": { "$ref": "#/components/schemas/Rgb" },
+          "standard_deviation": { "$ref": "#/components/schemas/Rgb" }
+        }
+      },
+      "MeasurementUpload": {
+        "title": "MeasurementUpload",
+        "description": "Server also accepts `sample_count`/`clipping_fraction`/`mean`/`standard_deviation` flattened at this level instead of nested under `stats` (CaptureUpload.normalize_measurement_attrs/2 prefers the top-level value when both are present); the app keeps sending the nested `stats` shape from the prose contract.",
+        "type": "object",
+        "required": ["patch_id", "linear_rgb_median", "normalized_linear_rgb_median", "stats"],
+        "properties": {
+          "patch_id": { "type": "string" },
+          "linear_rgb_median": { "$ref": "#/components/schemas/Rgb" },
+          "normalized_linear_rgb_median": { "$ref": "#/components/schemas/Rgb", "nullable": true },
+          "stats": { "$ref": "#/components/schemas/MeasurementStats" }
+        }
+      },
+      "PairScoreUpload": {
+        "title": "PairScoreUpload",
+        "description": "There is no shared top-level `scoring_algorithm_version`; each pair score carries its own `algorithm_version`. `distance` and `similarity` are both accepted; when both are present the server prefers `similarity` over `distance`, and all three variants clamp into [0,1] server-side.",
+        "type": "object",
+        "required": ["pair_id", "algorithm_version"],
+        "properties": {
+          "pair_id": { "type": "string" },
+          "algorithm_version": { "type": "string" },
+          "score": { "type": "number", "nullable": true },
+          "similarity": { "type": "number", "nullable": true },
+          "distance": { "type": "number", "nullable": true }
+        }
+      },
+      "MeasurementUploadRequest": {
+        "title": "MeasurementUploadRequest",
+        "description": "Unlike docs/color-matching-api-contract.md, there is no top-level `scoring_algorithm_version` field in the real schema; the app may keep sending it (CaptureController does not CastAndValidate this endpoint) but the server ignores it.",
+        "type": "object",
+        "properties": {
+          "measurements": { "type": "array", "items": { "$ref": "#/components/schemas/MeasurementUpload" } },
+          "pair_scores": { "type": "array", "items": { "$ref": "#/components/schemas/PairScoreUpload" } }
+        }
+      },
+      "MeasurementUploadResponse": {
+        "title": "MeasurementUploadResponse",
+        "description": "Undocumented in the prose contract, which showed no response body for this endpoint. The app currently discards this body entirely.",
+        "type": "object",
+        "required": ["capture_id", "measurement_count", "pair_score_count"],
+        "properties": {
+          "capture_id": { "type": "string" },
+          "measurement_count": { "type": "integer" },
+          "pair_score_count": { "type": "integer" }
+        }
+      },
+      "Judgment": {
+        "title": "Judgment",
+        "type": "object",
+        "required": ["pair_id", "judgment"],
+        "properties": {
+          "pair_id": { "type": "string" },
+          "judgment": { "type": "string", "enum": ["match", "near_match", "no_match"] }
+        }
+      },
+      "JudgmentUploadRequest": {
+        "title": "JudgmentUploadRequest",
+        "type": "object",
+        "required": ["judgments"],
+        "properties": {
+          "judgments": { "type": "array", "items": { "$ref": "#/components/schemas/Judgment" } }
+        }
+      },
+      "JudgmentUploadResponse": {
+        "title": "JudgmentUploadResponse",
+        "description": "Undocumented in the prose contract, which showed no response body for this endpoint. The app currently discards this body entirely.",
+        "type": "object",
+        "required": ["capture_id", "judgment_count"],
+        "properties": {
+          "capture_id": { "type": "string" },
+          "judgment_count": { "type": "integer" }
+        }
+      },
+      "SourceColors": {
+        "title": "SourceColors",
+        "type": "object",
+        "required": ["color_a_hex", "color_b_hex"],
+        "properties": {
+          "color_a_hex": { "type": "string" },
+          "color_b_hex": { "type": "string" }
+        }
+      },
+      "RankedScore": {
+        "title": "RankedScore",
+        "type": "object",
+        "required": ["capture_count", "sample_count", "algorithm_versions"],
+        "properties": {
+          "average": { "type": "number", "nullable": true },
+          "latest": { "type": "number", "nullable": true },
+          "minimum": { "type": "number", "nullable": true },
+          "maximum": { "type": "number", "nullable": true },
+          "capture_count": { "type": "integer" },
+          "sample_count": { "type": "integer" },
+          "algorithm_versions": { "type": "array", "items": { "type": "string" } }
+        }
+      },
+      "LatestObservation": {
+        "title": "LatestObservation",
+        "type": "object",
+        "required": ["judgment", "observed_at"],
+        "properties": {
+          "judgment": { "type": "string", "enum": ["match", "near_match", "no_match"] },
+          "observed_at": { "type": "string", "format": "date-time" }
+        }
+      },
+      "RankedResult": {
+        "title": "RankedResult",
+        "description": "A test sheet pair may appear more than once here: results are keyed by (pair_id, scoring_algorithm_version), not by pair_id alone, so a pair scored under two algorithm versions yields two entries.",
+        "type": "object",
+        "required": [
+          "rank", "pair_id", "scoring_algorithm_version", "row", "col", "source_colors",
+          "score", "current_judgment", "current_judgment_observed_at", "observation_count",
+          "latest_observation", "capture_count", "latest_capture_at", "earliest_capture_at"
+        ],
+        "properties": {
+          "rank": { "type": "integer" },
+          "pair_id": { "type": "string" },
+          "scoring_algorithm_version": { "type": "string", "nullable": true },
+          "row": { "type": "integer" },
+          "col": { "type": "integer" },
+          "source_colors": { "$ref": "#/components/schemas/SourceColors" },
+          "score": { "$ref": "#/components/schemas/RankedScore" },
+          "current_judgment": { "type": "string", "enum": ["match", "near_match", "no_match"], "nullable": true },
+          "current_judgment_observed_at": { "type": "string", "format": "date-time", "nullable": true },
+          "observation_count": { "type": "integer" },
+          "latest_observation": { "$ref": "#/components/schemas/LatestObservation", "nullable": true },
+          "capture_count": { "type": "integer" },
+          "latest_capture_at": { "type": "string", "format": "date-time", "nullable": true },
+          "earliest_capture_at": { "type": "string", "format": "date-time", "nullable": true }
+        }
+      },
+      "RankedResultsResponse": {
+        "title": "RankedResultsResponse",
+        "description": "Entirely undocumented in docs/color-matching-api-contract.md, which only described this endpoint in prose ('source colors, scores, labels, capture provenance, printer profile, scoring algorithm version') without a concrete schema. Reconstructed from TestSheetJSON.ranked_results/1 and test/color_matching_web/controllers/ranked_results_controller_test.exs.",
+        "type": "object",
+        "required": [
+          "schema_version", "sheet_id", "printer_profile", "capture_count",
+          "latest_capture_at", "earliest_capture_at", "scoring_algorithm_versions", "results"
+        ],
+        "properties": {
+          "schema_version": { "type": "string", "enum": ["lps-ranked-results/v1"] },
+          "sheet_id": { "type": "string" },
+          "printer_profile": { "$ref": "#/components/schemas/PrinterProfile" },
+          "capture_count": { "type": "integer" },
+          "latest_capture_at": { "type": "string", "format": "date-time", "nullable": true },
+          "earliest_capture_at": { "type": "string", "format": "date-time", "nullable": true },
+          "scoring_algorithm_versions": { "type": "array", "items": { "type": "string" } },
+          "results": { "type": "array", "items": { "$ref": "#/components/schemas/RankedResult" } }
+        }
+      }
+    }
+  },
+  "security": [{ "bearerAuth": [] }],
+  "paths": {
+    "/api/v1/test_sheets/{sheet_id}/manifest": {
+      "get": {
+        "operationId": "getTestSheetManifest",
+        "tags": ["Test sheets"],
+        "parameters": [
+          { "name": "sheet_id", "in": "path", "required": true, "schema": { "type": "string" } }
+        ],
+        "responses": {
+          "200": {
+            "description": "Sheet manifest",
+            "content": { "application/json": { "schema": { "$ref": "#/components/schemas/TestSheetManifest" } } }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": { "application/json": { "schema": { "$ref": "#/components/schemas/ErrorResponse" } } }
+          },
+          "404": {
+            "description": "Test sheet not found",
+            "content": { "application/json": { "schema": { "$ref": "#/components/schemas/ErrorResponse" } } }
+          }
+        }
+      }
+    },
+    "/api/v1/test_sheets/recent": {
+      "get": {
+        "operationId": "listRecentTestSheets",
+        "tags": ["Test sheets"],
+        "responses": {
+          "200": {
+            "description": "Recent sheets",
+            "content": { "application/json": { "schema": { "$ref": "#/components/schemas/RecentSheetsResponse" } } }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": { "application/json": { "schema": { "$ref": "#/components/schemas/ErrorResponse" } } }
+          }
+        }
+      }
+    },
+    "/api/v1/test_sheets/{sheet_id}/ranked_results": {
+      "get": {
+        "operationId": "getRankedResults",
+        "tags": ["Test sheets"],
+        "parameters": [
+          { "name": "sheet_id", "in": "path", "required": true, "schema": { "type": "string" } }
+        ],
+        "responses": {
+          "200": {
+            "description": "Ranked results",
+            "content": { "application/json": { "schema": { "$ref": "#/components/schemas/RankedResultsResponse" } } }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": { "application/json": { "schema": { "$ref": "#/components/schemas/ErrorResponse" } } }
+          },
+          "404": {
+            "description": "Test sheet not found",
+            "content": { "application/json": { "schema": { "$ref": "#/components/schemas/ErrorResponse" } } }
+          }
+        }
+      }
+    },
+    "/api/v1/test_sheets/{sheet_id}/captures": {
+      "post": {
+        "operationId": "createCapture",
+        "tags": ["Captures"],
+        "parameters": [
+          { "name": "sheet_id", "in": "path", "required": true, "schema": { "type": "string" } }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": { "application/json": { "schema": { "$ref": "#/components/schemas/CaptureRequest" } } }
+        },
+        "responses": {
+          "201": {
+            "description": "Capture created",
+            "content": { "application/json": { "schema": { "$ref": "#/components/schemas/CaptureCreatedResponse" } } }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": { "application/json": { "schema": { "$ref": "#/components/schemas/ErrorResponse" } } }
+          },
+          "404": {
+            "description": "Test sheet not found",
+            "content": { "application/json": { "schema": { "$ref": "#/components/schemas/ErrorResponse" } } }
+          },
+          "422": {
+            "description": "Invalid capture attributes",
+            "content": { "application/json": { "schema": { "$ref": "#/components/schemas/ErrorResponse" } } }
+          }
+        }
+      }
+    },
+    "/api/v1/captures/{capture_id}/measurements": {
+      "post": {
+        "operationId": "uploadMeasurements",
+        "tags": ["Captures"],
+        "parameters": [
+          { "name": "capture_id", "in": "path", "required": true, "schema": { "type": "string" } }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": { "application/json": { "schema": { "$ref": "#/components/schemas/MeasurementUploadRequest" } } }
+        },
+        "responses": {
+          "200": {
+            "description": "Measurements accepted",
+            "content": { "application/json": { "schema": { "$ref": "#/components/schemas/MeasurementUploadResponse" } } }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": { "application/json": { "schema": { "$ref": "#/components/schemas/ErrorResponse" } } }
+          },
+          "404": {
+            "description": "Capture not found",
+            "content": { "application/json": { "schema": { "$ref": "#/components/schemas/ErrorResponse" } } }
+          },
+          "422": {
+            "description": "Invalid measurement upload",
+            "content": { "application/json": { "schema": { "$ref": "#/components/schemas/ErrorResponse" } } }
+          }
+        }
+      }
+    },
+    "/api/v1/captures/{capture_id}/judgments": {
+      "post": {
+        "operationId": "uploadJudgments",
+        "tags": ["Captures"],
+        "parameters": [
+          { "name": "capture_id", "in": "path", "required": true, "schema": { "type": "string" } }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": { "application/json": { "schema": { "$ref": "#/components/schemas/JudgmentUploadRequest" } } }
+        },
+        "responses": {
+          "200": {
+            "description": "Judgments accepted",
+            "content": { "application/json": { "schema": { "$ref": "#/components/schemas/JudgmentUploadResponse" } } }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": { "application/json": { "schema": { "$ref": "#/components/schemas/ErrorResponse" } } }
+          },
+          "404": {
+            "description": "Capture not found",
+            "content": { "application/json": { "schema": { "$ref": "#/components/schemas/ErrorResponse" } } }
+          },
+          "422": {
+            "description": "Invalid judgment upload",
+            "content": { "application/json": { "schema": { "$ref": "#/components/schemas/ErrorResponse" } } }
+          }
+        }
+      }
+    }
+  }
+}
