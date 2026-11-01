@@ -1,0 +1,113 @@
+{
+  "status": "failed",
+  "summary": "Tests and contract-audit documentation are committed for the generated OpenAPI client red phase. The generated client target is deliberately absent, and this container does not provide the Swift toolchain to compile the suite.",
+  "acceptance_criteria": [
+    {
+      "id": "AC-1",
+      "status": "failed",
+      "verification": {
+        "kind": "unit_or_service_test",
+        "references": [
+          {
+            "locator": "iOS/Tests/ColorMatchingLPSAppTests/APIClientTests.swift:testGeneratedOpenAPIClientModuleIsLinked",
+            "result": "red: ColorMatchingAPI has not yet been generated or linked"
+          },
+          {
+            "locator": "docs/solutions/generated-openapi-ios-client-test-plan.md",
+            "result": "records package/spec generation plan and upstream spec source"
+          }
+        ]
+      }
+    },
+    {
+      "id": "AC-2",
+      "status": "not_run",
+      "verification": {
+        "kind": "unit_or_service_test",
+        "references": [
+          {
+            "locator": "iOS/Tests/ColorMatchingLPSAppTests/APIClientTests.swift:testFetchManifestDecodesPublishedManifestResponse",
+            "result": "local-stub test added; not compiled because swift is unavailable"
+          },
+          {
+            "locator": "iOS/Tests/ColorMatchingLPSAppTests/APIClientTests.swift:testFetchRecentSheetsDecodesPublishedResponse",
+            "result": "local-stub test added; not compiled because swift is unavailable"
+          }
+        ]
+      }
+    },
+    {
+      "id": "AC-3",
+      "status": "not_run",
+      "verification": {
+        "kind": "unit_or_service_test",
+        "references": [
+          {
+            "locator": "iOS/Tests/ColorMatchingLPSAppTests/APIClientTests.swift:testCreateCaptureEncodesMetadataAndQuality",
+            "result": "existing local-stub coverage must be migrated to generated operation types"
+          },
+          {
+            "locator": "iOS/Tests/ColorMatchingLPSAppTests/APIClientTests.swift:testUploadMeasurementsEncodesScoresWithAlgorithmVersion",
+            "result": "existing local-stub coverage must assert the published acknowledgement"
+          },
+          {
+            "locator": "iOS/Tests/ColorMatchingLPSAppTests/APIClientTests.swift:testUploadJudgmentsEncodesPathAndPayload",
+            "result": "existing local-stub coverage must assert the published acknowledgement"
+          }
+        ]
+      }
+    },
+    {
+      "id": "AC-4",
+      "status": "failed",
+      "verification": {
+        "kind": "unit_or_service_test",
+        "references": [
+          {
+            "locator": "docs/solutions/generated-openapi-ios-client-test-plan.md",
+            "result": "documents the absent ranked-results adapter and the required local-stub test"
+          }
+        ]
+      }
+    },
+    {
+      "id": "AC-5",
+      "status": "not_run",
+      "verification": {
+        "kind": "unit_or_service_test",
+        "references": [
+          {
+            "locator": "iOS/Tests/ColorMatchingLPSAppTests/APIClientTests.swift:MockURLProtocol",
+            "result": "tests are designed to use URLProtocol stubs with no live server"
+          }
+        ]
+      }
+    },
+    {
+      "id": "AC-6",
+      "status": "not_run",
+      "verification": {
+        "kind": "unit_or_service_test",
+        "references": [
+          {
+            "locator": "iOS/Package.swift",
+            "result": "swift test --disable-sandbox could not start: swift executable is absent"
+          }
+        ]
+      }
+    },
+    {
+      "id": "AC-7",
+      "status": "passed",
+      "verification": {
+        "kind": "human_or_external_evidence",
+        "references": [
+          {
+            "locator": "docs/solutions/generated-openapi-ios-client-test-plan.md",
+            "result": "records inspected upstream endpoint coverage and prose-to-spec deltas for the implementation PR description"
+          }
+        ]
+      }
+    }
+  ]
+}
