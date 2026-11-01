@@ -1,0 +1,58 @@
+{
+  "status": "passed",
+  "summary": "Test-writing (red) phase for issue #5. No implementation changes made (TDD boundary restricts this run to test/docs paths). Researched the real published OpenAPI contract by reading viamin/color_matching PR #113 (merged 094bd6d3443ddacbda7e63354299867eb5bdfa9f) source directly, since no live server is available in this environment and the spec is generated at runtime rather than committed as a static file. Documented 9 concrete contract deltas/gaps in docs/openapi-contract-deltas.md, and added two failing regression tests that reproduce two of the most severe gaps against the current hand-written client/quality-gate code. Swift toolchain is unavailable in this Linux container (no swift/swiftc/xcodebuild binary), so `swift test --disable-sandbox` could not be executed; new test code was manually checked against existing type signatures in MeasurementCore/Models.swift, QualityAndScoring.swift, and APIClient.swift for compile-correctness.",
+  "acceptance_criteria": [
+    {
+      "id": "AC-1-add-openapi-generator-deps",
+      "status": "not_run",
+      "verification": {
+        "kind": "human_or_external_evidence",
+        "references": [
+          { "locator": "iOS/Package.swift", "result": "unchanged this run" }
+        ]
+      },
+      "note": "Adding swift-openapi-generator/swift-openapi-runtime and vendoring the spec requires editing Package.swift, which is an implementation file. This run is restricted to test/docs paths per the TDD Boundaries instructions; deferred to the implementation run after paid-tests-approved."
+    },
+    {
+      "id": "AC-2-generate-client-for-used-surfaces",
+      "status": "not_run",
+      "verification": { "kind": "human_or_external_evidence", "references": [] },
+      "note": "Blocked on AC-1 (no generator dependency added yet) and on the same TDD-phase restriction."
+    },
+    {
+      "id": "AC-3-replace-hand-written-models",
+      "status": "not_run",
+      "verification": { "kind": "human_or_external_evidence", "references": [] },
+      "note": "Deferred to the implementation run; this run only added characterization tests against the existing hand-written APIClient/MeasurementCore models."
+    },
+    {
+      "id": "AC-4-tests-against-generated-client-with-stubs",
+      "status": "skipped",
+      "verification": {
+        "kind": "unit_or_service_test",
+        "references": [
+          { "locator": "iOS/Tests/ColorMatchingLPSAppTests/APIClientTests.swift:testUploadMeasurementsAlwaysIncludesNormalizedMedianKey", "result": "failed (expected/red)" },
+          { "locator": "iOS/Tests/MeasurementCoreTests/MeasurementCoreTests.swift:testQualityGateDoesNotRejectRealManifestsWithoutReferencePatches", "result": "failed (expected/red)" }
+        ]
+      },
+      "note": "The generated client doesn't exist yet (no Package.swift changes allowed this run), so tests can't exercise it. Instead, added two local-stub-backed regression tests against the current hand-written client/quality gate that encode two concrete gaps found against the real color_matching contract (required-but-omitted normalized_linear_rgb_median; always-true poorReferencePatch when the live manifest has no reference-role patches). Both are expected to fail (red) against current code, demonstrating the missing behavior the implementation run must address. Could not execute swift test in this environment (no Swift toolchain present on this Linux container: swift/swiftc/xcodebuild all absent) -- failure expectation is based on manual trace of Codable's encodeIfPresent synthesis and QualityGate.hasPoorReferencePatch's guard clause, not an observed test run. This must be confirmed by actually running swift test once a macOS/Xcode environment is available."
+    },
+    {
+      "id": "AC-5-pr-description-records-contract-deltas",
+      "status": "passed",
+      "verification": {
+        "kind": "human_or_external_evidence",
+        "references": [
+          { "locator": "docs/openapi-contract-deltas.md", "result": "created" }
+        ]
+      },
+      "note": "Documents 9 deltas between docs/color-matching-api-contract.md and the real API, sourced from reading viamin/color_matching PR #113 (merged 094bd6d3443ddacbda7e63354299867eb5bdfa9f) directly: api_schemas.ex, api_spec.ex, router.ex, capture_controller.ex, test_sheet_controller.ex, test_sheet_json.ex, capture_upload.ex, capture_patch_measurement.ex, and open_api_controller_test.exs. Confirmed main was only 9 commits (dependency bumps, mix.lock only) ahead of that merge as of 2026-11-01, so findings are current. Intended as the source material for the eventual PR description's required contract-delta section."
+    },
+    {
+      "id": "EXIT-swift-test-green",
+      "status": "not_run",
+      "verification": { "kind": "human_or_external_evidence", "references": [] },
+      "note": "No Swift toolchain available in this container (Linux aarch64, no swift/swiftc/xcodebuild) and no implementation exists yet to make green. Must be verified in a macOS/Xcode environment once the implementation run adds the generated client."
+    }
+  ]
+}
