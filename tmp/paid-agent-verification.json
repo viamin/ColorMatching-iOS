@@ -1,0 +1,88 @@
+{
+  "status": "passed",
+  "summary": "Test-writing (red-phase) run for issue #5. Added Swift tests pinning the hand-written APIClient against the real published color_matching OpenAPI contract (viamin/color_matching#113, closing #110) instead of the stale prose doc, and recorded the concrete contract deltas / endpoint gaps found. No Swift toolchain is available in this container (`swift`/`xcodebuild` not installed), so `swift test` could not be executed here; implementation (generated client, Package.swift dependency, model replacement) is out of scope for this test-writing run per the TDD boundary and is deferred to the implementation run.",
+  "acceptance_criteria": [
+    {
+      "id": "AC-1-add-openapi-generator-dependency",
+      "status": "skipped",
+      "verification": {
+        "kind": "human_or_external_evidence",
+        "references": [
+          {
+            "locator": "deferred-to-implementation-run",
+            "result": "not_applicable"
+          }
+        ]
+      }
+    },
+    {
+      "id": "AC-2-generate-client-for-app-surfaces",
+      "status": "skipped",
+      "verification": {
+        "kind": "human_or_external_evidence",
+        "references": [
+          {
+            "locator": "deferred-to-implementation-run",
+            "result": "not_applicable"
+          }
+        ]
+      }
+    },
+    {
+      "id": "AC-3-replace-hand-written-models",
+      "status": "skipped",
+      "verification": {
+        "kind": "human_or_external_evidence",
+        "references": [
+          {
+            "locator": "deferred-to-implementation-run",
+            "result": "not_applicable"
+          }
+        ]
+      }
+    },
+    {
+      "id": "AC-4-tests-exercise-generated-client-against-stubs",
+      "status": "not_run",
+      "verification": {
+        "kind": "unit_or_service_test",
+        "references": [
+          {
+            "locator": "iOS/Tests/ColorMatchingLPSAppTests/APIContractDriftTests.swift:28",
+            "result": "not_run"
+          },
+          {
+            "locator": "iOS/Tests/ColorMatchingLPSAppTests/APIContractDriftTests.swift:71",
+            "result": "not_run"
+          }
+        ]
+      }
+    },
+    {
+      "id": "AC-5-swift-test-disable-sandbox-green",
+      "status": "not_run",
+      "verification": {
+        "kind": "human_or_external_evidence",
+        "references": [
+          {
+            "locator": "environment: `swift`/`xcodebuild` not installed in this container",
+            "result": "not_run"
+          }
+        ]
+      }
+    },
+    {
+      "id": "AC-6-pr-description-captures-contract-deltas",
+      "status": "passed",
+      "verification": {
+        "kind": "human_or_external_evidence",
+        "references": [
+          {
+            "locator": "docs/openapi-contract-deltas.md",
+            "result": "documented"
+          }
+        ]
+      }
+    }
+  ]
+}
