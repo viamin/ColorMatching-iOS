@@ -1,0 +1,49 @@
+{
+  "status": "failed",
+  "summary": "Red-phase tests and OpenAPI contract evidence were added. The generator/runtime dependency assertion is intentionally failing until implementation; Swift is unavailable in this container, so the Swift test suite could not execute.",
+  "acceptance_criteria": [
+    {
+      "id": "AC-1",
+      "status": "failed",
+      "verification": {
+        "kind": "unit_or_service_test",
+        "references": [
+          {
+            "locator": "iOS/Tests/ColorMatchingLPSAppTests/OpenAPIClientIntegrationTests.swift:testPackageDeclaresOpenAPIGeneratorAndRuntime",
+            "result": "intentionally red: Package.swift does not yet declare swift-openapi-generator or swift-openapi-runtime"
+          }
+        ]
+      }
+    },
+    {
+      "id": "AC-2",
+      "status": "not_run",
+      "verification": {
+        "kind": "permanent_system_test",
+        "references": [
+          {
+            "locator": "iOS/Tests/ColorMatchingLPSAppTests/APIClientTests.swift",
+            "result": "local MockURLProtocol stubs added, but not run because swift is unavailable"
+          },
+          {
+            "locator": "iOS/Tests/ColorMatchingLPSAppTests/OpenAPIClientIntegrationTests.swift:testRankedResultsStubContainsPublishedResponseShape",
+            "result": "local ranked-results stub added, but not run because swift is unavailable"
+          }
+        ]
+      }
+    },
+    {
+      "id": "AC-3",
+      "status": "not_run",
+      "verification": {
+        "kind": "human_or_external_evidence",
+        "references": [
+          {
+            "locator": "docs/issue-5-openapi-client-verification.md",
+            "result": "published-contract deltas and endpoint-gap analysis recorded; PR description still required during implementation"
+          }
+        ]
+      }
+    }
+  ]
+}
