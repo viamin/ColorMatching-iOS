@@ -1,0 +1,71 @@
+{
+  "status": "not_run",
+  "summary": "Test-writing change adds local-stub regression coverage and records the generated-client verification plan. The Swift toolchain is unavailable in this container, so Swift tests could not run.",
+  "acceptance_criteria": [
+    {
+      "id": "AC-1",
+      "status": "not_run",
+      "verification": {
+        "kind": "unit_or_service_test",
+        "references": [
+          {
+            "locator": "iOS/Package.swift",
+            "result": "The generated-client package dependencies are intentionally deferred to the implementation phase."
+          }
+        ]
+      }
+    },
+    {
+      "id": "AC-2",
+      "status": "skipped",
+      "verification": {
+        "kind": "human_or_external_evidence",
+        "references": [
+          {
+            "locator": "docs/issue-5-generated-openapi-client-test-plan.md",
+            "result": "Provider ranked-results schema omits the typed fields required by the prose contract."
+          }
+        ]
+      }
+    },
+    {
+      "id": "AC-3",
+      "status": "not_run",
+      "verification": {
+        "kind": "unit_or_service_test",
+        "references": [
+          {
+            "locator": "docs/issue-5-generated-openapi-client-test-plan.md",
+            "result": "Replacement of hand-written transport models is deferred to the implementation phase."
+          }
+        ]
+      }
+    },
+    {
+      "id": "AC-4",
+      "status": "not_run",
+      "verification": {
+        "kind": "unit_or_service_test",
+        "references": [
+          {
+            "locator": "iOS/Tests/ColorMatchingLPSAppTests/APIClientTests.swift",
+            "result": "Local MockURLProtocol tests cover manifest, recent sheets, capture creation, measurement upload, and judgment upload but were not executable because swift is absent."
+          }
+        ]
+      }
+    },
+    {
+      "id": "AC-5",
+      "status": "skipped",
+      "verification": {
+        "kind": "human_or_external_evidence",
+        "references": [
+          {
+            "locator": "docs/issue-5-generated-openapi-client-test-plan.md",
+            "result": "Contract delta evidence is prepared for the implementation PR description; no PR exists in this no-push test-writing run."
+          }
+        ]
+      }
+    }
+  ]
+}
