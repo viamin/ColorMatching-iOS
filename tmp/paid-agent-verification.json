@@ -1,0 +1,71 @@
+{
+  "status": "not_run",
+  "summary": "Red-phase OpenAPI migration tests and verification plan added. Swift is unavailable in this container, so swift test --disable-sandbox could not run.",
+  "acceptance_criteria": [
+    {
+      "id": "AC-1",
+      "status": "not_run",
+      "verification": {
+        "kind": "unit_or_service_test",
+        "references": [
+          {
+            "locator": "iOS/Tests/ColorMatchingLPSAppTests/OpenAPIGenerationConfigurationTests.swift:5",
+            "result": "not_run: expected red until Package.swift declares swift-openapi-generator/runtime and generated target"
+          }
+        ]
+      }
+    },
+    {
+      "id": "AC-2",
+      "status": "not_run",
+      "verification": {
+        "kind": "unit_or_service_test",
+        "references": [
+          {
+            "locator": "iOS/Tests/ColorMatchingLPSAppTests/OpenAPIGenerationConfigurationTests.swift:15",
+            "result": "not_run: expected red until the vendored OpenAPI document includes all six used paths"
+          }
+        ]
+      }
+    },
+    {
+      "id": "AC-3",
+      "status": "not_run",
+      "verification": {
+        "kind": "human_or_external_evidence",
+        "references": [
+          {
+            "locator": "docs/openapi-client-migration-verification.md:9",
+            "result": "implementation review required in the subsequent implementation phase"
+          }
+        ]
+      }
+    },
+    {
+      "id": "AC-4",
+      "status": "not_run",
+      "verification": {
+        "kind": "unit_or_service_test",
+        "references": [
+          {
+            "locator": "iOS/Tests/ColorMatchingLPSAppTests/APIClientTests.swift:49",
+            "result": "not_run: local URLProtocol stubs cover manifest/recent reads; existing tests cover writes"
+          }
+        ]
+      }
+    },
+    {
+      "id": "AC-5",
+      "status": "passed",
+      "verification": {
+        "kind": "human_or_external_evidence",
+        "references": [
+          {
+            "locator": "docs/openapi-client-migration-verification.md:17",
+            "result": "provider issue #110 and provider main-branch controller tests were inspected; deltas and the ranked-results endpoint gap are recorded"
+          }
+        ]
+      }
+    }
+  ]
+}
