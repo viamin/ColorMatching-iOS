@@ -1,0 +1,62 @@
+{
+  "status": "not_run",
+  "summary": "Tests and contract-delta evidence were added in the required tests-only phase. The container has no Swift toolchain, and the implementation-phase vendored OpenAPI document is intentionally absent.",
+  "acceptance_criteria": [
+    {
+      "id": "AC-1",
+      "status": "not_run",
+      "verification": {
+        "kind": "unit_or_service_test",
+        "references": [
+          {
+            "locator": "iOS/Tests/ColorMatchingLPSAppTests/OpenAPIContractTests.swift:5",
+            "result": "Blocked: `iOS/openapi/color_matching.openapi.json` is not present until implementation vendors the upstream response."
+          }
+        ]
+      }
+    },
+    {
+      "id": "AC-2",
+      "status": "not_run",
+      "verification": {
+        "kind": "unit_or_service_test",
+        "references": [
+          {
+            "locator": "iOS/Tests/ColorMatchingLPSAppTests/APIClientTests.swift:95",
+            "result": "Local MockURLProtocol manifest stub added; Swift test execution is blocked because `swift` is unavailable."
+          },
+          {
+            "locator": "iOS/Tests/ColorMatchingLPSAppTests/APIClientTests.swift:116",
+            "result": "Local MockURLProtocol recent-sheets stub added; Swift test execution is blocked because `swift` is unavailable."
+          }
+        ]
+      }
+    },
+    {
+      "id": "AC-3",
+      "status": "skipped",
+      "verification": {
+        "kind": "human_or_external_evidence",
+        "references": [
+          {
+            "locator": "docs/issue-5-openapi-client-verification.md:8",
+            "result": "Package dependency and generated-type replacement require the subsequent implementation phase."
+          }
+        ]
+      }
+    },
+    {
+      "id": "AC-4",
+      "status": "not_run",
+      "verification": {
+        "kind": "human_or_external_evidence",
+        "references": [
+          {
+            "locator": "docs/issue-5-openapi-client-verification.md:18",
+            "result": "Verified contract-delta and endpoint-gap text is prepared for the PR description, but no PR exists in this tests-only run."
+          }
+        ]
+      }
+    }
+  ]
+}
