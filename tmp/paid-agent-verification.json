@@ -1,0 +1,90 @@
+{
+  "status": "passed",
+  "summary": "Tests-first run for issue #5 (replace hand-written API layer with generated OpenAPI Swift client). Authored permanent unit tests in iOS/Tests/ColorMatchingLPSAppTests/OpenAPIGeneratedClientTests.swift exercising the future generated client (module OpenAPIGenerated) against local URLProtocol-stubbed responses for all six surfaces (manifest, recent sheets, capture creation, measurement upload, judgment upload, ranked results) plus an undeclared-404 error path; a sentinel test fails red until the generated target is wired in, and the rest are gated on #if canImport(OpenAPIGenerated) so the existing suite still compiles. Recorded the AC-to-verification mapping and the prose-contract gaps (ranked_results has no response schema, undocumented success status codes, no error envelope, auth out-of-band, title nullability, upload stats key set) in docs/openapi-generated-client-test-plan.md. Limitations: no Swift toolchain in this container (swift: command not found) so tests could not be executed locally; the upstream OpenAPI spec from viamin/color_matching#110 is not fetchable from here (HTTP 404), both recorded in the doc. Implementation criteria are not_run pending the implementation run; authoritative test execution is the CI macOS 'swift test' job.",
+  "acceptance_criteria": [
+    {
+      "id": "AC-1",
+      "description": "Add swift-openapi-generator + swift-openapi-runtime to the iOS package; fetch or vendor the OpenAPI document from viamin/color_matching#110",
+      "status": "not_run",
+      "verification": {
+        "kind": "human_or_external_evidence",
+        "references": [
+          { "locator": "docs/openapi-generated-client-test-plan.md#dependency-status-at-authoring-time", "result": "blocked_external", "note": "Upstream spec PR not reachable (HTTP 404 on 2026-11-01); implementation-only change, not permitted in this tests-only run" }
+        ]
+      }
+    },
+    {
+      "id": "AC-2",
+      "description": "Generate the client for: test-sheet manifest + recent sheets, capture session creation, measurement upload, judgment upload, ranked results",
+      "status": "not_run",
+      "verification": {
+        "kind": "unit_or_service_test",
+        "references": [
+          { "locator": "iOS/Tests/ColorMatchingLPSAppTests/OpenAPIGeneratedClientTests.swift:22", "result": "red", "note": "Sentinel testGeneratedClientModuleIsWiredIntoPackage fails while the generated target is absent (expected red-phase evidence)" },
+          { "locator": "iOS/Tests/ColorMatchingLPSAppTests/OpenAPIGeneratedClientTests.swift:33", "result": "written_not_executed" },
+          { "locator": "iOS/Tests/ColorMatchingLPSAppTests/OpenAPIGeneratedClientTests.swift:54", "result": "written_not_executed" },
+          { "locator": "iOS/Tests/ColorMatchingLPSAppTests/OpenAPIGeneratedClientTests.swift:72", "result": "written_not_executed" },
+          { "locator": "iOS/Tests/ColorMatchingLPSAppTests/OpenAPIGeneratedClientTests.swift:103", "result": "written_not_executed" },
+          { "locator": "iOS/Tests/ColorMatchingLPSAppTests/OpenAPIGeneratedClientTests.swift:134", "result": "written_not_executed" },
+          { "locator": "iOS/Tests/ColorMatchingLPSAppTests/OpenAPIGeneratedClientTests.swift:156", "result": "written_not_executed" },
+          { "locator": "iOS/Tests/ColorMatchingLPSAppTests/OpenAPIGeneratedClientTests.swift:178", "result": "written_not_executed" }
+        ]
+      }
+    },
+    {
+      "id": "AC-3",
+      "description": "Replace the app's hand-written API models with generated types; keep purely client-side models as-is",
+      "status": "not_run",
+      "verification": {
+        "kind": "unit_or_service_test",
+        "references": [
+          { "locator": "iOS/Tests/ColorMatchingLPSAppTests/APIClientTests.swift", "result": "baseline_kept", "note": "Existing tests keep pinning bearer-token and wire-format behavior through the swap; implementation-only change" }
+        ]
+      }
+    },
+    {
+      "id": "AC-4",
+      "description": "Swift tests exercising the generated client against local stubbed responses (no live server in CI)",
+      "status": "skipped",
+      "verification": {
+        "kind": "unit_or_service_test",
+        "references": [
+          { "locator": "iOS/Tests/ColorMatchingLPSAppTests/OpenAPIGeneratedClientTests.swift:9", "result": "written_not_executed", "note": "Tests authored and gated on canImport(OpenAPIGenerated); cannot execute in this container (no Swift toolchain) and module not yet generated. CI macOS job (.github/workflows/ci.yml, swift test) is the authoritative run" }
+        ]
+      }
+    },
+    {
+      "id": "AC-5",
+      "description": "PR description records contract deltas between docs/color-matching-api-contract.md and the published spec, and endpoint gaps",
+      "status": "not_run",
+      "verification": {
+        "kind": "human_or_external_evidence",
+        "references": [
+          { "locator": "docs/openapi-generated-client-test-plan.md#contract-deltas-and-gaps-prose-contract-vs-machine-readable-spec", "result": "seeded", "note": "Gaps G-1..G-6 discovered and recorded; final delta set requires the published spec (unavailable) and belongs to the implementation PR description" }
+        ]
+      }
+    },
+    {
+      "id": "AC-6",
+      "description": "Map every acceptance criterion to the smallest credible verification before implementation",
+      "status": "passed",
+      "verification": {
+        "kind": "human_or_external_evidence",
+        "references": [
+          { "locator": "docs/openapi-generated-client-test-plan.md#acceptance-criteria-verification-mapping", "result": "passed" }
+        ]
+      }
+    },
+    {
+      "id": "AC-7",
+      "description": "Exit criterion: swift test --disable-sandbox green with generated types wired in",
+      "status": "not_run",
+      "verification": {
+        "kind": "unit_or_service_test",
+        "references": [
+          { "locator": ".github/workflows/ci.yml", "result": "pending_implementation", "note": "Requires generated target (implementation run); local swift unavailable in this container" }
+        ]
+      }
+    }
+  ]
+}
