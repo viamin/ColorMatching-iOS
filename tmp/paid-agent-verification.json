@@ -1,0 +1,73 @@
+{
+  "status": "failed",
+  "summary": "Tests-only red phase for issue #5 (replace hand-written API layer with a generated OpenAPI Swift client). Wrote 18 permanent tests: OpenAPIDocumentTests (10 Foundation-only tests guarding the vendored openapi.json; runtime-red because the document is not vendored yet) and GeneratedClientTests (8 tests driving the future generated ColorMatchingAPI client through a stub ClientTransport; compile-red because the generated target does not exist yet). Recorded the full prose-contract vs published-spec delta analysis (13 findings incl. 3 endpoint gaps) in docs/openapi-generated-client.md as source material for the implementation PR description. Swift toolchain is not available in this container, so swift test could not be executed locally; the suite runs on the repo's macOS CI (swift test + xcodebuild). Implementation (Package.swift plugin wiring, vendored spec, model replacement) intentionally deferred to the implementation run per phase rules.",
+  "acceptance_criteria": [
+    {
+      "id": "AC-1",
+      "description": "Add swift-openapi-generator + swift-openapi-runtime to the iOS package; fetch or vendor the OpenAPI document from viamin/color_matching#110",
+      "status": "failed",
+      "verification": {
+        "kind": "unit_or_service_test",
+        "references": [
+          { "locator": "iOS/Tests/ColorMatchingLPSAppTests/OpenAPIDocumentTests.swift:17", "result": "red: vendored iOS/ColorMatchingAPI/openapi.json absent (expected missing behavior)" },
+          { "locator": "iOS/Tests/ColorMatchingLPSAppTests/OpenAPIDocumentTests.swift:24", "result": "red: six app surfaces/operation IDs not yet vendored" },
+          { "locator": "iOS/Tests/ColorMatchingLPSAppTests/OpenAPIDocumentTests.swift:45", "result": "red: bearerAuth security scheme not vendored" }
+        ],
+        "notes": "Package.swift dependency wiring cannot be added in this tests-only phase (implementation file); it lands in the implementation run and is proven when swift test builds the ColorMatchingAPI target."
+      }
+    },
+    {
+      "id": "AC-2",
+      "description": "Generate the client for manifest + recent sheets, capture creation, measurement upload, judgment upload, ranked results",
+      "status": "failed",
+      "verification": {
+        "kind": "unit_or_service_test",
+        "references": [
+          { "locator": "iOS/Tests/ColorMatchingLPSAppTests/GeneratedClientTests.swift:39", "result": "red: compile (no ColorMatchingAPI module) - manifest" },
+          { "locator": "iOS/Tests/ColorMatchingLPSAppTests/GeneratedClientTests.swift:59", "result": "red: compile - recent sheets incl. nullable title" },
+          { "locator": "iOS/Tests/ColorMatchingLPSAppTests/GeneratedClientTests.swift:77", "result": "red: compile - capture creation" },
+          { "locator": "iOS/Tests/ColorMatchingLPSAppTests/GeneratedClientTests.swift:117", "result": "red: compile - measurement upload" },
+          { "locator": "iOS/Tests/ColorMatchingLPSAppTests/GeneratedClientTests.swift:174", "result": "red: compile - judgment upload" },
+          { "locator": "iOS/Tests/ColorMatchingLPSAppTests/GeneratedClientTests.swift:201", "result": "red: compile - ranked results (surface missing from hand-written client)" }
+        ]
+      }
+    },
+    {
+      "id": "AC-3",
+      "description": "Replace the app's hand-written API models with generated types; keep purely client-side models as-is",
+      "status": "not_run",
+      "verification": {
+        "kind": "human_or_external_evidence",
+        "references": [
+          { "locator": "docs/openapi-generated-client.md", "result": "plan recorded: hand-written Codable models to delete vs client-side models to keep; verified by implementation PR code review" }
+        ],
+        "notes": "Cannot be exercised in a tests-only phase: requires deleting implementation files in iOS/Sources/ColorMatchingLPSAppCore/APIClient.swift."
+      }
+    },
+    {
+      "id": "AC-4",
+      "description": "Swift tests exercising the generated client against local stubbed responses (no live server in CI)",
+      "status": "failed",
+      "verification": {
+        "kind": "unit_or_service_test",
+        "references": [
+          { "locator": "iOS/Tests/ColorMatchingLPSAppTests/GeneratedClientTests.swift:266", "result": "StubTransport + BearerTokenMiddleware defined; deterministic canned JSON, zero network" },
+          { "locator": "iOS/Tests/ColorMatchingLPSAppTests/GeneratedClientTests.swift:227", "result": "red: compile - auth middleware wiring test" }
+        ],
+        "notes": "Tests written but cannot execute in this container: no Swift toolchain installed (swift: command not found). Exit criterion 'swift test --disable-sandbox green' deferred to implementation run + macOS CI."
+      }
+    },
+    {
+      "id": "AC-5",
+      "description": "PR description records what changed between the prose contract and the published spec, and endpoint gaps discovered",
+      "status": "skipped",
+      "verification": {
+        "kind": "human_or_external_evidence",
+        "references": [
+          { "locator": "docs/openapi-generated-client.md", "result": "13 contract deltas recorded from the real upstream open_api_spex modules (fetched viamin/color_matching), incl. 3 endpoint gaps: manifest schema shrinkage, dropped per-measurement stats, skeletal ranked results" }
+        ],
+        "notes": "No PR is opened in this tests-only phase; the committed delta table is the inspectable source material for the implementation PR description."
+      }
+    }
+  ]
+}
