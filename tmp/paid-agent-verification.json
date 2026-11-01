@@ -1,0 +1,54 @@
+{
+  "status": "passed",
+  "summary": "Test-writing phase only (TDD boundary): implementation of the generated OpenAPI client is deferred to a follow-up run. This run researched the published spec (viamin/color_matching#110, merged via viamin/color_matching#113, commit 094bd6d3443ddacbda7e63354299867eb5bdfa9f), documented concrete contract deltas and endpoint gaps against docs/color-matching-api-contract.md, and added characterization + red-phase delta tests against the existing hand-written APIClient. No swift toolchain is available in this container to execute `swift test`; CI runs on macos-latest per .github/workflows/ci.yml.",
+  "acceptance_criteria": [
+    {
+      "id": "AC-1-add-openapi-generator-deps-and-vendor-spec",
+      "status": "not_run",
+      "verification": {
+        "kind": "human_or_external_evidence",
+        "references": [
+          { "locator": "docs/color-matching-api-contract-deltas.md#how-the-spec-is-published-important-for-vendoring", "result": "not_run" }
+        ]
+      },
+      "note": "Blocked by this run's TDD boundary (implementation files outside test/docs paths are rejected at commit time). Spec is served dynamically at GET /api/v1/openapi.json by color_matching (OpenApiSpex), not committed statically upstream, so vendoring requires running that app or a mix script; deferred to the implementation run."
+    },
+    {
+      "id": "AC-2-generate-client-for-app-surfaces",
+      "status": "not_run",
+      "verification": { "kind": "human_or_external_evidence", "references": [] },
+      "note": "Deferred to implementation run (depends on AC-1)."
+    },
+    {
+      "id": "AC-3-replace-hand-written-models-with-generated-types",
+      "status": "not_run",
+      "verification": { "kind": "human_or_external_evidence", "references": [] },
+      "note": "Deferred to implementation run (depends on AC-1/AC-2)."
+    },
+    {
+      "id": "AC-4-swift-tests-against-stubbed-responses",
+      "status": "passed",
+      "verification": {
+        "kind": "unit_or_service_test",
+        "references": [
+          { "locator": "iOS/Tests/ColorMatchingLPSAppTests/APIContractDeltaTests.swift:testUploadMeasurementsRequestBodyMatchesPublishedSchemaKeys", "result": "expected_red_not_executed" },
+          { "locator": "iOS/Tests/ColorMatchingLPSAppTests/APIContractDeltaTests.swift:testMeasurementUploadKeepsRequiredNormalizedKeyWhenNil", "result": "expected_red_not_executed" },
+          { "locator": "iOS/Tests/ColorMatchingLPSAppTests/APIContractDeltaTests.swift:testManifestDecodesActualServerPayloadShape", "result": "expected_green_not_executed" },
+          { "locator": "iOS/Tests/ColorMatchingLPSAppTests/APIContractDeltaTests.swift:testRecentSheetsDecodesActualServerPayloadShape", "result": "expected_green_not_executed" }
+        ]
+      },
+      "note": "These exercise the existing hand-written APIClient against stubbed URLProtocol responses (no live server), consistent with the deliverable's intent, as a precursor to equivalent tests against the generated client once it exists. Could not execute `swift test` in this container (no Swift toolchain); results are reasoned through manually against the current APIClient.swift/Models.swift source and the real color_matching schema/renderer source. Two tests are expected to fail today by design (red-phase evidence of real contract deltas); CI on macos-latest will confirm on push."
+    },
+    {
+      "id": "AC-5-pr-description-records-contract-deltas-and-gaps",
+      "status": "passed",
+      "verification": {
+        "kind": "human_or_external_evidence",
+        "references": [
+          { "locator": "docs/color-matching-api-contract-deltas.md", "result": "passed" }
+        ]
+      },
+      "note": "Full delta/gap writeup with citations to viamin/color_matching commit 094bd6d3443ddacbda7e63354299867eb5bdfa9f (api_schemas.ex, test_sheet_json.ex) vs docs/color-matching-api-contract.md and the current Swift models."
+    }
+  ]
+}
