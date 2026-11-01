@@ -1,0 +1,84 @@
+{
+  "status": "failed",
+  "summary": "Red-phase tests and contract evidence were added; Swift is unavailable in this container, and the ranked-results test intentionally fails until the generated operation is implemented.",
+  "acceptance_criteria": [
+    {
+      "id": "AC-1",
+      "status": "not_run",
+      "verification": {
+        "kind": "human_or_external_evidence",
+        "references": [
+          {
+            "locator": "docs/issue-5-openapi-client-plan.md:10",
+            "result": "Implementation-phase inspection planned; package dependencies and a pinned OpenAPI document do not exist yet."
+          }
+        ]
+      }
+    },
+    {
+      "id": "AC-2",
+      "status": "failed",
+      "verification": {
+        "kind": "unit_or_service_test",
+        "references": [
+          {
+            "locator": "iOS/Tests/ColorMatchingLPSAppTests/APIClientTests.swift:49",
+            "result": "Manifest and recent-sheet local-stub tests added; ranked-results test is intentionally red at line 136 pending a typed generated operation."
+          }
+        ]
+      }
+    },
+    {
+      "id": "AC-3",
+      "status": "not_run",
+      "verification": {
+        "kind": "human_or_external_evidence",
+        "references": [
+          {
+            "locator": "docs/issue-5-openapi-client-plan.md:12",
+            "result": "Replacement of hand-written wire models is reserved for the implementation phase."
+          }
+        ]
+      }
+    },
+    {
+      "id": "AC-4",
+      "status": "not_run",
+      "verification": {
+        "kind": "unit_or_service_test",
+        "references": [
+          {
+            "locator": "iOS/Tests/ColorMatchingLPSAppTests/APIClientTests.swift:200",
+            "result": "MockURLProtocol is the permanent local HTTP stub, but the suite could not run because swift is absent."
+          }
+        ]
+      }
+    },
+    {
+      "id": "AC-5",
+      "status": "not_run",
+      "verification": {
+        "kind": "human_or_external_evidence",
+        "references": [
+          {
+            "locator": "iOS/Package.swift:1",
+            "result": "swift test --disable-sandbox could not start: executable swift is unavailable in this container."
+          }
+        ]
+      }
+    },
+    {
+      "id": "AC-6",
+      "status": "passed",
+      "verification": {
+        "kind": "human_or_external_evidence",
+        "references": [
+          {
+            "locator": "docs/issue-5-openapi-client-plan.md:25",
+            "result": "Published-spec/prose-contract deltas and endpoint gaps are recorded with source links."
+          }
+        ]
+      }
+    }
+  ]
+}
