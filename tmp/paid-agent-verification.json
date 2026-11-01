@@ -1,0 +1,71 @@
+{
+  "status": "not_run",
+  "summary": "Tests-only red phase: the generated-client configuration assertion is intentionally red, and Swift is unavailable in this container.",
+  "acceptance_criteria": [
+    {
+      "id": "AC-1",
+      "status": "not_run",
+      "verification": {
+        "kind": "unit_or_service_test",
+        "references": [
+          {
+            "locator": "iOS/Tests/ColorMatchingLPSAppTests/OpenAPIClientConfigurationTests.swift:5",
+            "result": "not_run: swift executable is unavailable; assertion is intentionally red until dependencies and iOS/OpenAPI/color-matching-openapi.json are added"
+          }
+        ]
+      }
+    },
+    {
+      "id": "AC-2",
+      "status": "not_run",
+      "verification": {
+        "kind": "permanent_system_test",
+        "references": [
+          {
+            "locator": "iOS/Tests/ColorMatchingLPSAppTests/APIClientTests.swift:95",
+            "result": "not_run: local URLProtocol stub test added for manifest and recent sheets; generated client wiring remains implementation work"
+          }
+        ]
+      }
+    },
+    {
+      "id": "AC-3",
+      "status": "not_run",
+      "verification": {
+        "kind": "unit_or_service_test",
+        "references": [
+          {
+            "locator": "iOS/Tests/ColorMatchingLPSAppTests/APIClientTests.swift:12",
+            "result": "not_run: existing local stubs cover capture creation, measurement upload, and judgment upload"
+          }
+        ]
+      }
+    },
+    {
+      "id": "AC-4",
+      "status": "not_run",
+      "verification": {
+        "kind": "human_or_external_evidence",
+        "references": [
+          {
+            "locator": "docs/issue-5-openapi-client-plan.md:15",
+            "result": "not_run: ranked-results generated-client coverage is blocked until the upstream OpenAPI JSON is vendored"
+          }
+        ]
+      }
+    },
+    {
+      "id": "AC-5",
+      "status": "not_run",
+      "verification": {
+        "kind": "human_or_external_evidence",
+        "references": [
+          {
+            "locator": "docs/issue-5-openapi-client-plan.md:21",
+            "result": "not_run: deltas are based on upstream source and must be checked against the exact vendored JSON artifact in the implementation PR"
+          }
+        ]
+      }
+    }
+  ]
+}
