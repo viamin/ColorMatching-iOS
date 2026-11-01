@@ -1,0 +1,92 @@
+{
+  "status": "failed",
+  "summary": "Red-phase tests-only run for issue #5 (replace hand-written API layer with generated OpenAPI Swift client). Contract tests, stubbed generated-client tests, generated-types coding tests, and facade tests are committed; they intentionally fail until the ColorMatchingAPI target (swift-openapi-generator + vendored openapi.json) lands in the implementation run. Contract deltas between docs/color-matching-api-contract.md and the published spec (viamin/color_matching#110) are recorded in docs/openapi-client-migration.md. Swift toolchain is not installed in this container, so the suite could not be executed locally; CI (.github/workflows/ci.yml, swift test on macOS) is the executor.",
+  "acceptance_criteria": [
+    {
+      "id": "AC-1",
+      "description": "swift-openapi-generator + swift-openapi-runtime added to the iOS package; OpenAPI document vendored from viamin/color_matching#110",
+      "status": "failed",
+      "verification": {
+        "kind": "unit_or_service_test",
+        "references": [
+          { "locator": "iOS/Tests/ColorMatchingLPSAppTests/OpenAPISpecCoverageTests.swift:125", "result": "red" },
+          { "locator": "iOS/Tests/ColorMatchingLPSAppTests/OpenAPISpecCoverageTests.swift:13", "result": "red" },
+          { "locator": "iOS/Tests/ColorMatchingLPSAppTests/OpenAPISpecCoverageTests.swift:25", "result": "red" }
+        ],
+        "note": "Fails at HEAD because Sources/ColorMatchingAPI/openapi.json and the Package.swift dependencies do not exist yet; passes when the vendored document and toolchain dependencies land."
+      }
+    },
+    {
+      "id": "AC-2",
+      "description": "Generated client covers manifest, recent sheets, capture creation, measurement upload, judgment upload, ranked results",
+      "status": "failed",
+      "verification": {
+        "kind": "unit_or_service_test",
+        "references": [
+          { "locator": "iOS/Tests/ColorMatchingLPSAppTests/GeneratedClientStubbedTransportTests.swift:8", "result": "red" },
+          { "locator": "iOS/Tests/ColorMatchingLPSAppTests/GeneratedClientStubbedTransportTests.swift:34", "result": "red" },
+          { "locator": "iOS/Tests/ColorMatchingLPSAppTests/GeneratedClientStubbedTransportTests.swift:54", "result": "red" },
+          { "locator": "iOS/Tests/ColorMatchingLPSAppTests/GeneratedClientStubbedTransportTests.swift:84", "result": "red" },
+          { "locator": "iOS/Tests/ColorMatchingLPSAppTests/GeneratedClientStubbedTransportTests.swift:107", "result": "red" },
+          { "locator": "iOS/Tests/ColorMatchingLPSAppTests/GeneratedClientStubbedTransportTests.swift:129", "result": "red" }
+        ],
+        "note": "Compile-red: the ColorMatchingAPI module (generated client) does not exist yet."
+      }
+    },
+    {
+      "id": "AC-3",
+      "description": "Replace hand-written API models with generated types; keep purely client-side models as-is",
+      "status": "failed",
+      "verification": {
+        "kind": "unit_or_service_test",
+        "references": [
+          { "locator": "iOS/Tests/ColorMatchingLPSAppTests/GeneratedTypesCodingTests.swift:5", "result": "red" },
+          { "locator": "iOS/Tests/ColorMatchingLPSAppTests/APIClientGeneratedSurfaceTests.swift:13", "result": "red" },
+          { "locator": "iOS/Tests/MeasurementCoreTests/MeasurementCoreTests.swift", "result": "not_run_locally" }
+        ],
+        "note": "GeneratedTypesCodingTests/APIClientGeneratedSurfaceTests are compile-red until generated types and the receipts/ranked-results/error surface exist; MeasurementCoreTests (client-side models) are deliberately untouched."
+      }
+    },
+    {
+      "id": "AC-4",
+      "description": "Swift tests exercising the generated client against local stubbed responses, no live server in CI",
+      "status": "failed",
+      "verification": {
+        "kind": "unit_or_service_test",
+        "references": [
+          { "locator": "iOS/Tests/ColorMatchingLPSAppTests/GeneratedClientStubbedTransportTests.swift:198", "result": "red" },
+          { "locator": "iOS/Tests/ColorMatchingLPSAppTests/APIClientGeneratedSurfaceTests.swift:149", "result": "red" },
+          { "locator": "iOS/Tests/ColorMatchingLPSAppTests/APIClientTests.swift:49", "result": "updated_stub_200_json" }
+        ],
+        "note": "All stubbing is in-process (SendableTransport stub + URLProtocol stub); no network I/O anywhere in the target."
+      }
+    },
+    {
+      "id": "AC-5",
+      "description": "PR description records contract deltas between docs/color-matching-api-contract.md and the real API, and endpoint gaps",
+      "status": "passed",
+      "verification": {
+        "kind": "human_or_external_evidence",
+        "references": [
+          { "locator": "docs/openapi-client-migration.md", "result": "passed" },
+          { "locator": "https://github.com/viamin/color_matching/blob/main/lib/color_matching_web/api_schemas.ex", "result": "inspected" },
+          { "locator": "https://github.com/viamin/color_matching/blob/main/lib/color_matching_web/controllers/test_sheet_json.ex", "result": "inspected" },
+          { "locator": "https://github.com/viamin/color_matching/blob/main/lib/color_matching_web/controllers/capture_controller.ex", "result": "inspected" }
+        ],
+        "note": "14 documented deltas/gaps including under-declared manifest and ranked-results components, printer_profile shape drift, relative manifest_url, 201/200+JSON responses, required normalized_linear_rgb_median, undeclared stats."
+      }
+    },
+    {
+      "id": "AC-6",
+      "description": "Exit criterion: swift test --disable-sandbox green with generated types wired in",
+      "status": "not_run",
+      "verification": {
+        "kind": "human_or_external_evidence",
+        "references": [
+          { "locator": ".github/workflows/ci.yml:25", "result": "pending_implementation" }
+        ],
+        "note": "Not run: no Swift toolchain in this container and implementation intentionally excluded from this tests-only run; suite executes via CI swift test once the generated client lands."
+      }
+    }
+  ]
+}
