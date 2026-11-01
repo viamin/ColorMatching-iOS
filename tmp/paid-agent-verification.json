@@ -1,0 +1,107 @@
+{
+  "status": "failed",
+  "summary": "Tests-only red-phase run for issue #5 (replace hand-written API layer with generated OpenAPI client). Wrote permanent guard tests and the pinned migration contract/delta analysis; no implementation changes, per phase rules. No Swift toolchain exists in this container, so the Swift tests were not executed locally; they run via `swift test` on macOS CI and are red by design until the implementation run lands. Research against viamin/color_matching@main (issue #110, merged) verified the exact published operationIds, schemas, and paths used by the tests.",
+  "acceptance_criteria": [
+    {
+      "id": "AC-1",
+      "description": "swift-openapi-generator + swift-openapi-runtime added to the iOS package; OpenAPI document fetched/vendored from viamin/color_matching#110",
+      "status": "not_run",
+      "reason": "Implementation phase pending (tests-only run; Package.swift and Sources/ are outside permitted paths). Permanent guard test is in place to verify this the moment the spec is vendored.",
+      "verification": {
+        "kind": "unit_or_service_test",
+        "references": [
+          {
+            "locator": "iOS/Tests/ColorMatchingLPSAppTests/OpenAPISpecCoverageTests.swift:29",
+            "result": "not_run",
+            "note": "testVendoredSpecCoversEveryCompanionEndpoint fails today because iOS/Sources/OpenAPIGenerated/openapi.json does not exist yet; it asserts all six endpoint paths, verbs, and published operationIds after vendoring."
+          }
+        ]
+      }
+    },
+    {
+      "id": "AC-2",
+      "description": "Generate the client for the surfaces the app uses today: manifest, recent sheets, capture creation, measurement upload, judgment upload, ranked results",
+      "status": "not_run",
+      "reason": "Implementation phase pending. One stubbed-response test per surface is written and compile-gated on the generated module.",
+      "verification": {
+        "kind": "unit_or_service_test",
+        "references": [
+          {
+            "locator": "iOS/Tests/ColorMatchingLPSAppTests/OpenAPIGeneratedClientTests.swift:1",
+            "result": "not_run",
+            "note": "Gated on #if canImport(OpenAPIGenerated) && canImport(OpenAPIRuntime) && canImport(HTTPTypes); until then the #else placeholder at line 310 fails with a pointer to the pinned contract. Covers all six surfaces: manifest (line 19), recent (line 61), capture creation (line 94), measurements (line 138), judgments (line 190), ranked results (line 225), plus the 404 error case (line 48)."
+          }
+        ]
+      }
+    },
+    {
+      "id": "AC-3",
+      "description": "Replace hand-written API models with generated types; keep purely client-side models",
+      "status": "not_run",
+      "reason": "Implementation-phase criterion (sources outside permitted test/doc paths in this run). Existing APIClientTests remain green in the interim.",
+      "verification": {
+        "kind": "unit_or_service_test",
+        "references": [
+          {
+            "locator": "iOS/Tests/ColorMatchingLPSAppTests/APIClientTests.swift:6",
+            "result": "not_run",
+            "note": "Current hand-written client coverage; to be superseded by the generated-client tests when the replacement lands."
+          }
+        ]
+      }
+    },
+    {
+      "id": "AC-4",
+      "description": "Swift tests exercising the generated client against local stubbed responses (no live server in CI)",
+      "status": "not_run",
+      "reason": "Tests are written and committed at this PR head, but no Swift toolchain exists in this container so they were not executed locally; CI `swift test` (macOS) runs them. Expected state at this head: red (canImport placeholder fails; vendored-spec guards fail), demonstrating the missing behavior per the red-phase rules.",
+      "verification": {
+        "kind": "unit_or_service_test",
+        "references": [
+          {
+            "locator": "iOS/Tests/ColorMatchingLPSAppTests/OpenAPIGeneratedClientTests.swift:19",
+            "result": "not_run",
+            "note": "Seven tests using an in-process RecordingStubTransport (no network, no live server): request method/path/operationId/content-type and wire-shape assertions, decoded response assertions including versioned enums (lpsSheetManifestV1, lpsDistanceV1, lpsRankedResultsV1), nullable title decoding, and upload count responses."
+          },
+          {
+            "locator": "iOS/Tests/ColorMatchingLPSAppTests/OpenAPISpecCoverageTests.swift:52",
+            "result": "not_run",
+            "note": "Compatibility version strings and bearerAuth security scheme pinned in the vendored spec."
+          }
+        ]
+      }
+    },
+    {
+      "id": "AC-5",
+      "description": "PR description records what changed between the prose contract and the published spec, plus endpoint gaps",
+      "status": "passed",
+      "reason": "Delta analysis and endpoint-gap findings are recorded in an inspectable document committed at this head, ready to be carried into the PR description verbatim.",
+      "verification": {
+        "kind": "human_or_external_evidence",
+        "references": [
+          {
+            "locator": "docs/color-matching-openapi-client.md",
+            "result": "passed",
+            "note": "'Contract deltas: prose contract vs published spec' section (manifest schema only pins 3 fields; lps-ranked-results/v1 is new; CaptureRequest anyOf flat vs nested with exposure_duration name mismatch; top-level scoring_algorithm_version removed; per-measurement stats absent; RgbPayload three wire forms; normalized median required; uploads now return JSON count bodies; iso is integer) plus the 'Endpoint coverage' section (no gaps for the six surfaces; extra unused endpoints listed). Sources: viamin/color_matching@main api_schemas.ex, test_sheet_controller.ex, capture_controller.ex, router.ex."
+          }
+        ]
+      }
+    },
+    {
+      "id": "AC-6",
+      "description": "swift test --disable-sandbox green with generated types wired in",
+      "status": "not_run",
+      "reason": "Exit criterion for the implementation run; blocked on AC-1..AC-3. CI currently runs `swift test` without the flag and will show the designed red failures at this head.",
+      "verification": {
+        "kind": "unit_or_service_test",
+        "references": [
+          {
+            "locator": ".github/workflows/ci.yml",
+            "result": "not_run",
+            "note": "macOS CI job that must run `swift test --disable-sandbox` once the plugin-based OpenAPIGenerated target exists."
+          }
+        ]
+      }
+    }
+  ]
+}
