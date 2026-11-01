@@ -1,0 +1,68 @@
+{
+  "status": "failed",
+  "summary": "Tests-only red-phase run for issue #5. Grounded in the spec actually published by viamin/color_matching (#110, delivered in upstream PR #113): verified upstream sources directly (api_spec.ex, api_schemas.ex, test_sheet_controller.ex, capture_controller.ex, test_sheet_json.ex). Added three permanent Swift test files plus the migration/verification-plan doc. OpenAPIMigrationArtifactsTests are red by design (expected assertion failures demonstrating missing toolchain/vendored spec); OpenAPIClientTests are dormant behind #if canImport(ColorMatchingOpenAPI) until the implementation run lands; APIClientWireContractTests are a green regression net for the wire behavior the generated client must preserve. swift test could not be executed in this Linux container (no Swift toolchain installed; the ColorMatchingLPSApp target requires macOS/iOS SDKs) - the suite runs on the macOS CI runner. Implementation is intentionally out of scope for this phase.",
+  "acceptance_criteria": [
+    {
+      "id": "AC-1",
+      "description": "Add swift-openapi-generator + swift-openapi-runtime to the iOS package; vendor the OpenAPI document from viamin/color_matching#110",
+      "status": "failed",
+      "verification": {
+        "kind": "unit_or_service_test",
+        "references": [
+          { "locator": "iOS/Tests/ColorMatchingLPSAppTests/OpenAPIMigrationArtifactsTests.swift:22", "result": "red (expected: Package.swift lacks the dependencies)", "note": "testPackageDeclaresOpenAPIGeneratorPluginAndRuntime" },
+          { "locator": "iOS/Tests/ColorMatchingLPSAppTests/OpenAPIMigrationArtifactsTests.swift:38", "result": "red (expected: vendored openapi.yaml missing)", "note": "testOpenAPIDocumentIsVendoredForGeneration" }
+        ]
+      }
+    },
+    {
+      "id": "AC-2",
+      "description": "Generate the client for the six surfaces the app uses: manifest, recent sheets, capture creation, measurement upload, judgment upload, ranked results",
+      "status": "failed",
+      "verification": {
+        "kind": "unit_or_service_test",
+        "references": [
+          { "locator": "iOS/Tests/ColorMatchingLPSAppTests/OpenAPIMigrationArtifactsTests.swift:45", "result": "red (expected: no vendored spec)", "note": "testSpecCoversEverySurfaceTheAppUses - six paths incl. ranked_results" },
+          { "locator": "iOS/Tests/ColorMatchingLPSAppTests/OpenAPIMigrationArtifactsTests.swift:63", "result": "red (expected)", "note": "testSpecDefinesStableOperationIDsForGeneratedClientMethods" },
+          { "locator": "iOS/Tests/ColorMatchingLPSAppTests/OpenAPIClientTests.swift:23", "result": "not_run (dormant until ColorMatchingOpenAPI target exists)", "note": "stubbed-response tests per operation; activated by #if canImport" },
+          { "locator": "iOS/Tests/ColorMatchingLPSAppTests/OpenAPIClientTests.swift:205", "result": "not_run (dormant)", "note": "fetchRankedResults coverage - surface the app does not call today" }
+        ]
+      }
+    },
+    {
+      "id": "AC-3",
+      "description": "Replace hand-written API models with generated types; keep purely client-side models as-is",
+      "status": "not_run",
+      "verification": {
+        "kind": "unit_or_service_test",
+        "references": [
+          { "locator": "iOS/Tests/ColorMatchingLPSAppTests/APIClientWireContractTests.swift:20", "result": "written; suite not executable in this container (no Swift toolchain)", "note": "green-by-construction regression net pinning public APIClient wire behavior (paths, auth header, JSON payloads, published 200-with-body upload responses, 401 error mapping) so the model swap cannot silently change behavior; runs on macOS CI" },
+          { "locator": "iOS/Tests/ColorMatchingLPSAppTests/APIClientWireContractTests.swift:85", "result": "written; not executable locally", "note": "pins measurement upload payload incl. rgb channel shape" },
+          { "locator": "iOS/Sources/ColorMatchingLPSAppCore/APIClient.swift:87", "result": "not_run", "note": "model removal is implementation work (this phase is tests-only); PR-diff review is the human evidence" }
+        ]
+      }
+    },
+    {
+      "id": "AC-4",
+      "description": "Swift tests exercising the generated client against local stubbed responses (no live server in CI)",
+      "status": "failed",
+      "verification": {
+        "kind": "unit_or_service_test",
+        "references": [
+          { "locator": "iOS/Tests/ColorMatchingLPSAppTests/OpenAPIClientTests.swift:17", "result": "written and committed; dormant behind #if canImport(ColorMatchingOpenAPI); six operations stubbed via URLProtocol - no live server; not runnable until implementation lands", "note": "activates automatically when the generated target exists" },
+          { "locator": "docs/openapi-client-migration.md", "result": "passed", "note": "AC-to-verification map and test-status section record the plan" }
+        ]
+      }
+    },
+    {
+      "id": "AC-5",
+      "description": "PR description records what changed between the prose contract and the published spec, and endpoint gaps discovered",
+      "status": "skipped",
+      "verification": {
+        "kind": "human_or_external_evidence",
+        "references": [
+          { "locator": "docs/openapi-client-migration.md", "result": "passed (draft evidence)", "note": "18-row delta table + 3 named gaps (spec under-documents manifest and ranked_results; normalized_linear_rgb_median nullability mismatch; unspecified success/error codes) compiled against the real upstream spec sources; the PR description itself is authored at implementation-PR time, which cannot happen in this tests-only phase" }
+        ]
+      }
+    }
+  ]
+}
