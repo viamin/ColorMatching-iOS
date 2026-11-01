@@ -92,6 +92,61 @@ final class APIClientTests: XCTestCase {
         XCTAssertEqual((json["judgments"] as? [[String: Any]])?.first?["judgment"] as? String, "near_match")
     }
 
+    func testSheetCaptureWorkflowUsesProviderResponseShapes() async throws {
+        var requests: [URLRequest] = []
+        MockURLProtocol.handler = { request in
+            requests.append(request)
+            let response = HTTPURLResponse(url: request.url!, statusCode: 200, httpVersion: nil, headerFields: nil)!
+
+            switch request.url!.path {
+            case "/api/v1/test_sheets/sheet_1/manifest":
+                return (response, Data(Self.manifestJSON.utf8))
+            case "/api/v1/test_sheets/recent":
+                return (response, Data(#"{"sheets":[{"sheet_id":"sheet_1","manifest_url":"https://example.test/api/v1/test_sheets/sheet_1/manifest","title":null}]}"#.utf8))
+            case "/api/v1/test_sheets/sheet_1/captures":
+                return (response, Data(#"{"capture_id":"1"}"#.utf8))
+            case "/api/v1/captures/1/measurements":
+                return (response, Data(#"{"capture_id":"1","measurement_count":1,"pair_score_count":1}"#.utf8))
+            case "/api/v1/captures/1/judgments":
+                return (response, Data(#"{"capture_id":"1","judgment_count":1}"#.utf8))
+            default:
+                throw URLError(.badURL)
+            }
+        }
+
+        let baseURL = URL(string: "https://example.test")!
+        let api = client()
+        let manifest = try await api.fetchManifest(baseURL: baseURL, sheetCode: "sheet_1")
+        let recentSheets = try await api.fetchRecentSheets(baseURL: baseURL)
+        let capture = try await api.createCapture(
+            sheetID: manifest.sheetID,
+            baseURL: baseURL,
+            metadata: metadata(),
+            quality: CaptureQuality(detectedMarkerCount: 4, blurScore: 0.75, rejections: [])
+        )
+        try await api.uploadMeasurements(
+            captureID: capture.captureID,
+            baseURL: baseURL,
+            measurements: [measurement()],
+            scores: [PairScore(pairID: "pair_1", distance: 0.1, similarity: 0.9, algorithmVersion: LPSScorer.algorithmVersion)]
+        )
+        try await api.uploadJudgments(
+            captureID: capture.captureID,
+            baseURL: baseURL,
+            judgments: [PairJudgment(pairID: "pair_1", judgment: "near_match")]
+        )
+
+        XCTAssertEqual(recentSheets.map(\.sheetID), ["sheet_1"])
+        XCTAssertEqual(requests.map { $0.url!.path }, [
+            "/api/v1/test_sheets/sheet_1/manifest",
+            "/api/v1/test_sheets/recent",
+            "/api/v1/test_sheets/sheet_1/captures",
+            "/api/v1/captures/1/measurements",
+            "/api/v1/captures/1/judgments"
+        ])
+        XCTAssertTrue(requests.allSatisfy { $0.value(forHTTPHeaderField: "Authorization") == "Bearer token" })
+    }
+
     private func client() -> APIClient {
         let configuration = URLSessionConfiguration.ephemeral
         configuration.protocolClasses = [MockURLProtocol.self]
@@ -117,6 +172,40 @@ final class APIClientTests: XCTestCase {
         }
         return data
     }
+
+    private func metadata() -> CaptureMetadata {
+        CaptureMetadata(
+            deviceModel: "iPhone",
+            lens: "wide",
+            exposureDurationSeconds: 0.01,
+            iso: 100,
+            focusLensPosition: 0.4,
+            whiteBalanceGains: nil,
+            imageWidth: 100,
+            imageHeight: 200,
+            appVersion: "0.1.0",
+            timestamp: Date(timeIntervalSince1970: 0)
+        )
+    }
+
+    private func measurement() -> PatchMeasurement {
+        let rgb = RGB(r: 0.2, g: 0.3, b: 0.4)
+        let stats = ChannelStats(median: rgb, mean: rgb, standardDeviation: RGB(r: 0.01, g: 0.01, b: 0.01), min: rgb, max: rgb, sampleCount: 9, clippingFraction: 0)
+        return PatchMeasurement(patchID: "patch_1", linearRGBMedian: rgb, normalizedLinearRGBMedian: rgb, stats: stats)
+    }
+
+    private static let manifestJSON = #"""
+    {
+      "schema_version": "lps-sheet-manifest/v1",
+      "sheet_version": "lps-letter-grid-v1",
+      "sheet_id": "sheet_1",
+      "manifest_url": "https://example.test/api/v1/test_sheets/sheet_1/manifest",
+      "page": {"units": "mm", "width": 215.9, "height": 279.4},
+      "registration_markers": [],
+      "patches": [],
+      "pairs": []
+    }
+    """#
 }
 
 private final class MockURLProtocol: URLProtocol {
