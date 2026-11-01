@@ -1,0 +1,71 @@
+{
+  "status": "not_run",
+  "summary": "Red-phase tests and OpenAPI contract-delta evidence are committed. Swift is unavailable in the container, so package resolution and the required Swift suite could not run.",
+  "acceptance_criteria": [
+    {
+      "id": "AC-1",
+      "status": "not_run",
+      "verification": {
+        "kind": "human_or_external_evidence",
+        "references": [
+          {
+            "locator": "docs/openapi-client-test-plan.md:9",
+            "result": "The generated dependency and pinned OpenAPI document are implementation-run work."
+          }
+        ]
+      }
+    },
+    {
+      "id": "AC-2",
+      "status": "not_run",
+      "verification": {
+        "kind": "unit_or_service_test",
+        "references": [
+          {
+            "locator": "iOS/Tests/ColorMatchingLPSAppTests/APIClientTests.swift:12",
+            "result": "Local URLProtocol stubs cover the five currently callable surfaces, but were not executable because swift is absent; ranked results remains an app endpoint gap."
+          }
+        ]
+      }
+    },
+    {
+      "id": "AC-3",
+      "status": "not_run",
+      "verification": {
+        "kind": "human_or_external_evidence",
+        "references": [
+          {
+            "locator": "docs/openapi-client-test-plan.md:11",
+            "result": "Replacing handwritten server models is deferred to the implementation run."
+          }
+        ]
+      }
+    },
+    {
+      "id": "AC-4",
+      "status": "not_run",
+      "verification": {
+        "kind": "unit_or_service_test",
+        "references": [
+          {
+            "locator": "iOS/Tests/ColorMatchingLPSAppTests/APIClientTests.swift:179",
+            "result": "The committed tests use a local URLProtocol stub and no live server, but they could not be run because swift is absent."
+          }
+        ]
+      }
+    },
+    {
+      "id": "AC-5",
+      "status": "not_run",
+      "verification": {
+        "kind": "human_or_external_evidence",
+        "references": [
+          {
+            "locator": "docs/openapi-client-contract-deltas.md:1",
+            "result": "Concrete upstream contract deltas and the ranked-results endpoint gap are recorded for the implementation PR description; no PR was opened in this tests-only run."
+          }
+        ]
+      }
+    }
+  ]
+}
