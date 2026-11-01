@@ -1,0 +1,88 @@
+{
+  "status": "skipped",
+  "summary": "Test-writing (red) phase only. Wrote two failing XCTest cases against the current hand-written APIClient/MeasurementCore models that document real contract drift discovered by reading color_matching's published OpenAPI schema source (viamin/color_matching#110, merged via #113), and recorded all discovered deltas and endpoint gaps in docs/openapi-contract-deltas.md. Could not run swift test in this sandbox (no Swift toolchain on this Linux container; project CI uses macos-latest) and could not add swift-openapi-generator/vendor the spec/generate the client, since those are implementation changes outside this run's allowed test/doc paths and the real spec is served dynamically by a running color_matching instance this sandbox cannot reach.",
+  "acceptance_criteria": [
+    {
+      "id": "AC-1-add-generator-deps-vendor-spec",
+      "status": "not_run",
+      "verification": {
+        "kind": "human_or_external_evidence",
+        "references": [
+          {
+            "locator": "docs/openapi-contract-deltas.md#dependency-status",
+            "result": "blocked: color_matching serves the spec dynamically at GET /api/v1/openapi.json (not a static file in its repo); no running instance reachable from this sandbox. Adding swift-openapi-generator/swift-openapi-runtime to Package.swift is also an implementation change outside this test-only run's allowed paths."
+          }
+        ]
+      }
+    },
+    {
+      "id": "AC-2-generate-client-for-current-surfaces",
+      "status": "not_run",
+      "verification": {
+        "kind": "human_or_external_evidence",
+        "references": [
+          {
+            "locator": "docs/openapi-contract-deltas.md#dependency-status",
+            "result": "blocked on AC-1; codegen requires the vendored spec and Package.swift changes not permitted in this test-writing run"
+          }
+        ]
+      }
+    },
+    {
+      "id": "AC-3-replace-hand-written-models",
+      "status": "not_run",
+      "verification": {
+        "kind": "human_or_external_evidence",
+        "references": [
+          {
+            "locator": "docs/openapi-contract-deltas.md#dependency-status",
+            "result": "implementation work for a follow-up run after AC-1/AC-2; not started"
+          }
+        ]
+      }
+    },
+    {
+      "id": "AC-4-swift-tests-against-stubbed-responses",
+      "status": "skipped",
+      "verification": {
+        "kind": "unit_or_service_test",
+        "references": [
+          {
+            "locator": "iOS/Tests/ColorMatchingLPSAppTests/APIClientTests.swift:82 testUploadMeasurementsBodyMatchesPublishedOpenAPISchema",
+            "result": "not_run: swift test could not be executed (no Swift toolchain in this Linux sandbox). Expected to fail today -- traced by hand against the schema in color_matching's lib/color_matching_web/api_schemas.ex: current client sends extra scoring_algorithm_version/stats keys the published MeasurementUploadRequest schema does not define."
+          },
+          {
+            "locator": "iOS/Tests/ColorMatchingLPSAppTests/APIClientTests.swift:115 testPatchMeasurementEncodingOmitsRequiredNormalizedRGBWhenNil",
+            "result": "not_run: swift test could not be executed (no Swift toolchain in this Linux sandbox). Expected to fail today -- traced by hand: Swift's synthesized Encodable uses encodeIfPresent for Optional properties, so PatchMeasurement omits normalized_linear_rgb_median when nil even though the published schema marks it required."
+          }
+        ]
+      }
+    },
+    {
+      "id": "AC-5-pr-description-records-contract-deltas-and-gaps",
+      "status": "passed",
+      "verification": {
+        "kind": "human_or_external_evidence",
+        "references": [
+          {
+            "locator": "docs/openapi-contract-deltas.md",
+            "result": "records confirmed deltas (missing fields, required-field omission, discarded structured errors, discarded response bodies), confirmed non-deltas, and out-of-scope endpoint gaps (/api/illuminant_measurements[/bulk], /api/multi_image_mapping, palette/printer-profile GETs) found by reading color_matching's router.ex and api_schemas.ex on main"
+          }
+        ]
+      }
+    },
+    {
+      "id": "EXIT-swift-test-disable-sandbox-green",
+      "status": "not_run",
+      "verification": {
+        "kind": "human_or_external_evidence",
+        "references": [
+          {
+            "locator": "N/A",
+            "result": "swift test --disable-sandbox could not be run: no Swift toolchain available in this Linux sandbox (project CI runs on macos-latest). Needs a macOS runner to execute; the two new tests are expected to fail (red) until a follow-up implementation run lands the generated client and fixes the documented deltas."
+          }
+        ]
+      }
+    }
+  ]
+}
