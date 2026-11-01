@@ -1,0 +1,71 @@
+{
+  "status": "not_run",
+  "summary": "Test-writing phase: focused red tests and PR evidence were added. Swift is not installed in this container, so swift test --disable-sandbox could not run.",
+  "acceptance_criteria": [
+    {
+      "id": "AC-1",
+      "status": "not_run",
+      "verification": {
+        "kind": "unit_or_service_test",
+        "references": [
+          {
+            "locator": "iOS/Tests/ColorMatchingLPSAppTests/OpenAPIContractTests.swift:5",
+            "result": "Red test requires a vendored OpenAPI 3 document containing all six app operations; not run because the swift executable is unavailable."
+          }
+        ]
+      }
+    },
+    {
+      "id": "AC-2",
+      "status": "not_run",
+      "verification": {
+        "kind": "unit_or_service_test",
+        "references": [
+          {
+            "locator": "iOS/Tests/ColorMatchingLPSAppTests/OpenAPIContractTests.swift:19",
+            "result": "Red test requires swift-openapi-generator and swift-openapi-runtime package declarations; implementation is deferred to the approved implementation phase."
+          }
+        ]
+      }
+    },
+    {
+      "id": "AC-3",
+      "status": "not_run",
+      "verification": {
+        "kind": "unit_or_service_test",
+        "references": [
+          {
+            "locator": "docs/issue-5-pr-description.md:16",
+            "result": "Permanent local-URLProtocol stub test is planned for the implementation phase; no live-server test is proposed."
+          }
+        ]
+      }
+    },
+    {
+      "id": "AC-4",
+      "status": "passed",
+      "verification": {
+        "kind": "human_or_external_evidence",
+        "references": [
+          {
+            "locator": "docs/issue-5-pr-description.md:28",
+            "result": "Records the prose-contract deltas and notes the required pinned-document recheck."
+          }
+        ]
+      }
+    },
+    {
+      "id": "AC-5",
+      "status": "not_run",
+      "verification": {
+        "kind": "unit_or_service_test",
+        "references": [
+          {
+            "locator": "docs/issue-5-pr-description.md:21",
+            "result": "swift test --disable-sandbox could not be run because swift is absent from the container."
+          }
+        ]
+      }
+    }
+  ]
+}
