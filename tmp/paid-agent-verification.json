@@ -1,0 +1,75 @@
+{
+  "status": "failed",
+  "summary": "Tests-only red phase: generated-client dependency/spec assertion intentionally fails; Swift is unavailable in this container, so XCTest was not run.",
+  "acceptance_criteria": [
+    {
+      "id": "AC-1",
+      "status": "failed",
+      "verification": {
+        "kind": "unit_or_service_test",
+        "references": [
+          {
+            "locator": "iOS/Tests/ColorMatchingLPSAppTests/APIClientTests.swift:82",
+            "result": "expected red assertion: Package.swift has no swift-openapi-generator/runtime dependencies or vendored OpenAPI/openapi.json"
+          }
+        ]
+      }
+    },
+    {
+      "id": "AC-2",
+      "status": "not_run",
+      "verification": {
+        "kind": "permanent_system_test",
+        "references": [
+          {
+            "locator": "iOS/Tests/ColorMatchingLPSAppTests/APIClientTests.swift:46",
+            "result": "local URLProtocol manifest stub added; not run because swift is unavailable"
+          },
+          {
+            "locator": "iOS/Tests/ColorMatchingLPSAppTests/APIClientTests.swift:65",
+            "result": "local URLProtocol recent-sheets stub added; not run because swift is unavailable"
+          }
+        ]
+      }
+    },
+    {
+      "id": "AC-3",
+      "status": "not_run",
+      "verification": {
+        "kind": "unit_or_service_test",
+        "references": [
+          {
+            "locator": "iOS/Tests/ColorMatchingLPSAppTests/APIClientTests.swift:6",
+            "result": "existing local stubs cover capture, measurements, and judgments; not run because swift is unavailable"
+          }
+        ]
+      }
+    },
+    {
+      "id": "AC-4",
+      "status": "not_run",
+      "verification": {
+        "kind": "human_or_external_evidence",
+        "references": [
+          {
+            "locator": "docs/issue-5-openapi-client-plan.md",
+            "result": "ranked-results response schema is incomplete upstream and no app operation exists yet"
+          }
+        ]
+      }
+    },
+    {
+      "id": "AC-5",
+      "status": "not_run",
+      "verification": {
+        "kind": "human_or_external_evidence",
+        "references": [
+          {
+            "locator": "docs/issue-5-openapi-client-plan.md",
+            "result": "contract deltas recorded for transfer to the PR description; no PR was opened in this run"
+          }
+        ]
+      }
+    }
+  ]
+}
