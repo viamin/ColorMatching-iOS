@@ -130,6 +130,42 @@ final class MeasurementCoreTests: XCTestCase {
         XCTAssertTrue(rejections.contains(.poorReferencePatch))
     }
 
+    func testQualityGateDoesNotRejectRealManifestsWithoutReferencePatches() {
+        // color_matching's live `/api/v1/test_sheets/:sheet_id/manifest` only ever emits
+        // `role: "pair_color"` patches (TestSheetJSON.render_patches/2 in
+        // viamin/color_matching never calls render_patch with role: "reference"), even
+        // though docs/color-matching-api-contract.md documents a "reference" role with
+        // white/gray/black/blank_paper reference roles. hasPoorReferencePatch's
+        // `guard !references.isEmpty else { return true }` means a manifest with zero
+        // reference patches is always treated as having a poor reference patch, so every
+        // real capture is rejected for a condition it can never satisfy. See
+        // docs/openapi-contract-deltas.md (#2).
+        let patches = [
+            Patch(id: "a", role: "pair_color", pairID: "pair", pairSide: "first", referenceRole: nil, sourceColor: "#333333", safeInsetMM: 1, rect: Rect(x: 0, y: 0, width: 1, height: 1)),
+            Patch(id: "b", role: "pair_color", pairID: "pair", pairSide: "second", referenceRole: nil, sourceColor: "#343333", safeInsetMM: 1, rect: Rect(x: 0, y: 0, width: 1, height: 1))
+        ]
+        let measurements = [
+            measurement("a", RGB(r: 0.2, g: 0.2, b: 0.2)),
+            measurement("b", RGB(r: 0.21, g: 0.2, b: 0.2))
+        ]
+        let goodCorners = [Point(x: 1, y: 1), Point(x: 2, y: 1), Point(x: 2, y: 2), Point(x: 1, y: 2)]
+
+        let rejections = QualityGate.rejections(
+            measurements: measurements,
+            patches: patches,
+            sampleRegions: [
+                SampleOverlayRegion(patchID: "a", corners: goodCorners),
+                SampleOverlayRegion(patchID: "b", corners: goodCorners)
+            ],
+            image: LinearImage(width: 10, height: 10, pixels: Array(repeating: RGB(r: 0.5, g: 0.5, b: 0.5), count: 100)),
+            expectedMarkerCount: 4,
+            detectedMarkerCount: 4,
+            blurScore: 0.5
+        )
+
+        XCTAssertFalse(rejections.contains(.poorReferencePatch))
+    }
+
     func testLPSScorerRanksNearestPairFirst() {
         let pairs = [
             PairManifest(id: "near", gridRow: 0, gridCol: 0, firstPatchID: "a", secondPatchID: "b", sourceColors: ["#111111", "#121212"]),

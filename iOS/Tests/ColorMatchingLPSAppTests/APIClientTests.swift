@@ -92,6 +92,38 @@ final class APIClientTests: XCTestCase {
         XCTAssertEqual((json["judgments"] as? [[String: Any]])?.first?["judgment"] as? String, "near_match")
     }
 
+    func testUploadMeasurementsAlwaysIncludesNormalizedMedianKey() async throws {
+        // color_matching's CapturePatchMeasurement changeset marks
+        // normalized_linear_rgb_median as validate_required (see
+        // lib/color_matching/persistence/capture_patch_measurement.ex in
+        // viamin/color_matching), but PatchMeasurement.normalizedLinearRGBMedian is
+        // Optional and the hand-written MeasurementUpload wrapper is a plain Codable
+        // struct, so Swift's synthesized encoder drops the key entirely via
+        // encodeIfPresent when the value is nil. A pre-normalization upload would get a
+        // 422 from the real API. See docs/openapi-contract-deltas.md (#4).
+        var capturedBody: Data?
+        MockURLProtocol.handler = { request in
+            capturedBody = request.httpBodyStream.flatMap(Self.readBody) ?? request.httpBody
+            return (HTTPURLResponse(url: request.url!, statusCode: 200, httpVersion: nil, headerFields: nil)!, Data(#"{"capture_id":"cap_1","measurement_count":1,"pair_score_count":0}"#.utf8))
+        }
+
+        let rgb = RGB(r: 0.2, g: 0.3, b: 0.4)
+        let stats = ChannelStats(median: rgb, mean: rgb, standardDeviation: RGB(r: 0.01, g: 0.01, b: 0.01), min: rgb, max: rgb, sampleCount: 9, clippingFraction: 0)
+        try await client().uploadMeasurements(
+            captureID: "cap_1",
+            baseURL: URL(string: "https://example.test")!,
+            measurements: [PatchMeasurement(patchID: "patch_1", linearRGBMedian: rgb, normalizedLinearRGBMedian: nil, stats: stats)],
+            scores: []
+        )
+
+        let json = try XCTUnwrap(Self.jsonObject(from: capturedBody) as? [String: Any])
+        let measurement = try XCTUnwrap((json["measurements"] as? [[String: Any]])?.first)
+        XCTAssertNotNil(
+            measurement["normalized_linear_rgb_median"],
+            "server's CapturePatchMeasurement changeset requires normalized_linear_rgb_median; omitting it gets a 422"
+        )
+    }
+
     private func client() -> APIClient {
         let configuration = URLSessionConfiguration.ephemeral
         configuration.protocolClasses = [MockURLProtocol.self]
