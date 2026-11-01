@@ -1,0 +1,58 @@
+{
+  "status": "not_run",
+  "summary": "Red-phase Swift tests and contract-gap documentation were added. Swift is unavailable in this container, so compilation and execution are not run.",
+  "acceptance_criteria": [
+    {
+      "id": "AC-1",
+      "status": "not_run",
+      "verification": {
+        "kind": "unit_or_service_test",
+        "references": [
+          {
+            "locator": "iOS/Tests/ColorMatchingLPSAppTests/APIClientTests.swift:49",
+            "result": "not_run: Swift toolchain is unavailable"
+          }
+        ]
+      }
+    },
+    {
+      "id": "AC-2",
+      "status": "not_run",
+      "verification": {
+        "kind": "unit_or_service_test",
+        "references": [
+          {
+            "locator": "iOS/Tests/ColorMatchingLPSAppTests/APIClientTests.swift:12",
+            "result": "not_run: generated types are intentionally not added in the test-writing phase"
+          }
+        ]
+      }
+    },
+    {
+      "id": "AC-3",
+      "status": "not_run",
+      "verification": {
+        "kind": "unit_or_service_test",
+        "references": [
+          {
+            "locator": "iOS/Tests/ColorMatchingLPSAppTests/APIClientTests.swift:49",
+            "result": "not_run: local-stub manifest and recent-sheet coverage added; ranked-results coverage awaits generated operation surface"
+          }
+        ]
+      }
+    },
+    {
+      "id": "AC-4",
+      "status": "passed",
+      "verification": {
+        "kind": "human_or_external_evidence",
+        "references": [
+          {
+            "locator": "docs/solutions/api-contracts/generated-openapi-client-test-plan.md",
+            "result": "Upstream issue #110 and revision 47057afd58f7d46b4d4b740ca7d2d08947774471 were inspected; endpoint and schema gaps are recorded"
+          }
+        ]
+      }
+    }
+  ]
+}
