@@ -92,10 +92,35 @@ final class APIClientTests: XCTestCase {
         XCTAssertEqual((json["judgments"] as? [[String: Any]])?.first?["judgment"] as? String, "near_match")
     }
 
+    func testGeneratedOpenAPIClientHasVendoredContractForEveryAppSurface() throws {
+        let package = try String(contentsOf: projectRoot.appending(path: "Package.swift"), encoding: .utf8)
+        XCTAssertTrue(package.contains("swift-openapi-generator"), "Package must run swift-openapi-generator from the vendored API contract.")
+        XCTAssertTrue(package.contains("swift-openapi-runtime"), "Package must use swift-openapi-runtime to execute generated operations.")
+
+        let data = try Data(contentsOf: projectRoot.appending(path: "OpenAPI/openapi.json"))
+        let document = try XCTUnwrap(JSONSerialization.jsonObject(with: data) as? [String: Any])
+        XCTAssertTrue((document["openapi"] as? String)?.hasPrefix("3.") == true)
+
+        let paths = try XCTUnwrap(document["paths"] as? [String: Any])
+        XCTAssertNotNil(paths["/api/v1/test_sheets/{sheet_id}/manifest"])
+        XCTAssertNotNil(paths["/api/v1/test_sheets/recent"])
+        XCTAssertNotNil(paths["/api/v1/test_sheets/{sheet_id}/captures"])
+        XCTAssertNotNil(paths["/api/v1/captures/{capture_id}/measurements"])
+        XCTAssertNotNil(paths["/api/v1/captures/{capture_id}/judgments"])
+        XCTAssertNotNil(paths["/api/v1/test_sheets/{sheet_id}/ranked_results"])
+    }
+
     private func client() -> APIClient {
         let configuration = URLSessionConfiguration.ephemeral
         configuration.protocolClasses = [MockURLProtocol.self]
         return APIClient(token: "token", session: URLSession(configuration: configuration))
+    }
+
+    private var projectRoot: URL {
+        URL(fileURLWithPath: #filePath)
+            .deletingLastPathComponent()
+            .deletingLastPathComponent()
+            .deletingLastPathComponent()
     }
 
     private static func jsonObject(from data: Data?) throws -> Any {
