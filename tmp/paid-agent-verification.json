@@ -1,0 +1,71 @@
+{
+  "status": "failed",
+  "summary": "Tests and a criterion-level verification plan were added in the tests-only phase. Swift is unavailable in this container, the OpenAPI document/dependencies are absent, and ranked results has no current client operation.",
+  "acceptance_criteria": [
+    {
+      "id": "AC-1",
+      "status": "not_run",
+      "verification": {
+        "kind": "human_or_external_evidence",
+        "references": [
+          {
+            "locator": "docs/issue-5-openapi-client-verification.md",
+            "result": "The published viamin/color_matching#110 OpenAPI document is not present in this checkout."
+          }
+        ]
+      }
+    },
+    {
+      "id": "AC-2",
+      "status": "failed",
+      "verification": {
+        "kind": "unit_or_service_test",
+        "references": [
+          {
+            "locator": "iOS/Tests/ColorMatchingLPSAppTests/APIClientTests.swift:testRankedResultsOperationIsExercisedAgainstAStubbedResponse",
+            "result": "Intentional red-phase assertion records the missing ranked-results operation."
+          }
+        ]
+      }
+    },
+    {
+      "id": "AC-3",
+      "status": "not_run",
+      "verification": {
+        "kind": "human_or_external_evidence",
+        "references": [
+          {
+            "locator": "docs/issue-5-openapi-client-verification.md",
+            "result": "Generated types do not yet exist; a generated-type compile check cannot be run."
+          }
+        ]
+      }
+    },
+    {
+      "id": "AC-4",
+      "status": "not_run",
+      "verification": {
+        "kind": "unit_or_service_test",
+        "references": [
+          {
+            "locator": "iOS/Tests/ColorMatchingLPSAppTests/APIClientTests.swift",
+            "result": "Local URLProtocol stubs cover the legacy client, but swift is unavailable in the container so they could not be executed."
+          }
+        ]
+      }
+    },
+    {
+      "id": "AC-5",
+      "status": "not_run",
+      "verification": {
+        "kind": "human_or_external_evidence",
+        "references": [
+          {
+            "locator": "docs/issue-5-openapi-client-verification.md",
+            "result": "The comparison checklist is recorded; actual contract deltas require the published OpenAPI document."
+          }
+        ]
+      }
+    }
+  ]
+}
