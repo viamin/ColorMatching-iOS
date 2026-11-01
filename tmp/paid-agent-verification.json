@@ -1,0 +1,58 @@
+{
+  "status": "failed",
+  "summary": "Test-writing phase added OpenAPI generation contract tests and a local-stubbed API flow test. The Swift toolchain is unavailable in this container, so no Swift tests could be executed. The generated-client implementation and published specification are intentionally absent at this red-phase head.",
+  "acceptance_criteria": [
+    {
+      "id": "AC-1",
+      "status": "failed",
+      "verification": {
+        "kind": "unit_or_service_test",
+        "references": [
+          {
+            "locator": "iOS/Tests/ColorMatchingLPSAppTests/OpenAPIGenerationContractTests.swift:5",
+            "result": "red: Package.swift does not yet declare swift-openapi-generator or swift-openapi-runtime"
+          }
+        ]
+      }
+    },
+    {
+      "id": "AC-2",
+      "status": "failed",
+      "verification": {
+        "kind": "unit_or_service_test",
+        "references": [
+          {
+            "locator": "iOS/Tests/ColorMatchingLPSAppTests/OpenAPIGenerationContractTests.swift:29",
+            "result": "red: APIClient.swift still declares CaptureMetadata, CaptureSessionResponse, RecentSheet, and PairJudgment"
+          }
+        ]
+      }
+    },
+    {
+      "id": "AC-3",
+      "status": "not_run",
+      "verification": {
+        "kind": "permanent_system_test",
+        "references": [
+          {
+            "locator": "iOS/Tests/ColorMatchingLPSAppTests/APIClientTests.swift:95",
+            "result": "not run: swift executable is unavailable in the container; test uses only local URLProtocol stubs"
+          }
+        ]
+      }
+    },
+    {
+      "id": "AC-4",
+      "status": "not_run",
+      "verification": {
+        "kind": "human_or_external_evidence",
+        "references": [
+          {
+            "locator": "docs/issue-5-openapi-client-verification.md:14",
+            "result": "not run: requires the published viamin/color_matching#110 specification for an inspectable contract comparison"
+          }
+        ]
+      }
+    }
+  ]
+}
