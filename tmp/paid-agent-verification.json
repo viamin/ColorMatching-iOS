@@ -1,0 +1,58 @@
+{
+  "status": "not_run",
+  "summary": "Test-writing phase added local-stub coverage and a red generation-configuration test; Swift is unavailable in this container, so the suite could not run.",
+  "acceptance_criteria": [
+    {
+      "id": "AC-1",
+      "status": "not_run",
+      "verification": {
+        "kind": "unit_or_service_test",
+        "references": [
+          {
+            "locator": "iOS/Tests/ColorMatchingLPSAppTests/APIClientTests.swift:95",
+            "result": "Local-stub manifest and recent-sheet coverage was added; capture, measurement, and judgment local-stub coverage already exists in this file. Ranked-results awaits the generated surface."
+          }
+        ]
+      }
+    },
+    {
+      "id": "AC-2",
+      "status": "not_run",
+      "verification": {
+        "kind": "unit_or_service_test",
+        "references": [
+          {
+            "locator": "iOS/Tests/ColorMatchingLPSAppTests/APIClientTests.swift:116",
+            "result": "Intentionally red until the vendored OpenAPI document, generator dependency, runtime dependency, and plugin configuration are checked in."
+          }
+        ]
+      }
+    },
+    {
+      "id": "AC-3",
+      "status": "not_run",
+      "verification": {
+        "kind": "human_or_external_evidence",
+        "references": [
+          {
+            "locator": "docs/issue-5-verification-plan.md:15",
+            "result": "Upstream contract deltas and endpoint-scope evidence are recorded for the implementation PR description."
+          }
+        ]
+      }
+    },
+    {
+      "id": "AC-4",
+      "status": "not_run",
+      "verification": {
+        "kind": "unit_or_service_test",
+        "references": [
+          {
+            "locator": "iOS/Tests/ColorMatchingLPSAppTests/APIClientTests.swift:6",
+            "result": "swift test --disable-sandbox could not start because the container has no swift executable."
+          }
+        ]
+      }
+    }
+  ]
+}
