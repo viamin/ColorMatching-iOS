@@ -1,0 +1,65 @@
+{
+  "status": "failed",
+  "summary": "Test-writing (red) phase for issue #5. Dependency viamin/color_matching#110 is resolved (merged as PR #113, spec served at runtime from GET /api/v1/openapi.json) but no static OpenAPI document is committed in that repo and no live Phoenix server is reachable from this sandbox, so the spec cannot be fetched or vendored here. Per the TDD boundary for this run, Package.swift, dependency additions, vendored spec files, and generated client code are implementation changes and are out of scope. Added two focused, compiler-verifiable red-phase tests that document concrete gaps between docs/color-matching-api-contract.md and the current hand-written APIClient: (1) the 'ranked results' surface has no client method at all, and (2) SheetManifest silently drops the documented printer_profile/capture_profile fields. No Swift toolchain is available in this container, so `swift test` could not be executed locally to confirm the expected compile failures; this is reported rather than assumed.",
+  "acceptance_criteria": [
+    {
+      "id": "AC-1-add-openapi-deps-and-spec",
+      "status": "not_run",
+      "verification": {
+        "kind": "human_or_external_evidence",
+        "references": [
+          { "locator": "iOS/Package.swift", "result": "unchanged in this run" }
+        ],
+        "notes": "Adding swift-openapi-generator/swift-openapi-runtime and vendoring the OpenAPI document are implementation-file changes, out of scope for this test-writing run. Blocked: viamin/color_matching#110 is closed (merged via viamin/color_matching#113), but the spec is only served at runtime (GET /api/v1/openapi.json) by a live Phoenix server; no static spec file is committed in that repo and no live server is reachable from this sandbox. The implementation run will need either network access to a running color_matching instance or a maintainer-provided static export of the spec."
+      }
+    },
+    {
+      "id": "AC-2-generate-client-for-current-surfaces",
+      "status": "not_run",
+      "verification": {
+        "kind": "human_or_external_evidence",
+        "references": [],
+        "notes": "No generator can run without the spec from AC-1; deferred to the implementation run."
+      }
+    },
+    {
+      "id": "AC-3-replace-handwritten-models-with-generated-types",
+      "status": "not_run",
+      "verification": {
+        "kind": "human_or_external_evidence",
+        "references": [],
+        "notes": "Depends on AC-2's generated types existing first; deferred to the implementation run."
+      }
+    },
+    {
+      "id": "AC-4-swift-tests-against-stubbed-responses",
+      "status": "failed",
+      "verification": {
+        "kind": "unit_or_service_test",
+        "references": [
+          { "locator": "iOS/Tests/ColorMatchingLPSAppTests/RankedResultsAPIClientTests.swift:1", "result": "failed" },
+          { "locator": "iOS/Tests/ColorMatchingLPSAppTests/SheetManifestContractFieldsTests.swift:1", "result": "failed" }
+        ],
+        "notes": "Two new tests exercise the current (pre-generated-client) APIClient against local MockURLProtocol stubs built from docs/color-matching-api-contract.md. RankedResultsAPIClientTests calls APIClient.fetchRankedResults(sheetID:baseURL:), which does not exist today -- expected compile failure ('value of type APIClient has no member fetchRankedResults'). SheetManifestContractFieldsTests reads manifest.printerProfile / manifest.captureProfile, which SheetManifest does not declare -- expected compile failure. Both are genuine, scoped red-phase evidence of endpoint/model gaps the issue is meant to close, not infrastructure or syntax errors. The existing passing coverage in APIClientTests.swift (createCapture, uploadMeasurements, uploadJudgments) and the untouched fetchManifest/fetchRecentSheets paths remain the regression baseline the eventual generated client must preserve. Could not run `swift test` to confirm the exact compiler diagnostics: no Swift toolchain is installed in this Linux sandbox (CI runs this on macos-latest); verified by careful manual inspection and brace/paren balance checks instead."
+      }
+    },
+    {
+      "id": "AC-5-pr-description-records-contract-deltas",
+      "status": "skipped",
+      "verification": {
+        "kind": "human_or_external_evidence",
+        "references": [],
+        "notes": "This run commits tests/docs only and does not open a PR (per run instructions). Contract-delta findings gathered in this run: viamin/color_matching#110 was closed by merging viamin/color_matching#113, which added OpenApiSpex-based spec generation (lib/color_matching_web/api_spec.ex, served at GET /api/v1/openapi.json), Schemathesis and oasdiff CI gates, and two previously-undocumented POST routes (/api/illuminant_measurements, /api/multi_image_mapping) unrelated to this app's surfaces. No static spec file is committed in that repo, so the real schema for test_sheets manifest/recent/captures/measurements/judgments/ranked_results could not be diffed against docs/color-matching-api-contract.md in this sandbox. Two concrete gaps were found by inspecting the current iOS implementation against its own prose contract (independent of the unreachable spec): ranked_results has no client method, and SheetManifest drops printer_profile/capture_profile."
+      }
+    },
+    {
+      "id": "EXIT-swift-test-disable-sandbox-green",
+      "status": "skipped",
+      "verification": {
+        "kind": "human_or_external_evidence",
+        "references": [],
+        "notes": "Not applicable in this red-phase run: the new tests are intentionally expected to fail to compile until the implementation run adds fetchRankedResults and SheetManifest.printerProfile/captureProfile. Also, no Swift toolchain is available in this sandbox to run `swift test --disable-sandbox` at all."
+      }
+    }
+  ]
+}
