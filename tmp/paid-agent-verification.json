@@ -1,0 +1,71 @@
+{
+  "status": "failed",
+  "summary": "Tests-only red phase: local URLProtocol coverage was added for manifest and recent sheets, and adoption checks are intentionally red until the generated-client implementation lands. Swift is unavailable in this container, so the suite was not runnable.",
+  "acceptance_criteria": [
+    {
+      "id": "AC-1",
+      "status": "failed",
+      "verification": {
+        "kind": "unit_or_service_test",
+        "references": [
+          {
+            "locator": "iOS/Tests/ColorMatchingLPSAppTests/GeneratedOpenAPIClientAdoptionTests.swift:14",
+            "result": "red as expected: Package.swift does not yet declare swift-openapi-generator/runtime or vendor OpenAPI/color-matching.json"
+          }
+        ]
+      }
+    },
+    {
+      "id": "AC-2",
+      "status": "not_run",
+      "verification": {
+        "kind": "permanent_system_test",
+        "references": [
+          {
+            "locator": "iOS/Tests/ColorMatchingLPSAppTests/APIClientTests.swift:12",
+            "result": "local-stub manifest and recent-sheet coverage added; ranked-results client operation awaits implementation"
+          }
+        ]
+      }
+    },
+    {
+      "id": "AC-3",
+      "status": "not_run",
+      "verification": {
+        "kind": "unit_or_service_test",
+        "references": [
+          {
+            "locator": "iOS/Tests/ColorMatchingLPSAppTests/APIClientTests.swift:50",
+            "result": "existing local-stub write-operation coverage retained; generated type wiring awaits implementation"
+          }
+        ]
+      }
+    },
+    {
+      "id": "AC-4",
+      "status": "passed",
+      "verification": {
+        "kind": "human_or_external_evidence",
+        "references": [
+          {
+            "locator": "docs/issue-5-openapi-client-verification.md:40",
+            "result": "provider issue #110 / merged PR #113 comparison records contract deltas and schema gaps"
+          }
+        ]
+      }
+    },
+    {
+      "id": "AC-5",
+      "status": "not_run",
+      "verification": {
+        "kind": "unit_or_service_test",
+        "references": [
+          {
+            "locator": "iOS",
+            "result": "swift test --disable-sandbox could not start because swift is not installed in this container"
+          }
+        ]
+      }
+    }
+  ]
+}
