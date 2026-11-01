@@ -46,6 +46,77 @@ final class APIClientTests: XCTestCase {
         XCTAssertEqual(quality["rejections"] as? [String], [])
     }
 
+    func testFetchesManifestFromStubbedResponse() async throws {
+        var capturedRequest: URLRequest?
+        MockURLProtocol.handler = { request in
+            capturedRequest = request
+            return (
+                HTTPURLResponse(url: request.url!, statusCode: 200, httpVersion: nil, headerFields: nil)!,
+                Data(Self.manifestResponse.utf8)
+            )
+        }
+
+        let manifest = try await client().fetchManifest(
+            baseURL: URL(string: "https://example.test")!,
+            sheetCode: "SHEET-123"
+        )
+
+        XCTAssertEqual(capturedRequest?.httpMethod, "GET")
+        XCTAssertEqual(capturedRequest?.url?.path, "/api/v1/test_sheets/SHEET-123/manifest")
+        XCTAssertEqual(capturedRequest?.value(forHTTPHeaderField: "Authorization"), "Bearer token")
+        XCTAssertEqual(manifest.schemaVersion, "lps-sheet-manifest/v1")
+        XCTAssertEqual(manifest.sheetID, "SHEET-123")
+        XCTAssertEqual(manifest.pairs.first?.id, "pair-1")
+    }
+
+    func testFetchesRecentSheetsFromStubbedResponse() async throws {
+        var capturedRequest: URLRequest?
+        MockURLProtocol.handler = { request in
+            capturedRequest = request
+            return (
+                HTTPURLResponse(url: request.url!, statusCode: 200, httpVersion: nil, headerFields: nil)!,
+                Data(#"{"sheets":[{"sheet_id":"SHEET-123","manifest_url":"https://example.test/api/v1/test_sheets/SHEET-123/manifest","title":null}]}"#.utf8)
+            )
+        }
+
+        let sheets = try await client().fetchRecentSheets(baseURL: URL(string: "https://example.test")!)
+
+        XCTAssertEqual(capturedRequest?.httpMethod, "GET")
+        XCTAssertEqual(capturedRequest?.url?.path, "/api/v1/test_sheets/recent")
+        XCTAssertEqual(sheets.map(\.sheetID), ["SHEET-123"])
+        XCTAssertNil(sheets.first?.title)
+    }
+
+    func testVendoredOpenAPIDocumentDefinesEveryConsumedOperation() throws {
+        let openAPIURL = Self.packageRoot
+            .appending(path: "openapi")
+            .appending(path: "color-matching.json")
+
+        XCTAssertTrue(
+            FileManager.default.fileExists(atPath: openAPIURL.path),
+            "Vendor the published OpenAPI document at iOS/openapi/color-matching.json."
+        )
+        guard FileManager.default.fileExists(atPath: openAPIURL.path) else { return }
+
+        let document = try XCTUnwrap(
+            try JSONSerialization.jsonObject(with: Data(contentsOf: openAPIURL)) as? [String: Any]
+        )
+        let paths = try XCTUnwrap(document["paths"] as? [String: Any])
+        let consumedOperations = [
+            "/api/v1/test_sheets/{sheet_id}/manifest": "get",
+            "/api/v1/test_sheets/recent": "get",
+            "/api/v1/test_sheets/{sheet_id}/captures": "post",
+            "/api/v1/captures/{capture_id}/measurements": "post",
+            "/api/v1/captures/{capture_id}/judgments": "post",
+            "/api/v1/test_sheets/{sheet_id}/ranked_results": "get"
+        ]
+
+        for (path, method) in consumedOperations {
+            let pathItem = try XCTUnwrap(paths[path] as? [String: Any], "Missing OpenAPI path: \(path)")
+            XCTAssertNotNil(pathItem[method], "Missing \(method.uppercased()) operation for \(path)")
+        }
+    }
+
     func testUploadMeasurementsEncodesScoresWithAlgorithmVersion() async throws {
         var capturedBody: Data?
         MockURLProtocol.handler = { request in
@@ -117,6 +188,33 @@ final class APIClientTests: XCTestCase {
         }
         return data
     }
+
+    private static var packageRoot: URL {
+        URL(fileURLWithPath: #filePath)
+            .deletingLastPathComponent()
+            .deletingLastPathComponent()
+            .deletingLastPathComponent()
+    }
+
+    private static let manifestResponse = #"""
+    {
+      "schema_version": "lps-sheet-manifest/v1",
+      "sheet_version": "lps-letter-grid-v1",
+      "sheet_id": "SHEET-123",
+      "manifest_url": "https://example.test/api/v1/test_sheets/SHEET-123/manifest",
+      "page": {"units": "mm", "width": 215.9, "height": 279.4},
+      "registration_markers": [
+        {"role": "top_left", "shape": "solid_square", "rect": {"x": 12, "y": 12, "width": 8, "height": 8}}
+      ],
+      "patches": [
+        {"id": "patch-a", "role": "pair_color", "pair_id": "pair-1", "pair_side": "first", "reference_role": null, "source_color": "#FF0000", "safe_inset_mm": 1.5, "rect": {"x": 16, "y": 38, "width": 16, "height": 10}},
+        {"id": "patch-b", "role": "pair_color", "pair_id": "pair-1", "pair_side": "second", "reference_role": null, "source_color": "#00FF00", "safe_inset_mm": 1.5, "rect": {"x": 32, "y": 38, "width": 16, "height": 10}}
+      ],
+      "pairs": [
+        {"id": "pair-1", "first_patch_id": "patch-a", "second_patch_id": "patch-b", "source_colors": ["#FF0000", "#00FF00"], "grid_row": 0, "grid_col": 1}
+      ]
+    }
+    """#
 }
 
 private final class MockURLProtocol: URLProtocol {
