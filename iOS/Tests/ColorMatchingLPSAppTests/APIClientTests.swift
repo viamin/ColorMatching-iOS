@@ -71,6 +71,36 @@ final class APIClientTests: XCTestCase {
         XCTAssertEqual((json["pair_scores"] as? [[String: Any]])?.first?["pair_id"] as? String, "pair_1")
     }
 
+    // Per color_matching's published OpenAPI schema (ColorMatchingWeb.ApiSchemas.MeasurementUploadRequest,
+    // confirmed against viamin/color_matching@main as of 2026-11-01; see docs/openapi-contract-deltas.md),
+    // every measurement item requires `normalized_linear_rgb_median`. PatchMeasurement models that value as
+    // Optional, so Codable's synthesized encoder omits the key entirely when it is nil (e.g. before the
+    // normalization pass has run), producing a request the real server would reject. This test is expected
+    // to fail until the upload path guarantees the key is always sent (#5).
+    func testUploadMeasurementsAlwaysSendsNormalizedMedianKeyPerRealServerContract() async throws {
+        var capturedBody: Data?
+        MockURLProtocol.handler = { request in
+            capturedBody = request.httpBodyStream.flatMap(Self.readBody) ?? request.httpBody
+            return (HTTPURLResponse(url: request.url!, statusCode: 204, httpVersion: nil, headerFields: nil)!, Data())
+        }
+
+        let rgb = RGB(r: 0.2, g: 0.3, b: 0.4)
+        let stats = ChannelStats(median: rgb, mean: rgb, standardDeviation: RGB(r: 0.01, g: 0.01, b: 0.01), min: rgb, max: rgb, sampleCount: 9, clippingFraction: 0)
+        try await client().uploadMeasurements(
+            captureID: "cap_1",
+            baseURL: URL(string: "https://example.test")!,
+            measurements: [PatchMeasurement(patchID: "patch_1", linearRGBMedian: rgb, stats: stats)],
+            scores: []
+        )
+
+        let json = try XCTUnwrap(Self.jsonObject(from: capturedBody) as? [String: Any])
+        let measurement = try XCTUnwrap((json["measurements"] as? [[String: Any]])?.first)
+        XCTAssertTrue(
+            measurement.keys.contains("normalized_linear_rgb_median"),
+            "real server schema requires normalized_linear_rgb_median on every measurement item, even when null"
+        )
+    }
+
     func testUploadJudgmentsEncodesPathAndPayload() async throws {
         var capturedRequest: URLRequest?
         var capturedBody: Data?
