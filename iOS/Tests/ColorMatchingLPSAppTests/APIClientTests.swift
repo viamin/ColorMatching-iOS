@@ -92,6 +92,48 @@ final class APIClientTests: XCTestCase {
         XCTAssertEqual((json["judgments"] as? [[String: Any]])?.first?["judgment"] as? String, "near_match")
     }
 
+    func testAppAPIFlowUsesLocalStubbedResponses() async throws {
+        var requestedPaths: [String] = []
+        MockURLProtocol.handler = { request in
+            requestedPaths.append(request.url!.path)
+            let response = HTTPURLResponse(url: request.url!, statusCode: request.httpMethod == "POST" ? 204 : 200, httpVersion: nil, headerFields: nil)!
+
+            switch request.url!.path {
+            case "/api/v1/test_sheets/recent":
+                return (response, Data(#"{"sheets":[{"sheet_id":"sheet_1","manifest_url":"https://example.test/api/v1/test_sheets/sheet_1/manifest","title":"LPS"}]}"#.utf8))
+            case "/api/v1/test_sheets/sheet_1/manifest":
+                return (response, Data(#"{"schema_version":"lps-sheet-manifest/v1","sheet_version":"lps-letter-grid-v1","sheet_id":"sheet_1","manifest_url":"https://example.test/api/v1/test_sheets/sheet_1/manifest","page":{"units":"mm","width":215.9,"height":279.4},"registration_markers":[],"patches":[],"pairs":[]}"#.utf8))
+            case "/api/v1/test_sheets/sheet_1/captures":
+                let created = HTTPURLResponse(url: request.url!, statusCode: 201, httpVersion: nil, headerFields: nil)!
+                return (created, Data(#"{"capture_id":"capture_1"}"#.utf8))
+            default:
+                return (response, Data())
+            }
+        }
+
+        let baseURL = URL(string: "https://example.test")!
+        let api = client()
+        let sheets = try await api.fetchRecentSheets(baseURL: baseURL)
+        let manifest = try await api.fetchManifest(baseURL: baseURL, sheetCode: sheets[0].sheetID)
+        let capture = try await api.createCapture(
+            sheetID: manifest.sheetID,
+            baseURL: baseURL,
+            metadata: metadata(),
+            quality: CaptureQuality(detectedMarkerCount: 4, blurScore: 0.75, rejections: [])
+        )
+        try await api.uploadMeasurements(captureID: capture.captureID, baseURL: baseURL, measurements: [], scores: [])
+        try await api.uploadJudgments(captureID: capture.captureID, baseURL: baseURL, judgments: [])
+
+        XCTAssertEqual(capture.captureID, "capture_1")
+        XCTAssertEqual(requestedPaths, [
+            "/api/v1/test_sheets/recent",
+            "/api/v1/test_sheets/sheet_1/manifest",
+            "/api/v1/test_sheets/sheet_1/captures",
+            "/api/v1/captures/capture_1/measurements",
+            "/api/v1/captures/capture_1/judgments"
+        ])
+    }
+
     private func client() -> APIClient {
         let configuration = URLSessionConfiguration.ephemeral
         configuration.protocolClasses = [MockURLProtocol.self]
@@ -100,6 +142,21 @@ final class APIClientTests: XCTestCase {
 
     private static func jsonObject(from data: Data?) throws -> Any {
         try JSONSerialization.jsonObject(with: XCTUnwrap(data))
+    }
+
+    private func metadata() -> CaptureMetadata {
+        CaptureMetadata(
+            deviceModel: "iPhone",
+            lens: "wide",
+            exposureDurationSeconds: nil,
+            iso: nil,
+            focusLensPosition: nil,
+            whiteBalanceGains: nil,
+            imageWidth: nil,
+            imageHeight: nil,
+            appVersion: "0.1.0",
+            timestamp: Date(timeIntervalSince1970: 0)
+        )
     }
 
     private static func readBody(_ stream: InputStream) -> Data {
