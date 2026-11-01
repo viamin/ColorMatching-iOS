@@ -1,0 +1,71 @@
+{
+  "status": "not_run",
+  "summary": "Tests and contract-delta evidence were prepared in the test-writing phase; this container does not provide Swift, so the focused suite could not run.",
+  "acceptance_criteria": [
+    {
+      "id": "AC-1",
+      "status": "not_run",
+      "verification": {
+        "kind": "unit_or_service_test",
+        "references": [
+          {
+            "locator": "iOS/Tests/ColorMatchingLPSAppTests/APIClientTests.swift:54",
+            "result": "not_run: requires Swift; manifest/recent local-stub coverage is prepared"
+          }
+        ]
+      }
+    },
+    {
+      "id": "AC-2",
+      "status": "not_run",
+      "verification": {
+        "kind": "unit_or_service_test",
+        "references": [
+          {
+            "locator": "docs/issue-5-openapi-client-plan.md:14",
+            "result": "not_run: production changes are prohibited during this test-writing run"
+          }
+        ]
+      }
+    },
+    {
+      "id": "AC-3",
+      "status": "passed",
+      "verification": {
+        "kind": "human_or_external_evidence",
+        "references": [
+          {
+            "locator": "iOS/Tests/ColorMatchingLPSAppTests/APIClientTests.swift:54",
+            "result": "inspected: tests configure MockURLProtocol and stub every response locally"
+          }
+        ]
+      }
+    },
+    {
+      "id": "AC-4",
+      "status": "not_run",
+      "verification": {
+        "kind": "unit_or_service_test",
+        "references": [
+          {
+            "locator": "README.md:11",
+            "result": "not_run: swift test --disable-sandbox cannot execute because swift is unavailable"
+          }
+        ]
+      }
+    },
+    {
+      "id": "AC-5",
+      "status": "passed",
+      "verification": {
+        "kind": "human_or_external_evidence",
+        "references": [
+          {
+            "locator": "docs/issue-5-openapi-client-plan.md:30",
+            "result": "inspected against viamin/color_matching issue #110 and current provider source; deltas and endpoint gaps are recorded"
+          }
+        ]
+      }
+    }
+  ]
+}
