@@ -1,0 +1,73 @@
+{
+  "status": "passed",
+  "summary": "Test-writing phase only (per TDD boundary): added Swift tests pinning real color_matching OpenAPI contract shapes against the existing hand-written APIClient, plus a docs/openapi-contract-deltas.md findings record of contract drift and endpoint gaps. No implementation files were touched. Swift toolchain is unavailable in this container, so tests were verified by manual code review against existing compiling patterns rather than executed; this is reported explicitly rather than claimed as a run result.",
+  "acceptance_criteria": [
+    {
+      "id": "AC-1-measurement-upload-schema-drift",
+      "status": "not_run",
+      "verification": {
+        "kind": "unit_or_service_test",
+        "references": [
+          {
+            "locator": "iOS/Tests/ColorMatchingLPSAppTests/APIContractDeltaTests.swift:testUploadMeasurementsBodyMatchesPublishedMeasurementUploadRequestSchema",
+            "result": "not_run"
+          }
+        ]
+      },
+      "notes": "Red-phase test asserting the measurement-upload request body matches the real MeasurementUploadRequest schema (viamin/color_matching PR #113): drops the undocumented top-level scoring_algorithm_version and per-measurement stats object this app currently sends. Expected to fail against current APIClient.uploadMeasurements, demonstrating documented drift (see docs/openapi-contract-deltas.md delta #1). Could not execute via `swift test`: no Swift toolchain is installed in this Linux container. Verified by manual trace against the existing, already-compiling APIClientTests.swift patterns it mirrors."
+    },
+    {
+      "id": "AC-2-real-contract-regression-locks",
+      "status": "not_run",
+      "verification": {
+        "kind": "unit_or_service_test",
+        "references": [
+          {
+            "locator": "iOS/Tests/ColorMatchingLPSAppTests/APIContractDeltaTests.swift:testManifestDecodesRealPublishedShapeIncludingUndeclaredPrinterAndCaptureProfile",
+            "result": "not_run"
+          },
+          {
+            "locator": "iOS/Tests/ColorMatchingLPSAppTests/APIContractDeltaTests.swift:testRecentSheetsDecodesRealShapeWithNullTitle",
+            "result": "not_run"
+          },
+          {
+            "locator": "iOS/Tests/ColorMatchingLPSAppTests/APIContractDeltaTests.swift:testCreateCaptureDecodesRealCaptureCreatedResponse",
+            "result": "not_run"
+          }
+        ]
+      },
+      "notes": "Fixtures shaped exactly like the real ColorMatchingWeb.TestSheetJSON/TestSheetController output (confirmed by reading viamin/color_matching source at commit 05062f5381a6f76413cc2bdf1cb2cc08a1b70ff7), decoded through the existing Codable models. Expected to pass today (regression lock ahead of the generated-client swap). Not executed: no Swift toolchain in this container."
+    },
+    {
+      "id": "AC-3-contract-delta-documentation",
+      "status": "passed",
+      "verification": {
+        "kind": "human_or_external_evidence",
+        "references": [
+          { "locator": "docs/openapi-contract-deltas.md", "result": "present" }
+        ]
+      },
+      "notes": "Records deltas between docs/color-matching-api-contract.md and the real spec published by viamin/color_matching PR #113, and endpoint gaps discovered (notably: this app never calls the documented ranked_results endpoint). Sourced directly from the real repo's api_schemas.ex/router.ex/controllers/json views since that repo has no committed static openapi.json to fetch."
+    },
+    {
+      "id": "AC-4-generated-client-and-green-swift-test-disable-sandbox",
+      "status": "skipped",
+      "verification": {
+        "kind": "human_or_external_evidence",
+        "references": []
+      },
+      "notes": "Out of scope for this run by design: this run is the TDD test-writing phase (pre-commit hook restricts changes to iOS/Tests/ and docs/). Adding swift-openapi-generator/swift-openapi-runtime to iOS/Package.swift, vendoring the spec, generating client types, and replacing hand-written models all require touching implementation files, which happens in a separate implementation run gated on paid-tests-approved. Additionally, no Swift toolchain is available in this container, so `swift test --disable-sandbox` could not be run regardless."
+    },
+    {
+      "id": "AC-5-ranked-results-endpoint-gap",
+      "status": "skipped",
+      "verification": {
+        "kind": "human_or_external_evidence",
+        "references": [
+          { "locator": "docs/openapi-contract-deltas.md#endpoint-gaps-discovered", "result": "present" }
+        ]
+      },
+      "notes": "APIClient.swift has no method calling GET /api/v1/test_sheets/:sheet_id/ranked_results, despite it being one of the five surfaces the issue names as in use today. Documented as a gap rather than encoded as a compiling-but-undefined-symbol test, since a Swift test referencing a nonexistent method would fail the whole test target's compilation rather than producing an isolated, reportable assertion failure."
+    }
+  ]
+}
