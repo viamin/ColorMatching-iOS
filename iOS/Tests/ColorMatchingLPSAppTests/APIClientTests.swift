@@ -46,11 +46,45 @@ final class APIClientTests: XCTestCase {
         XCTAssertEqual(quality["rejections"] as? [String], [])
     }
 
+    func testFetchManifestDecodesPublishedManifestStub() async throws {
+        MockURLProtocol.handler = { request in
+            XCTAssertEqual(request.url?.path, "/api/v1/test_sheets/SHEET-1/manifest")
+            return (
+                HTTPURLResponse(url: request.url!, statusCode: 200, httpVersion: nil, headerFields: nil)!,
+                Data(Self.manifestStub.utf8)
+            )
+        }
+
+        let manifest = try await client().fetchManifest(
+            baseURL: URL(string: "https://example.test")!,
+            sheetCode: "SHEET-1"
+        )
+
+        XCTAssertEqual(manifest.schemaVersion, "lps-sheet-manifest/v1")
+        XCTAssertEqual(manifest.sheetID, "SHEET-1")
+        XCTAssertEqual(manifest.patches.map(\.id), ["pair-1##first", "pair-1##second"])
+    }
+
+    func testFetchRecentSheetsDecodesPublishedRecentSheetsStub() async throws {
+        MockURLProtocol.handler = { request in
+            XCTAssertEqual(request.url?.path, "/api/v1/test_sheets/recent")
+            return (
+                HTTPURLResponse(url: request.url!, statusCode: 200, httpVersion: nil, headerFields: nil)!,
+                Data(#"{"sheets":[{"sheet_id":"SHEET-1","manifest_url":"https://example.test/api/v1/test_sheets/SHEET-1/manifest","title":null}]}"#.utf8)
+            )
+        }
+
+        let sheets = try await client().fetchRecentSheets(baseURL: URL(string: "https://example.test")!)
+
+        XCTAssertEqual(sheets.map(\.sheetID), ["SHEET-1"])
+        XCTAssertNil(sheets.first?.title)
+    }
+
     func testUploadMeasurementsEncodesScoresWithAlgorithmVersion() async throws {
         var capturedBody: Data?
         MockURLProtocol.handler = { request in
             capturedBody = request.httpBodyStream.flatMap(Self.readBody) ?? request.httpBody
-            return (HTTPURLResponse(url: request.url!, statusCode: 204, httpVersion: nil, headerFields: nil)!, Data())
+            return (HTTPURLResponse(url: request.url!, statusCode: 200, httpVersion: nil, headerFields: nil)!, Data(#"{"capture_id":"cap_1","measurement_count":1,"pair_score_count":1}"#.utf8))
         }
 
         let rgb = RGB(r: 0.2, g: 0.3, b: 0.4)
@@ -77,7 +111,7 @@ final class APIClientTests: XCTestCase {
         MockURLProtocol.handler = { request in
             capturedRequest = request
             capturedBody = request.httpBodyStream.flatMap(Self.readBody) ?? request.httpBody
-            return (HTTPURLResponse(url: request.url!, statusCode: 204, httpVersion: nil, headerFields: nil)!, Data())
+            return (HTTPURLResponse(url: request.url!, statusCode: 200, httpVersion: nil, headerFields: nil)!, Data(#"{"capture_id":"cap_1","judgment_count":1}"#.utf8))
         }
 
         try await client().uploadJudgments(
@@ -117,6 +151,25 @@ final class APIClientTests: XCTestCase {
         }
         return data
     }
+
+    private static let manifestStub = #"""
+    {
+      "schema_version": "lps-sheet-manifest/v1",
+      "sheet_id": "SHEET-1",
+      "sheet_version": "lps-letter-grid-v1",
+      "manifest_url": "https://example.test/api/v1/test_sheets/SHEET-1/manifest",
+      "created_at": "2026-10-30T00:00:00Z",
+      "page": {"units": "mm", "width": 215.9, "height": 279.4},
+      "registration_markers": [{"role": "top_left", "shape": "solid_square", "rect": {"x": 12, "y": 12, "width": 8, "height": 8}}],
+      "printer_profile": {"printer_make_model": "Printer", "paper_type": "Paper", "ink_type": "Ink"},
+      "capture_profile": {"scoring_algorithm_version": "lps-distance-v1"},
+      "patches": [
+        {"id": "pair-1##first", "role": "pair_color", "pair_id": "pair-1", "pair_side": "first", "reference_role": null, "source_color": "#FF0000", "safe_inset_mm": 1.5, "rect": {"x": 16, "y": 38, "width": 16, "height": 10}},
+        {"id": "pair-1##second", "role": "pair_color", "pair_id": "pair-1", "pair_side": "second", "reference_role": null, "source_color": "#00FF00", "safe_inset_mm": 1.5, "rect": {"x": 34, "y": 38, "width": 16, "height": 10}}
+      ],
+      "pairs": [{"id": "pair-1", "first_patch_id": "pair-1##first", "second_patch_id": "pair-1##second", "source_colors": ["#FF0000", "#00FF00"], "grid_row": 0, "grid_col": 0}]
+    }
+    """
 }
 
 private final class MockURLProtocol: URLProtocol {
