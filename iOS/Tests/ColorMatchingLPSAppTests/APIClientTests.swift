@@ -71,6 +71,36 @@ final class APIClientTests: XCTestCase {
         XCTAssertEqual((json["pair_scores"] as? [[String: Any]])?.first?["pair_id"] as? String, "pair_1")
     }
 
+    // Exercises the drift between the hand-written request body and the published
+    // OpenAPI schema for `POST /api/v1/captures/:capture_id/measurements`
+    // (`ColorMatchingWeb.ApiSchemas.MeasurementUploadRequest`, viamin/color_matching#113,
+    // commit 094bd6d3443ddacbda7e63354299867eb5bdfa9f). That schema declares only
+    // `measurements` (each with `patch_id`, `linear_rgb_median`, `normalized_linear_rgb_median`)
+    // and `pair_scores` — it has no top-level `scoring_algorithm_version` and no per-measurement
+    // `stats`, both of which the current client still sends. See
+    // docs/color-matching-api-contract-deltas.md for the full writeup.
+    func testUploadMeasurementsRequestFieldsMatchPublishedOpenAPISchema() async throws {
+        var capturedBody: Data?
+        MockURLProtocol.handler = { request in
+            capturedBody = request.httpBodyStream.flatMap(Self.readBody) ?? request.httpBody
+            return (HTTPURLResponse(url: request.url!, statusCode: 204, httpVersion: nil, headerFields: nil)!, Data())
+        }
+
+        let rgb = RGB(r: 0.2, g: 0.3, b: 0.4)
+        let stats = ChannelStats(median: rgb, mean: rgb, standardDeviation: RGB(r: 0.01, g: 0.01, b: 0.01), min: rgb, max: rgb, sampleCount: 9, clippingFraction: 0)
+        try await client().uploadMeasurements(
+            captureID: "cap_1",
+            baseURL: URL(string: "https://example.test")!,
+            measurements: [PatchMeasurement(patchID: "patch_1", linearRGBMedian: rgb, normalizedLinearRGBMedian: rgb, stats: stats)],
+            scores: [PairScore(pairID: "pair_1", distance: 0.1, similarity: 0.9, algorithmVersion: LPSScorer.algorithmVersion)]
+        )
+
+        let json = try XCTUnwrap(Self.jsonObject(from: capturedBody) as? [String: Any])
+        XCTAssertEqual(Set(json.keys), ["measurements", "pair_scores"], "published schema has no top-level scoring_algorithm_version")
+        let measurement = try XCTUnwrap((json["measurements"] as? [[String: Any]])?.first)
+        XCTAssertEqual(Set(measurement.keys), ["patch_id", "linear_rgb_median", "normalized_linear_rgb_median"], "published schema has no per-measurement stats")
+    }
+
     func testUploadJudgmentsEncodesPathAndPayload() async throws {
         var capturedRequest: URLRequest?
         var capturedBody: Data?
