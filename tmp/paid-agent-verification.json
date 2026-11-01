@@ -1,0 +1,68 @@
+{
+  "status": "passed",
+  "summary": "Test-writing run only (TDD boundary enforced by pre-commit hook restricts changes to test paths and docs). Added red-phase Swift tests that encode two concrete, researched gaps ahead of the generated-client implementation, plus research notes on the viamin/color_matching#110 dependency and preliminary contract deltas. No Swift toolchain is installed in this sandbox, so tests could not be executed here (compile/run status is not_run, by source inspection only); the implementation run must execute `swift test --disable-sandbox` and resolve/report any failures, including these new ones.",
+  "acceptance_criteria": [
+    {
+      "id": "AC-1-vendor-openapi-spec",
+      "status": "not_run",
+      "verification": {
+        "kind": "ephemeral_system_test",
+        "references": [
+          { "locator": "iOS/Tests/ColorMatchingLPSAppTests/OpenAPISpecVendoringTests.swift:31", "result": "not_run" },
+          { "locator": "docs/openapi-client-migration-notes.md", "result": "not_run" }
+        ]
+      }
+    },
+    {
+      "id": "AC-2-generate-client-for-used-surfaces",
+      "status": "not_run",
+      "verification": {
+        "kind": "human_or_external_evidence",
+        "references": [
+          { "locator": "iOS/Package.swift", "result": "not_run" }
+        ]
+      }
+    },
+    {
+      "id": "AC-3-replace-hand-written-models-with-generated-types",
+      "status": "not_run",
+      "verification": {
+        "kind": "human_or_external_evidence",
+        "references": [
+          { "locator": "iOS/Sources/ColorMatchingLPSAppCore/APIClient.swift", "result": "not_run" }
+        ]
+      }
+    },
+    {
+      "id": "AC-4-swift-tests-against-stubbed-responses",
+      "status": "skipped",
+      "verification": {
+        "kind": "unit_or_service_test",
+        "references": [
+          { "locator": "iOS/Tests/ColorMatchingLPSAppTests/OpenAPIContractGapTests.swift:19", "result": "not_run" },
+          { "locator": "iOS/Tests/ColorMatchingLPSAppTests/OpenAPIContractGapTests.swift:26", "result": "not_run" }
+        ]
+      }
+    },
+    {
+      "id": "AC-5-pr-description-records-contract-deltas",
+      "status": "skipped",
+      "verification": {
+        "kind": "human_or_external_evidence",
+        "references": [
+          { "locator": "docs/openapi-client-migration-notes.md", "result": "not_run" }
+        ]
+      }
+    },
+    {
+      "id": "EXIT-swift-test-disable-sandbox-green",
+      "status": "not_run",
+      "verification": {
+        "kind": "human_or_external_evidence",
+        "references": [
+          { "locator": "iOS/Package.swift", "result": "not_run" }
+        ]
+      }
+    }
+  ]
+}
