@@ -1,0 +1,678 @@
+{
+  "openapi": "3.0.3",
+  "info": {
+    "title": "Color Matching API",
+    "version": "v1",
+    "description": "Reference vendored OpenAPI document for the iOS companion app. Derived from the spec served by viamin/color_matching at GET /api/v1/openapi.json (viamin/color_matching#110) and extended where the served spec under-documents payloads the app consumes. Copy to iOS/Sources/OpenAPIClient/openapi.json; see docs/openapi-generated-client-plan.md for the delta list. Property order in this file is significant: it determines generated Swift memberwise-init parameter order."
+  },
+  "servers": [
+    {
+      "url": "https://example.test",
+      "description": "Placeholder; the app always passes an explicit serverURL to the generated Client."
+    }
+  ],
+  "paths": {
+    "/api/v1/test_sheets/recent": {
+      "get": {
+        "operationId": "listRecentTestSheets",
+        "summary": "List recent test sheets",
+        "security": [{ "bearerAuth": [] }],
+        "responses": {
+          "200": {
+            "description": "Recent sheets",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/RecentSheetsResponse" }
+              }
+            }
+          },
+          "401": { "description": "Unauthorized" }
+        }
+      }
+    },
+    "/api/v1/test_sheets/{sheet_id}/manifest": {
+      "parameters": [
+        {
+          "name": "sheet_id",
+          "in": "path",
+          "required": true,
+          "schema": { "type": "string" }
+        }
+      ],
+      "get": {
+        "operationId": "getTestSheetManifest",
+        "summary": "Fetch a test sheet manifest",
+        "security": [{ "bearerAuth": [] }],
+        "responses": {
+          "200": {
+            "description": "Sheet manifest",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/TestSheetManifest" }
+              }
+            }
+          },
+          "401": { "description": "Unauthorized" },
+          "404": { "description": "Test sheet not found" }
+        }
+      }
+    },
+    "/api/v1/test_sheets/{sheet_id}/ranked_results": {
+      "parameters": [
+        {
+          "name": "sheet_id",
+          "in": "path",
+          "required": true,
+          "schema": { "type": "string" }
+        }
+      ],
+      "get": {
+        "operationId": "getTestSheetRankedResults",
+        "summary": "Fetch ranked results for a test sheet",
+        "security": [{ "bearerAuth": [] }],
+        "responses": {
+          "200": {
+            "description": "Ranked results",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/RankedResults" }
+              }
+            }
+          },
+          "401": { "description": "Unauthorized" },
+          "404": { "description": "Test sheet not found" }
+        }
+      }
+    },
+    "/api/v1/test_sheets/{sheet_id}/captures": {
+      "parameters": [
+        {
+          "name": "sheet_id",
+          "in": "path",
+          "required": true,
+          "schema": { "type": "string" }
+        }
+      ],
+      "post": {
+        "operationId": "createCaptureSession",
+        "summary": "Create a capture for a test sheet",
+        "security": [{ "bearerAuth": [] }],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": { "$ref": "#/components/schemas/CaptureRequest" }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Capture created",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/CaptureCreatedResponse" }
+              }
+            }
+          },
+          "401": { "description": "Unauthorized" },
+          "404": { "description": "Test sheet not found" },
+          "422": { "description": "Invalid capture attributes" }
+        }
+      }
+    },
+    "/api/v1/captures/{capture_id}/measurements": {
+      "parameters": [
+        {
+          "name": "capture_id",
+          "in": "path",
+          "required": true,
+          "schema": { "type": "string" }
+        }
+      ],
+      "post": {
+        "operationId": "uploadMeasurements",
+        "summary": "Upload capture measurements",
+        "security": [{ "bearerAuth": [] }],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": { "$ref": "#/components/schemas/MeasurementUploadRequest" }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Measurements accepted",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/MeasurementUploadResponse" }
+              }
+            }
+          },
+          "401": { "description": "Unauthorized" },
+          "404": { "description": "Capture not found" },
+          "422": { "description": "Invalid measurement upload" }
+        }
+      }
+    },
+    "/api/v1/captures/{capture_id}/judgments": {
+      "parameters": [
+        {
+          "name": "capture_id",
+          "in": "path",
+          "required": true,
+          "schema": { "type": "string" }
+        }
+      ],
+      "post": {
+        "operationId": "uploadJudgments",
+        "summary": "Upload capture judgments",
+        "security": [{ "bearerAuth": [] }],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": { "$ref": "#/components/schemas/JudgmentUploadRequest" }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Judgments accepted",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/JudgmentUploadResponse" }
+              }
+            }
+          },
+          "401": { "description": "Unauthorized" },
+          "404": { "description": "Capture not found" },
+          "422": { "description": "Invalid judgment upload" }
+        }
+      }
+    }
+  },
+  "components": {
+    "securitySchemes": {
+      "bearerAuth": {
+        "type": "http",
+        "scheme": "bearer",
+        "description": "Shared bearer token (Authorization: Bearer <token>)."
+      }
+    },
+    "schemas": {
+      "TestSheetManifest": {
+        "type": "object",
+        "description": "Versioned sheet manifest consumed by the iOS companion app (schema lps-sheet-manifest/v1). Extended from the served spec: the served TestSheetManifest schema only declares schema_version, sheet_id and capture_profile, but the rendered payload also carries the geometry fields pinned here.",
+        "required": [
+          "schema_version",
+          "sheet_version",
+          "sheet_id",
+          "manifest_url",
+          "created_at",
+          "page",
+          "registration_markers",
+          "printer_profile",
+          "capture_profile",
+          "patches",
+          "pairs"
+        ],
+        "properties": {
+          "schema_version": {
+            "type": "string",
+            "enum": ["lps-sheet-manifest/v1"]
+          },
+          "sheet_version": { "type": "string" },
+          "sheet_id": { "type": "string" },
+          "manifest_url": {
+            "type": "string",
+            "description": "Path-only URL rendered by the Phoenix app, e.g. /api/v1/test_sheets/<sheet_id>/manifest."
+          },
+          "created_at": { "type": "string", "format": "date-time" },
+          "page": { "$ref": "#/components/schemas/Page" },
+          "registration_markers": {
+            "type": "array",
+            "items": { "$ref": "#/components/schemas/RegistrationMarker" }
+          },
+          "printer_profile": { "$ref": "#/components/schemas/PrinterProfile" },
+          "capture_profile": { "$ref": "#/components/schemas/CaptureProfile" },
+          "patches": {
+            "type": "array",
+            "items": { "$ref": "#/components/schemas/Patch" }
+          },
+          "pairs": {
+            "type": "array",
+            "items": { "$ref": "#/components/schemas/PairManifest" }
+          }
+        }
+      },
+      "Page": {
+        "type": "object",
+        "required": ["units", "width", "height"],
+        "properties": {
+          "units": { "type": "string" },
+          "width": { "type": "number" },
+          "height": { "type": "number" }
+        }
+      },
+      "Rect": {
+        "type": "object",
+        "required": ["x", "y", "width", "height"],
+        "properties": {
+          "x": { "type": "number" },
+          "y": { "type": "number" },
+          "width": { "type": "number" },
+          "height": { "type": "number" }
+        }
+      },
+      "RegistrationMarker": {
+        "type": "object",
+        "required": ["role", "shape", "rect"],
+        "properties": {
+          "role": { "type": "string" },
+          "shape": { "type": "string" },
+          "rect": { "$ref": "#/components/schemas/Rect" }
+        }
+      },
+      "PrinterProfile": {
+        "type": "object",
+        "description": "Field names the Phoenix app actually renders. The prose contract's {id, name, paper, ink, settings} shape never existed server-side.",
+        "required": ["printer_make_model", "paper_type", "ink_type"],
+        "properties": {
+          "printer_make_model": { "type": "string" },
+          "paper_type": { "type": "string" },
+          "ink_type": { "type": "string" }
+        }
+      },
+      "CaptureProfile": {
+        "type": "object",
+        "required": ["expected_illuminant", "preferred_camera", "scoring_algorithm_version"],
+        "properties": {
+          "expected_illuminant": { "type": "string" },
+          "preferred_camera": { "type": "string" },
+          "scoring_algorithm_version": {
+            "type": "string",
+            "enum": ["lps-distance-v1"]
+          }
+        }
+      },
+      "Patch": {
+        "type": "object",
+        "description": "Patch ids are <pair_id>#<side> strings rendered by the Phoenix app.",
+        "required": [
+          "id",
+          "role",
+          "pair_id",
+          "pair_side",
+          "reference_role",
+          "source_color",
+          "safe_inset_mm",
+          "rect"
+        ],
+        "properties": {
+          "id": { "type": "string" },
+          "role": { "type": "string" },
+          "pair_id": { "type": "string" },
+          "pair_side": { "type": "string" },
+          "reference_role": {
+            "type": "string",
+            "nullable": true
+          },
+          "source_color": { "type": "string" },
+          "safe_inset_mm": { "type": "number" },
+          "rect": { "$ref": "#/components/schemas/Rect" }
+        }
+      },
+      "PairManifest": {
+        "type": "object",
+        "required": [
+          "id",
+          "first_patch_id",
+          "second_patch_id",
+          "source_colors",
+          "grid_row",
+          "grid_col"
+        ],
+        "properties": {
+          "id": { "type": "string" },
+          "first_patch_id": { "type": "string" },
+          "second_patch_id": { "type": "string" },
+          "source_colors": {
+            "type": "array",
+            "items": { "type": "string" }
+          },
+          "grid_row": { "type": "integer" },
+          "grid_col": { "type": "integer" }
+        }
+      },
+      "RecentSheetsResponse": {
+        "type": "object",
+        "required": ["sheets"],
+        "properties": {
+          "sheets": {
+            "type": "array",
+            "items": { "$ref": "#/components/schemas/RecentSheet" }
+          }
+        }
+      },
+      "RecentSheet": {
+        "type": "object",
+        "description": "The Phoenix app currently always renders title as null.",
+        "required": ["sheet_id", "manifest_url", "title"],
+        "properties": {
+          "sheet_id": { "type": "string" },
+          "manifest_url": { "type": "string" },
+          "title": {
+            "type": "string",
+            "nullable": true
+          }
+        }
+      },
+      "CaptureRequest": {
+        "type": "object",
+        "description": "The nested form the iOS app sends. The served spec accepts this via anyOf alongside a flat variant; the vendored document narrows to the nested form.",
+        "required": ["metadata", "quality"],
+        "properties": {
+          "metadata": { "$ref": "#/components/schemas/CaptureMetadata" },
+          "quality": { "$ref": "#/components/schemas/CaptureQuality" }
+        }
+      },
+      "CaptureMetadata": {
+        "type": "object",
+        "required": ["device_model", "lens", "image_width", "image_height", "app_version", "timestamp"],
+        "properties": {
+          "device_model": { "type": "string" },
+          "lens": { "type": "string" },
+          "exposure_duration_seconds": {
+            "type": "number",
+            "minimum": 0,
+            "exclusiveMinimum": true
+          },
+          "iso": {
+            "type": "integer",
+            "minimum": 0,
+            "exclusiveMinimum": true,
+            "description": "Integer per the served spec; the app must convert its Float ISO at the boundary."
+          },
+          "focus_lens_position": { "type": "number", "minimum": 0 },
+          "white_balance_gains": { "$ref": "#/components/schemas/WhiteBalanceGains" },
+          "image_width": { "type": "integer", "minimum": 0, "exclusiveMinimum": true },
+          "image_height": { "type": "integer", "minimum": 0, "exclusiveMinimum": true },
+          "app_version": { "type": "string" },
+          "timestamp": { "type": "string", "format": "date-time" }
+        }
+      },
+      "WhiteBalanceGains": {
+        "type": "object",
+        "description": "The served spec declares white_balance_gains as a bare object; the app sends {red, green, blue} floats.",
+        "required": ["red", "green", "blue"],
+        "properties": {
+          "red": { "type": "number" },
+          "green": { "type": "number" },
+          "blue": { "type": "number" }
+        }
+      },
+      "CaptureQuality": {
+        "type": "object",
+        "required": ["detected_marker_count", "blur_score", "rejections"],
+        "properties": {
+          "detected_marker_count": { "type": "integer", "minimum": 0 },
+          "blur_score": { "type": "number", "minimum": 0 },
+          "rejections": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "enum": [
+                "missingRegistrationMarks",
+                "incompleteSheetCoverage",
+                "clipping",
+                "excessiveBlur",
+                "glare",
+                "poorReferencePatch"
+              ]
+            }
+          }
+        }
+      },
+      "CaptureCreatedResponse": {
+        "type": "object",
+        "required": ["capture_id"],
+        "properties": {
+          "capture_id": {
+            "type": "string",
+            "description": "Integer capture id stringified by the server."
+          }
+        }
+      },
+      "Rgb": {
+        "type": "object",
+        "description": "Object form of the served anyOf RgbPayload (array | object | string); the app sends and reads the object form.",
+        "required": ["r", "g", "b"],
+        "properties": {
+          "r": { "type": "number" },
+          "g": { "type": "number" },
+          "b": { "type": "number" }
+        }
+      },
+      "MeasurementStats": {
+        "type": "object",
+        "description": "Extended from prose contract: the served MeasurementUploadRequest schema omits stats entirely (the server ignores-or-accepts extra properties); the app sends stats today.",
+        "required": ["sample_count", "clipping_fraction", "mean", "standard_deviation"],
+        "properties": {
+          "sample_count": { "type": "integer", "minimum": 0 },
+          "clipping_fraction": { "type": "number" },
+          "mean": { "$ref": "#/components/schemas/Rgb" },
+          "standard_deviation": { "$ref": "#/components/schemas/Rgb" }
+        }
+      },
+      "PatchMeasurementUpload": {
+        "type": "object",
+        "required": ["patch_id", "linear_rgb_median", "normalized_linear_rgb_median", "stats"],
+        "properties": {
+          "patch_id": { "type": "string" },
+          "linear_rgb_median": { "$ref": "#/components/schemas/Rgb" },
+          "normalized_linear_rgb_median": {
+            "$ref": "#/components/schemas/Rgb"
+          },
+          "stats": { "$ref": "#/components/schemas/MeasurementStats" }
+        }
+      },
+      "PairScoreUpload": {
+        "type": "object",
+        "description": "The served schema requires any of score | similarity | distance; the app always sends both distance and similarity, so the vendored document requires both.",
+        "required": ["pair_id", "algorithm_version", "distance", "similarity"],
+        "properties": {
+          "pair_id": { "type": "string" },
+          "algorithm_version": { "type": "string" },
+          "distance": { "type": "number" },
+          "similarity": { "type": "number" }
+        }
+      },
+      "MeasurementUploadRequest": {
+        "type": "object",
+        "description": "Extended from prose contract: the served schema has no top-level scoring_algorithm_version and does not require measurements/pair_scores; the app sends all three.",
+        "required": ["scoring_algorithm_version", "measurements", "pair_scores"],
+        "properties": {
+          "scoring_algorithm_version": { "type": "string" },
+          "measurements": {
+            "type": "array",
+            "items": { "$ref": "#/components/schemas/PatchMeasurementUpload" }
+          },
+          "pair_scores": {
+            "type": "array",
+            "items": { "$ref": "#/components/schemas/PairScoreUpload" }
+          }
+        }
+      },
+      "MeasurementUploadResponse": {
+        "type": "object",
+        "description": "New versus prose contract: the measurement upload returns a JSON body, not 204.",
+        "required": ["capture_id", "measurement_count", "pair_score_count"],
+        "properties": {
+          "capture_id": { "type": "string" },
+          "measurement_count": { "type": "integer" },
+          "pair_score_count": { "type": "integer" }
+        }
+      },
+      "PairJudgmentPayload": {
+        "type": "object",
+        "required": ["pair_id", "judgment"],
+        "properties": {
+          "pair_id": { "type": "string" },
+          "judgment": {
+            "type": "string",
+            "description": "Kept a plain string (as served); prose documents match | near_match | no_match."
+          }
+        }
+      },
+      "JudgmentUploadRequest": {
+        "type": "object",
+        "required": ["judgments"],
+        "properties": {
+          "judgments": {
+            "type": "array",
+            "items": { "$ref": "#/components/schemas/PairJudgmentPayload" }
+          }
+        }
+      },
+      "JudgmentUploadResponse": {
+        "type": "object",
+        "description": "New versus prose contract: the judgment upload returns a JSON body, not 204.",
+        "required": ["capture_id", "judgment_count"],
+        "properties": {
+          "capture_id": { "type": "string" },
+          "judgment_count": { "type": "integer" }
+        }
+      },
+      "RankedResults": {
+        "type": "object",
+        "description": "Extended from the served spec, which only declares schema_version and sheet_id; pinned here to the payload rendered by ColorMatchingWeb.TestSheetJSON.ranked_results/1.",
+        "required": [
+          "schema_version",
+          "sheet_id",
+          "printer_profile",
+          "capture_count",
+          "scoring_algorithm_versions",
+          "results"
+        ],
+        "properties": {
+          "schema_version": {
+            "type": "string",
+            "enum": ["lps-ranked-results/v1"]
+          },
+          "sheet_id": { "type": "string" },
+          "printer_profile": { "$ref": "#/components/schemas/PrinterProfile" },
+          "capture_count": { "type": "integer" },
+          "latest_capture_at": {
+            "type": "string",
+            "format": "date-time",
+            "nullable": true
+          },
+          "earliest_capture_at": {
+            "type": "string",
+            "format": "date-time",
+            "nullable": true
+          },
+          "scoring_algorithm_versions": {
+            "type": "array",
+            "items": { "type": "string" }
+          },
+          "results": {
+            "type": "array",
+            "items": { "$ref": "#/components/schemas/RankedPairResult" }
+          }
+        }
+      },
+      "RankedSourceColors": {
+        "type": "object",
+        "required": ["color_a_hex", "color_b_hex"],
+        "properties": {
+          "color_a_hex": { "type": "string" },
+          "color_b_hex": { "type": "string" }
+        }
+      },
+      "RankedScore": {
+        "type": "object",
+        "required": [
+          "average",
+          "latest",
+          "minimum",
+          "maximum",
+          "capture_count",
+          "sample_count",
+          "algorithm_versions"
+        ],
+        "properties": {
+          "average": { "type": "number" },
+          "latest": { "type": "number" },
+          "minimum": { "type": "number" },
+          "maximum": { "type": "number" },
+          "capture_count": { "type": "integer" },
+          "sample_count": { "type": "integer" },
+          "algorithm_versions": {
+            "type": "array",
+            "items": { "type": "string" }
+          }
+        }
+      },
+      "RankedObservation": {
+        "type": "object",
+        "required": ["judgment", "observed_at"],
+        "properties": {
+          "judgment": { "type": "string" },
+          "observed_at": { "type": "string", "format": "date-time" }
+        }
+      },
+      "RankedPairResult": {
+        "type": "object",
+        "required": [
+          "rank",
+          "pair_id",
+          "scoring_algorithm_version",
+          "row",
+          "col",
+          "source_colors",
+          "score",
+          "current_judgment",
+          "observation_count",
+          "capture_count"
+        ],
+        "properties": {
+          "rank": { "type": "integer" },
+          "pair_id": { "type": "string" },
+          "scoring_algorithm_version": { "type": "string" },
+          "row": { "type": "integer" },
+          "col": { "type": "integer" },
+          "source_colors": { "$ref": "#/components/schemas/RankedSourceColors" },
+          "score": { "$ref": "#/components/schemas/RankedScore" },
+          "current_judgment": {
+            "type": "string",
+            "nullable": true
+          },
+          "current_judgment_observed_at": {
+            "type": "string",
+            "format": "date-time",
+            "nullable": true
+          },
+          "observation_count": { "type": "integer" },
+          "latest_observation": {
+            "allOf": [{ "$ref": "#/components/schemas/RankedObservation" }],
+            "nullable": true
+          },
+          "capture_count": { "type": "integer" },
+          "latest_capture_at": {
+            "type": "string",
+            "format": "date-time",
+            "nullable": true
+          },
+          "earliest_capture_at": {
+            "type": "string",
+            "format": "date-time",
+            "nullable": true
+          }
+        }
+      }
+    }
+  }
+}
