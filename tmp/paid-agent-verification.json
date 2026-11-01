@@ -1,0 +1,66 @@
+{
+  "status": "skipped",
+  "summary": "This run is restricted to test paths and docs (TDD test-writing phase). Issue #5's deliverables (add swift-openapi-generator/runtime to Package.swift, vendor the spec, run the generator, replace hand-written models) are all implementation-file changes outside that allowlist, so they could not be made this run. Swift test targets must compile, so XCTest files exercising a generated client that does not yet exist would fail to compile rather than fail an assertion — the rules for this run explicitly disallow treating compile failures as red-phase evidence, so no such test files were added. What could be done within the allowlist was completed: the published OpenAPI spec (merged in viamin/color_matching#113, closing #110) was read directly from source and diffed against docs/color-matching-api-contract.md, producing docs/openapi-contract-deltas.md with concrete deltas and endpoint gaps (notably: the measurement 'stats' field and the full ranked_results shape are both required/returned by the server but undocumented in the published schema). That document is ready to anchor the real PR description once an implementation run adds the dependency, generator config, and generated types.",
+  "acceptance_criteria": [
+    {
+      "id": "AC-1-add-dependencies-and-vendor-spec",
+      "status": "not_run",
+      "verification": {
+        "kind": "human_or_external_evidence",
+        "references": [
+          { "locator": "iOS/Package.swift", "result": "unchanged — adding swift-openapi-generator/runtime is an implementation-file change outside this test-writing run's allowed paths (test/, tests/, spec/, .ephemeral-tests/, docs/)" }
+        ]
+      }
+    },
+    {
+      "id": "AC-2-generate-client-for-app-surfaces",
+      "status": "not_run",
+      "verification": {
+        "kind": "human_or_external_evidence",
+        "references": [
+          { "locator": "docs/openapi-contract-deltas.md", "result": "blocked on AC-1; research into the real shapes of all five surfaces (manifest, recent sheets, capture creation, measurement/judgment upload, ranked results) is recorded here for the implementation run" }
+        ]
+      }
+    },
+    {
+      "id": "AC-3-replace-hand-written-models",
+      "status": "not_run",
+      "verification": {
+        "kind": "human_or_external_evidence",
+        "references": [
+          { "locator": "iOS/Sources/ColorMatchingLPSAppCore/APIClient.swift", "result": "unchanged — replacing models is an implementation-file change outside this run's allowed paths" }
+        ]
+      }
+    },
+    {
+      "id": "AC-4-swift-tests-against-generated-client-with-stubs",
+      "status": "not_run",
+      "verification": {
+        "kind": "unit_or_service_test",
+        "references": [
+          { "locator": "iOS/Tests/ColorMatchingLPSAppTests/APIClientTests.swift", "result": "no new tests added — generated types do not exist yet (blocked on AC-1/AC-2/AC-3), and XCTest files referencing nonexistent types would be compile failures, not permitted red-phase assertion failures under this run's rules" }
+        ]
+      }
+    },
+    {
+      "id": "AC-5-pr-description-records-contract-deltas-and-gaps",
+      "status": "passed",
+      "verification": {
+        "kind": "human_or_external_evidence",
+        "references": [
+          { "locator": "docs/openapi-contract-deltas.md", "result": "documents deltas sourced from the merged viamin/color_matching#113 (closing #110): printer_profile shape mismatch, undocumented required 'stats' field on measurement upload, pair_scores anyOf, discarded upload response bodies, and the ranked_results schema being far thinner than the real response" }
+        ]
+      }
+    },
+    {
+      "id": "EXIT-swift-test-disable-sandbox-green-with-generated-types",
+      "status": "not_run",
+      "verification": {
+        "kind": "human_or_external_evidence",
+        "references": [
+          { "locator": "iOS/Package.swift", "result": "not applicable this run — no generated types were wired in, per AC-1 through AC-4" }
+        ]
+      }
+    }
+  ]
+}
