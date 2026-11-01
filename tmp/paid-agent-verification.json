@@ -1,0 +1,79 @@
+{
+  "status": "not_run",
+  "summary": "Tests-only phase: local-stub coverage was added for manifest and recent-sheet reads. Swift is unavailable in this container, so swift test --disable-sandbox could not run; generated-client implementation is intentionally deferred to the approved implementation phase.",
+  "acceptance_criteria": [
+    {
+      "id": "AC-1",
+      "status": "not_run",
+      "verification": {
+        "kind": "human_or_external_evidence",
+        "references": [
+          {
+            "locator": "docs/issue-5-openapi-client-test-plan.md:7",
+            "result": "Implementation-phase inspection required for dependencies, vendored OpenAPI revision, and generated sources."
+          }
+        ]
+      }
+    },
+    {
+      "id": "AC-2",
+      "status": "not_run",
+      "verification": {
+        "kind": "unit_or_service_test",
+        "references": [
+          {
+            "locator": "iOS/Tests/ColorMatchingLPSAppTests/APIClientTests.swift:12",
+            "result": "Manifest local-stub test added; not run because swift is unavailable."
+          },
+          {
+            "locator": "iOS/Tests/ColorMatchingLPSAppTests/APIClientTests.swift:34",
+            "result": "Recent-sheets local-stub test added; not run because swift is unavailable."
+          },
+          {
+            "locator": "docs/issue-5-openapi-client-test-plan.md:8",
+            "result": "Ranked-results facade/test remains an implementation-phase gap."
+          }
+        ]
+      }
+    },
+    {
+      "id": "AC-3",
+      "status": "not_run",
+      "verification": {
+        "kind": "human_or_external_evidence",
+        "references": [
+          {
+            "locator": "docs/issue-5-openapi-client-test-plan.md:9",
+            "result": "Generated-type replacement requires implementation diff inspection and compilation."
+          }
+        ]
+      }
+    },
+    {
+      "id": "AC-4",
+      "status": "not_run",
+      "verification": {
+        "kind": "unit_or_service_test",
+        "references": [
+          {
+            "locator": "iOS/Tests/ColorMatchingLPSAppTests/APIClientTests.swift:158",
+            "result": "MockURLProtocol keeps tests local; suite was not run because swift is unavailable."
+          }
+        ]
+      }
+    },
+    {
+      "id": "AC-5",
+      "status": "not_run",
+      "verification": {
+        "kind": "human_or_external_evidence",
+        "references": [
+          {
+            "locator": "docs/issue-5-openapi-client-test-plan.md:19",
+            "result": "Implementation PR must compare the vendored spec with the prose contract and publish the deltas."
+          }
+        ]
+      }
+    }
+  ]
+}
