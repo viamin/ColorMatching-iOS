@@ -1,0 +1,66 @@
+{
+  "status": "failed",
+  "summary": "Test-writing phase: focused OpenAPI migration tests and PR evidence are committed; implementation, vendored specification, and Swift toolchain execution remain pending.",
+  "acceptance_criteria": [
+    {
+      "id": "AC-1",
+      "status": "failed",
+      "verification": {
+        "kind": "unit_or_service_test",
+        "references": [
+          {
+            "locator": "iOS/Tests/ColorMatchingLPSAppTests/APIClientTests.swift:testPackageDeclaresTheOpenAPIGeneratorAndRuntime",
+            "result": "red until the implementation adds swift-openapi-generator and swift-openapi-runtime"
+          },
+          {
+            "locator": "iOS/Tests/ColorMatchingLPSAppTests/APIClientTests.swift:testVendoredOpenAPIDocumentContainsEveryAppOperation",
+            "result": "red until the implementation vendors the document and all six paths"
+          }
+        ]
+      }
+    },
+    {
+      "id": "AC-2",
+      "status": "not_run",
+      "verification": {
+        "kind": "unit_or_service_test",
+        "references": [
+          {
+            "locator": "iOS/Tests/ColorMatchingLPSAppTests/APIClientTests.swift:testFetchManifestDecodesTheSheetUsedByTheAnalyzer",
+            "result": "local URLProtocol stub added; execution blocked because swift is not installed in this container"
+          },
+          {
+            "locator": "iOS/Tests/ColorMatchingLPSAppTests/APIClientTests.swift:testFetchRecentSheetsDecodesGeneratedSurfaceResponse",
+            "result": "local URLProtocol stub added; execution blocked because swift is not installed in this container"
+          }
+        ]
+      }
+    },
+    {
+      "id": "AC-3",
+      "status": "passed",
+      "verification": {
+        "kind": "human_or_external_evidence",
+        "references": [
+          {
+            "locator": "docs/issue-5-openapi-client-pr-description.md:16",
+            "result": "upstream spec/schema comparison and endpoint gaps recorded from viamin/color_matching#110"
+          }
+        ]
+      }
+    },
+    {
+      "id": "AC-4",
+      "status": "not_run",
+      "verification": {
+        "kind": "unit_or_service_test",
+        "references": [
+          {
+            "locator": "iOS/Tests/ColorMatchingLPSAppTests/APIClientTests.swift",
+            "result": "swift test --disable-sandbox could not start: swift executable is unavailable"
+          }
+        ]
+      }
+    }
+  ]
+}
