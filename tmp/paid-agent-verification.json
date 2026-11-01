@@ -1,0 +1,57 @@
+{
+  "status": "not_run",
+  "summary": "Tests-only red phase for generated OpenAPI migration. The local-stub tests and generator boundary test were added, but swift test could not run because the container does not contain a Swift toolchain.",
+  "acceptance_criteria": [
+    {
+      "id": "AC-1",
+      "status": "not_run",
+      "verification": {
+        "kind": "unit_or_service_test",
+        "references": [
+          {
+            "locator": "iOS/Tests/ColorMatchingLPSAppTests/GeneratedOpenAPIConfigurationTests.swift:5",
+            "result": "not_run: swift executable is unavailable in the container"
+          }
+        ]
+      }
+    },
+    {
+      "id": "AC-2",
+      "status": "not_run",
+      "verification": {
+        "kind": "unit_or_service_test",
+        "references": [
+          {
+            "locator": "iOS/Tests/ColorMatchingLPSAppTests/APIClientTests.swift:49",
+            "result": "not_run: deterministic URLProtocol stub covers manifest and recent-sheet responses"
+          },
+          {
+            "locator": "iOS/Tests/ColorMatchingLPSAppTests/APIClientTests.swift:12",
+            "result": "not_run: deterministic URLProtocol stub covers capture creation"
+          },
+          {
+            "locator": "iOS/Tests/ColorMatchingLPSAppTests/APIClientTests.swift:73",
+            "result": "not_run: deterministic URLProtocol stub covers measurement upload"
+          },
+          {
+            "locator": "iOS/Tests/ColorMatchingLPSAppTests/APIClientTests.swift:98",
+            "result": "not_run: deterministic URLProtocol stub covers judgment upload"
+          }
+        ]
+      }
+    },
+    {
+      "id": "AC-3",
+      "status": "not_run",
+      "verification": {
+        "kind": "human_or_external_evidence",
+        "references": [
+          {
+            "locator": "docs/solutions/api-integration/openapi-generated-client-test-plan.md:29",
+            "result": "not_run: a human must compare the vendored published spec with the prose contract and place the deltas in the PR description"
+          }
+        ]
+      }
+    }
+  ]
+}

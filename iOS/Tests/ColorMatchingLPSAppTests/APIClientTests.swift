@@ -46,6 +46,30 @@ final class APIClientTests: XCTestCase {
         XCTAssertEqual(quality["rejections"] as? [String], [])
     }
 
+    func testFetchesManifestAndRecentSheetsFromStubbedResponses() async throws {
+        MockURLProtocol.handler = { request in
+            let data: Data
+            switch request.url?.path {
+            case "/api/v1/test_sheets/sheet_1/manifest":
+                data = Data(Self.manifestJSON.utf8)
+            case "/api/v1/test_sheets/recent":
+                data = Data(#"{"sheets":[{"sheet_id":"sheet_1","manifest_url":"https://example.test/api/v1/test_sheets/sheet_1/manifest","title":"October sheet"}]}"#.utf8)
+            default:
+                throw URLError(.badURL)
+            }
+            return (HTTPURLResponse(url: try XCTUnwrap(request.url), statusCode: 200, httpVersion: nil, headerFields: nil)!, data)
+        }
+
+        let baseURL = URL(string: "https://example.test")!
+        let manifest = try await client().fetchManifest(baseURL: baseURL, sheetCode: "sheet_1")
+        let recentSheets = try await client().fetchRecentSheets(baseURL: baseURL)
+
+        XCTAssertEqual(manifest.sheetID, "sheet_1")
+        XCTAssertEqual(manifest.schemaVersion, "lps-sheet-manifest/v1")
+        XCTAssertEqual(recentSheets.map(\.sheetID), ["sheet_1"])
+        XCTAssertEqual(recentSheets.first?.title, "October sheet")
+    }
+
     func testUploadMeasurementsEncodesScoresWithAlgorithmVersion() async throws {
         var capturedBody: Data?
         MockURLProtocol.handler = { request in
@@ -117,6 +141,19 @@ final class APIClientTests: XCTestCase {
         }
         return data
     }
+
+    private static let manifestJSON = #"""
+    {
+      "schema_version": "lps-sheet-manifest/v1",
+      "sheet_version": "lps-letter-grid-v1",
+      "sheet_id": "sheet_1",
+      "manifest_url": "https://example.test/api/v1/test_sheets/sheet_1/manifest",
+      "page": {"units": "mm", "width": 215.9, "height": 279.4},
+      "registration_markers": [],
+      "patches": [],
+      "pairs": []
+    }
+    ""#
 }
 
 private final class MockURLProtocol: URLProtocol {
