@@ -1,0 +1,98 @@
+{
+  "status": "failed",
+  "summary": "Red-phase tests-only run for issue #5 (generated OpenAPI client). Two compiled suites under iOS/Tests/ColorMatchingLPSAppTests fail red on the missing vendored spec (iOS/OpenAPI/color-matching-openapi.json) and missing Package.swift wiring (swift-openapi-generator/-runtime, GeneratedAPIClient + GeneratedClientTests targets); the stubbed-response suite under iOS/Tests/GeneratedClientTests/ activates once wiring exists. Contract deltas and endpoint gaps between docs/color-matching-api-contract.md and the published spec (served at GET /api/v1/openapi.json per viamin/color_matching#110) are recorded in docs/openapi-generated-client-plan.md for the PR description. No Swift toolchain exists in this container, so swift test could not be executed locally; CI (macos) runs swift test on the PR.",
+  "acceptance_criteria": [
+    {
+      "id": "AC-1-deps-and-vendored-spec",
+      "status": "failed",
+      "verification": {
+        "kind": "unit_or_service_test",
+        "references": [
+          {
+            "locator": "iOS/Tests/ColorMatchingLPSAppTests/OpenAPIDocumentTests.swift:23",
+            "result": "red — vendored document iOS/OpenAPI/color-matching-openapi.json does not exist yet (expected missing behavior)"
+          },
+          {
+            "locator": "iOS/Tests/ColorMatchingLPSAppTests/OpenAPIPackageWiringTests.swift:20",
+            "result": "red — iOS/Package.swift declares neither swift-openapi-generator nor swift-openapi-runtime yet"
+          }
+        ]
+      }
+    },
+    {
+      "id": "AC-2-generate-client-for-app-surfaces",
+      "status": "failed",
+      "verification": {
+        "kind": "unit_or_service_test",
+        "references": [
+          {
+            "locator": "iOS/Tests/ColorMatchingLPSAppTests/OpenAPIPackageWiringTests.swift:28",
+            "result": "red — GeneratedAPIClient target with OpenAPIGenerator plugin + OpenAPIRuntime not declared yet"
+          },
+          {
+            "locator": "iOS/Tests/ColorMatchingLPSAppTests/OpenAPIDocumentTests.swift:39",
+            "result": "red — spec surfaces pinned (recent/manifest/ranked_results/captures/measurements/judgments) until document vendored"
+          }
+        ]
+      }
+    },
+    {
+      "id": "AC-3-replace-handwritten-models-keep-client-side",
+      "status": "failed",
+      "verification": {
+        "kind": "unit_or_service_test",
+        "references": [
+          {
+            "locator": "iOS/Tests/ColorMatchingLPSAppTests/OpenAPIPackageWiringTests.swift:41",
+            "result": "red — ColorMatchingLPSAppCore does not depend on GeneratedAPIClient yet; MeasurementCore client-side models (RGB/Rect/Patch/...) remain untouched by this run"
+          }
+        ]
+      }
+    },
+    {
+      "id": "AC-4-stubbed-response-swift-tests",
+      "status": "not_run",
+      "verification": {
+        "kind": "unit_or_service_test",
+        "references": [
+          {
+            "locator": "iOS/Tests/GeneratedClientTests/GeneratedClientStubbedResponseTests.swift:1",
+            "result": "suite authored (6 happy-path operations + documented 404 case, ClientTransport-level stubs, no live server) but not compiled/executed until the GeneratedClientTests test target is declared"
+          },
+          {
+            "locator": "iOS/Tests/ColorMatchingLPSAppTests/OpenAPIPackageWiringTests.swift:50",
+            "result": "red gate — fails until the test target wiring makes the stubbed suite runnable, so it cannot be silently skipped"
+          }
+        ]
+      }
+    },
+    {
+      "id": "AC-5-pr-description-contract-deltas-and-gaps",
+      "status": "skipped",
+      "verification": {
+        "kind": "human_or_external_evidence",
+        "references": [
+          {
+            "locator": "docs/openapi-generated-client-plan.md:1",
+            "result": "delta table (9 deltas: 200-with-body upload responses, required normalized_linear_rgb_median, dropped stats/scoring_algorithm_version, polymorphic RgbPayload, integer iso, opaque white_balance_gains, flat capture compat shape, missing rejection/judgment enums, bearer auth match) and 2 endpoint gaps (manifest fields, ranked-results fields) prepared as PR-body source"
+          }
+        ],
+        "reason": "PR body is authored by Paid when the draft is published after paid-tests-approved; the prepared, inspectable delta analysis lives in docs/openapi-generated-client-plan.md"
+      }
+    },
+    {
+      "id": "EXIT-swift-test-green-with-generated-types",
+      "status": "not_run",
+      "verification": {
+        "kind": "unit_or_service_test",
+        "references": [
+          {
+            "locator": ".github/workflows/ci.yml:25",
+            "result": "swift test runs on the macOS CI runner for the PR; this container has no Swift toolchain so the suite could not be executed locally"
+          }
+        ],
+        "reason": "Exit criterion belongs to the implementation run; by design the tests-only draft PR is red"
+      }
+    }
+  ]
+}
