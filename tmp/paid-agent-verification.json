@@ -1,0 +1,79 @@
+{
+  "status": "skipped",
+  "summary": "Test-writing phase only: added failing Swift tests encoding verified deltas between docs/color-matching-api-contract.md and the real, now-published /api/v1 OpenAPI spec (viamin/color_matching#110, closed via #113), plus a delta doc for the PR description. Implementation (swift-openapi-generator dependency, vendoring the spec, generating the client, replacing hand-written models) is out of scope for this run under TDD Boundaries and is additionally blocked here: this sandbox has no Swift toolchain (cannot run swift test) and no network/API access to the viamin/color_matching repo or a live color_matching server (the GitHub API proxy only permits calls against this repo).",
+  "acceptance_criteria": [
+    {
+      "id": "AC-add-openapi-deps-and-vendor-spec",
+      "status": "skipped",
+      "verification": {
+        "kind": "human_or_external_evidence",
+        "references": [
+          {
+            "locator": "docs/color-matching-api-contract-deltas.md#dependency-status",
+            "result": "not_run"
+          }
+        ]
+      }
+    },
+    {
+      "id": "AC-generate-client-for-used-surfaces",
+      "status": "skipped",
+      "verification": {
+        "kind": "human_or_external_evidence",
+        "references": [
+          {
+            "locator": "docs/color-matching-api-contract-deltas.md#whats-blocked",
+            "result": "not_run"
+          }
+        ]
+      }
+    },
+    {
+      "id": "AC-replace-hand-written-models",
+      "status": "skipped",
+      "verification": {
+        "kind": "human_or_external_evidence",
+        "references": [
+          {
+            "locator": "docs/color-matching-api-contract-deltas.md#whats-blocked",
+            "result": "not_run"
+          }
+        ]
+      }
+    },
+    {
+      "id": "AC-swift-tests-against-stubbed-responses",
+      "status": "failed",
+      "verification": {
+        "kind": "unit_or_service_test",
+        "references": [
+          {
+            "locator": "iOS/Tests/ColorMatchingLPSAppTests/APIContractDriftTests.swift:28 testUploadMeasurementsOmitsTopLevelScoringAlgorithmVersion",
+            "result": "expected_failure_red_phase"
+          },
+          {
+            "locator": "iOS/Tests/ColorMatchingLPSAppTests/APIContractDriftTests.swift:52 testServerErrorDetailIsSurfacedInsteadOfGenericBadStatus",
+            "result": "expected_failure_red_phase"
+          },
+          {
+            "locator": "iOS/Tests/ColorMatchingLPSAppTests/APIContractDriftTests.swift:85 testCaptureMetadataAlwaysSendsRequiredImageDimensions",
+            "result": "expected_failure_red_phase"
+          }
+        ]
+      }
+    },
+    {
+      "id": "AC-pr-records-contract-deltas-and-endpoint-gaps",
+      "status": "passed",
+      "verification": {
+        "kind": "human_or_external_evidence",
+        "references": [
+          {
+            "locator": "docs/color-matching-api-contract-deltas.md",
+            "result": "written; verified against viamin/color_matching PR #113 (merged, closing #110) via GitHub source reads"
+          }
+        ]
+      }
+    }
+  ]
+}
