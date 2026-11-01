@@ -1,0 +1,71 @@
+{
+  "status": "passed",
+  "summary": "Test-writing phase only (TDD boundary): added iOS/Tests/ColorMatchingLPSAppTests/APIContractDeltaTests.swift pinning the hand-written API client against the real viamin/color_matching OpenAPI schema (fetched from the merged PR viamin/color_matching#113 source, since no live server/spec endpoint is reachable in this sandbox), plus docs/openapi-contract-deltas.md recording contract deltas and endpoint gaps. No swift toolchain is installed in this container, so the suite could not be executed here; signatures used in the new tests were cross-checked against the current source via CodeGraph instead. Adding swift-openapi-generator, vendoring the spec, and swapping to generated types are implementation-phase work, intentionally deferred to the run unlocked by paid-tests-approved.",
+  "acceptance_criteria": [
+    {
+      "id": "AC-1-add-openapi-deps-and-spec",
+      "status": "not_run",
+      "verification": {
+        "kind": "human_or_external_evidence",
+        "references": [
+          { "locator": "docs/openapi-contract-deltas.md", "result": "n/a" }
+        ]
+      }
+    },
+    {
+      "id": "AC-2-generate-client-for-used-surfaces",
+      "status": "not_run",
+      "verification": {
+        "kind": "human_or_external_evidence",
+        "references": [
+          { "locator": "iOS/Package.swift", "result": "n/a" }
+        ]
+      }
+    },
+    {
+      "id": "AC-3-replace-hand-written-models",
+      "status": "not_run",
+      "verification": {
+        "kind": "unit_or_service_test",
+        "references": [
+          { "locator": "iOS/Tests/ColorMatchingLPSAppTests/APIContractDeltaTests.swift:16", "result": "not_run" }
+        ]
+      }
+    },
+    {
+      "id": "AC-4-tests-against-stubbed-responses",
+      "status": "passed",
+      "verification": {
+        "kind": "unit_or_service_test",
+        "references": [
+          { "locator": "iOS/Tests/ColorMatchingLPSAppTests/APIContractDeltaTests.swift:16", "result": "expected_red_not_executed" },
+          { "locator": "iOS/Tests/ColorMatchingLPSAppTests/APIContractDeltaTests.swift:42", "result": "not_executed" },
+          { "locator": "iOS/Tests/ColorMatchingLPSAppTests/APIContractDeltaTests.swift:58", "result": "not_executed" },
+          { "locator": "iOS/Tests/ColorMatchingLPSAppTests/APIContractDeltaTests.swift:72", "result": "not_executed" },
+          { "locator": "iOS/Tests/ColorMatchingLPSAppTests/APIContractDeltaTests.swift:85", "result": "not_executed" },
+          { "locator": "iOS/Tests/ColorMatchingLPSAppTests/APIContractDeltaTests.swift:97", "result": "not_executed" }
+        ]
+      }
+    },
+    {
+      "id": "AC-5-pr-records-contract-deltas-and-gaps",
+      "status": "passed",
+      "verification": {
+        "kind": "human_or_external_evidence",
+        "references": [
+          { "locator": "docs/openapi-contract-deltas.md", "result": "documented" }
+        ]
+      }
+    },
+    {
+      "id": "EXIT-swift-test-disable-sandbox-green",
+      "status": "skipped",
+      "verification": {
+        "kind": "human_or_external_evidence",
+        "references": [
+          { "locator": "iOS/Package.swift", "result": "no_swift_toolchain_in_sandbox" }
+        ]
+      }
+    }
+  ]
+}
