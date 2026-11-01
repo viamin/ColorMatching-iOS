@@ -1,0 +1,71 @@
+{
+  "status": "not_run",
+  "summary": "Test-writing run added local-stub coverage and an intentional generated-module red assertion. Swift is unavailable in this container, so swift test --disable-sandbox could not execute.",
+  "acceptance_criteria": [
+    {
+      "id": "AC-1",
+      "status": "failed",
+      "verification": {
+        "kind": "unit_or_service_test",
+        "references": [
+          {
+            "locator": "iOS/Tests/ColorMatchingLPSAppTests/APIClientTests.swift:testGeneratedOpenAPIClientModuleIsAvailable",
+            "result": "intentionally failing until swift-openapi-runtime and the generated module are added"
+          }
+        ]
+      }
+    },
+    {
+      "id": "AC-2",
+      "status": "not_run",
+      "verification": {
+        "kind": "unit_or_service_test",
+        "references": [
+          {
+            "locator": "docs/issue-5-openapi-client-verification-plan.md",
+            "result": "ranked-results schema gap prevents a typed generated-client test; implementation-run coverage required"
+          }
+        ]
+      }
+    },
+    {
+      "id": "AC-3",
+      "status": "not_run",
+      "verification": {
+        "kind": "human_or_external_evidence",
+        "references": [
+          {
+            "locator": "docs/issue-5-openapi-client-verification-plan.md",
+            "result": "requires implementation-run compile inspection after handwritten models are removed"
+          }
+        ]
+      }
+    },
+    {
+      "id": "AC-4",
+      "status": "not_run",
+      "verification": {
+        "kind": "unit_or_service_test",
+        "references": [
+          {
+            "locator": "iOS/Tests/ColorMatchingLPSAppTests/APIClientTests.swift",
+            "result": "local URLProtocol tests added, but not executable because swift is not installed"
+          }
+        ]
+      }
+    },
+    {
+      "id": "AC-5",
+      "status": "passed",
+      "verification": {
+        "kind": "human_or_external_evidence",
+        "references": [
+          {
+            "locator": "docs/issue-5-openapi-client-verification-plan.md",
+            "result": "documents comparison against viamin/color_matching#113 commit 05062f5381a6f76413cc2bdf1cb2cc08a1b70ff7"
+          }
+        ]
+      }
+    }
+  ]
+}
