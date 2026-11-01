@@ -1,0 +1,85 @@
+{
+  "status": "passed",
+  "summary": "Test-writing (red) phase for issue #5: committed compile-guarded tests that specify the generated OpenAPI client (module GeneratedAPIClient, six operations, stubbed ClientTransport responses) plus wire-contract tests pinning the migration; LID doc maps every acceptance criterion to its verification and pre-records prose-contract deltas and endpoint gaps. Swift toolchain is unavailable in this Linux container, so tests could not be executed locally; CI on macOS runs swift test. Implementation deliverables remain pending the implementation run.",
+  "acceptance_criteria": [
+    {
+      "id": "AC-1",
+      "status": "not_run",
+      "verification": {
+        "kind": "unit_or_service_test",
+        "references": [
+          { "locator": "iOS/Tests/ColorMatchingLPSAppTests/GeneratedClientTests.swift:314", "result": "red_fallback_expected_failure" }
+        ],
+        "reason": "Adding swift-openapi-generator/runtime and vendoring the spec are implementation-phase actions (not permitted in this tests-only run). The canImport(GeneratedAPIClient) guard plus the failing fallback test demonstrate the module is missing today and activate the full suite once generated."
+      }
+    },
+    {
+      "id": "AC-2",
+      "status": "not_run",
+      "verification": {
+        "kind": "unit_or_service_test",
+        "references": [
+          { "locator": "iOS/Tests/ColorMatchingLPSAppTests/GeneratedClientTests.swift:7", "result": "written_red_not_compilable_until_module_exists" },
+          { "locator": "docs/generated-openapi-client-test-plan.md", "result": "operations_table_defines_six_surfaces" }
+        ],
+        "reason": "Six-operation coverage (manifest, recent sheets, create capture, measurements, judgments, ranked results) is specified test-first behind the compile guard; the generated client does not exist yet."
+      }
+    },
+    {
+      "id": "AC-3",
+      "status": "not_run",
+      "verification": {
+        "kind": "unit_or_service_test",
+        "references": [
+          { "locator": "iOS/Tests/ColorMatchingLPSAppTests/SheetAPIClientWireContractTests.swift:8", "result": "written_passes_against_hand_written_client_cannot_execute_locally" }
+        ],
+        "reason": "Model replacement is implementation work. Wire-contract tests pin the behavior the rewrite must preserve (paths, bearer header, absolute-URL manifest fetch) and are committed green-by-design against the current client."
+      }
+    },
+    {
+      "id": "AC-4",
+      "status": "skipped",
+      "verification": {
+        "kind": "unit_or_service_test",
+        "references": [
+          { "locator": "iOS/Tests/ColorMatchingLPSAppTests/GeneratedClientTests.swift", "result": "tests_written_stubbed_responses_only_no_live_server" },
+          { "locator": "iOS/Tests/ColorMatchingLPSAppTests/SheetAPIClientWireContractTests.swift", "result": "tests_written_urlprotocol_stub_only" }
+        ],
+        "reason": "Tests exist and use only in-process stubs (ClientTransport / URLProtocol), but no Swift toolchain exists in this Linux container, so they could not be executed locally; CI (.github/workflows/ci.yml, macOS) runs swift test."
+      }
+    },
+    {
+      "id": "AC-5",
+      "status": "not_run",
+      "verification": {
+        "kind": "human_or_external_evidence",
+        "references": [
+          { "locator": "docs/generated-openapi-client-test-plan.md", "result": "contract_deltas_and_endpoint_gaps_recorded" }
+        ],
+        "reason": "PR description is authored at implementation time; deltas and gaps are pre-recorded in the LID doc for verbatim reuse, pending reconciliation with the published viamin/color_matching#110 spec."
+      }
+    },
+    {
+      "id": "EC-1",
+      "status": "not_run",
+      "verification": {
+        "kind": "unit_or_service_test",
+        "references": [
+          { "locator": ".github/workflows/ci.yml:25", "result": "swift_test_step_exists_not_run_in_this_phase" }
+        ],
+        "reason": "swift test --disable-sandbox green requires the generated client to exist (implementation run) and a Swift toolchain (absent in this container)."
+      }
+    },
+    {
+      "id": "EC-2",
+      "status": "not_run",
+      "verification": {
+        "kind": "human_or_external_evidence",
+        "references": [
+          { "locator": "docs/generated-openapi-client-test-plan.md", "result": "deltas_seeded" }
+        ],
+        "reason": "Same as AC-5: PR body is produced when the PR is opened in the implementation run."
+      }
+    }
+  ]
+}
