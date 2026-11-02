@@ -1,0 +1,78 @@
+{
+  "status": "skipped",
+  "summary": "Red-phase test-writing run for issue #5 (replace hand-written API layer with generated OpenAPI Swift client). 25 permanent XCTest cases committed across three files: (1) OpenAPISpecConformanceTests - 13 unguarded tests that assert the vendored OpenAPI document (expected at iOS/Sources/ColorMatchingAPI/openapi.json) exactly matches the API published by viamin/color_matching#113 (paths, methods, operationIds, bearerAuth, schema component shapes, compatibility-version enums); they fail today because the document is not vendored yet. (2) OpenAPIGeneratorWiringTests - 6 unguarded tests asserting Package.swift declares swift-openapi-generator + swift-openapi-runtime, a ColorMatchingAPI generated target, dependency wiring into ColorMatchingLPSAppCore and the test target, checked-in generator config, and removal of the hand-written transport DTOs; all fail today. (3) GeneratedClientStubbedResponseTests - 7 tests exercising every app-facing operation of the generated client against an in-memory ClientTransport (no live server), guarded by #if canImport(ColorMatchingAPI) so the suite compiles at red phase and activates automatically once the generated target exists. Contract deltas between docs/color-matching-api-contract.md and the published spec are recorded in docs/ios-openapi-generated-client-plan.md for the implementation PR description. No Swift toolchain exists in this container, so no test could be executed locally; swift test --disable-sandbox is deferred to CI / the implementation run, where the unguarded tests are expected to fail (red phase) until the generated client lands.",
+  "acceptance_criteria": [
+    {
+      "id": "AC-1",
+      "description": "Add swift-openapi-generator + swift-openapi-runtime to the iOS package; fetch or vendor the OpenAPI document from viamin/color_matching#110",
+      "status": "not_run",
+      "reason": "Implementation phase; this run is tests-only. Permanent tests committed that fail red today: package dependency/plugin assertions and vendored-document existence checks. No Swift toolchain in this container to execute them.",
+      "verification": {
+        "kind": "unit_or_service_test",
+        "references": [
+          { "locator": "iOS/Tests/ColorMatchingLPSAppTests/OpenAPIGeneratorWiringTests.swift:35", "result": "not_run" },
+          { "locator": "iOS/Tests/ColorMatchingLPSAppTests/OpenAPIGeneratorWiringTests.swift:61", "result": "not_run" },
+          { "locator": "iOS/Tests/ColorMatchingLPSAppTests/OpenAPISpecConformanceTests.swift:67", "result": "not_run" }
+        ]
+      }
+    },
+    {
+      "id": "AC-2",
+      "description": "Generate the client for the surfaces the app uses today: test-sheet manifest + recent sheets, capture session creation, measurement upload, judgment upload, ranked results",
+      "status": "not_run",
+      "reason": "Implementation phase. Permanent per-operation spec-conformance tests pin every path/method/operationId/request+response schema, and guarded stubbed-response tests exercise each generated operation. Not executable in this container (no Swift toolchain).",
+      "verification": {
+        "kind": "unit_or_service_test",
+        "references": [
+          { "locator": "iOS/Tests/ColorMatchingLPSAppTests/OpenAPISpecConformanceTests.swift:84", "result": "not_run" },
+          { "locator": "iOS/Tests/ColorMatchingLPSAppTests/OpenAPISpecConformanceTests.swift:102", "result": "not_run" },
+          { "locator": "iOS/Tests/ColorMatchingLPSAppTests/OpenAPISpecConformanceTests.swift:115", "result": "not_run" },
+          { "locator": "iOS/Tests/ColorMatchingLPSAppTests/OpenAPISpecConformanceTests.swift:128", "result": "not_run" },
+          { "locator": "iOS/Tests/ColorMatchingLPSAppTests/OpenAPISpecConformanceTests.swift:142", "result": "not_run" },
+          { "locator": "iOS/Tests/ColorMatchingLPSAppTests/OpenAPISpecConformanceTests.swift:159", "result": "not_run" },
+          { "locator": "iOS/Tests/ColorMatchingLPSAppTests/GeneratedClientStubbedResponseTests.swift:26", "result": "not_run" }
+        ]
+      }
+    },
+    {
+      "id": "AC-3",
+      "description": "Replace the app's hand-written API models with generated types; keep purely client-side models as-is",
+      "status": "not_run",
+      "reason": "Implementation phase. Permanent tests committed: hand-written transport DTO scan over iOS/Sources (red today: APIClient.swift still declares CreateCaptureRequest/MeasurementUploadRequest/JudgmentUploadRequest) plus ColorMatchingLPSAppCore -> ColorMatchingAPI dependency wiring assertions. Not executable in this container.",
+      "verification": {
+        "kind": "unit_or_service_test",
+        "references": [
+          { "locator": "iOS/Tests/ColorMatchingLPSAppTests/OpenAPIGeneratorWiringTests.swift:71", "result": "not_run" },
+          { "locator": "iOS/Tests/ColorMatchingLPSAppTests/OpenAPIGeneratorWiringTests.swift:51", "result": "not_run" }
+        ]
+      }
+    },
+    {
+      "id": "AC-4",
+      "description": "Swift tests exercising the generated client against local stubbed responses (no live server in CI)",
+      "status": "not_run",
+      "reason": "Tests written and committed; they are guarded by #if canImport(ColorMatchingAPI) so the red-phase suite compiles today and the seven stubbed-transport tests activate once the generated target exists. They cannot run in this container (no Swift toolchain).",
+      "verification": {
+        "kind": "unit_or_service_test",
+        "references": [
+          { "locator": "iOS/Tests/ColorMatchingLPSAppTests/GeneratedClientStubbedResponseTests.swift:26", "result": "not_run" },
+          { "locator": "iOS/Tests/ColorMatchingLPSAppTests/GeneratedClientStubbedResponseTests.swift:99", "result": "not_run" },
+          { "locator": "iOS/Tests/ColorMatchingLPSAppTests/GeneratedClientStubbedResponseTests.swift:144", "result": "not_run" },
+          { "locator": "iOS/Tests/ColorMatchingLPSAppTests/GeneratedClientStubbedResponseTests.swift:193", "result": "not_run" }
+        ]
+      }
+    },
+    {
+      "id": "AC-5",
+      "description": "PR description records what changed between the prose contract and the published spec, and any endpoint gaps discovered",
+      "status": "skipped",
+      "reason": "The PR description itself is authored in the implementation run. The delta analysis (10 contract deltas + endpoint gaps + status-code changes) was produced in this run by reading viamin/color_matching's published spec sources (api_schemas.ex, controllers, router, open_api_spex operationId derivation) and is committed as docs/ios-openapi-generated-client-plan.md for the implementation PR to reference verbatim.",
+      "verification": {
+        "kind": "human_or_external_evidence",
+        "references": [
+          { "locator": "docs/ios-openapi-generated-client-plan.md", "result": "available" }
+        ]
+      }
+    }
+  ]
+}
