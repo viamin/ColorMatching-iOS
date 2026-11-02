@@ -1,0 +1,58 @@
+{
+  "status": "not_run",
+  "summary": "Tests-only phase: local-stub coverage was added for the current API boundary; generated-client wiring cannot be verified until the implementation phase.",
+  "acceptance_criteria": [
+    {
+      "id": "AC-1",
+      "status": "not_run",
+      "verification": {
+        "kind": "unit_or_service_test",
+        "references": [
+          {
+            "locator": "iOS/Tests/ColorMatchingLPSAppTests/APIClientTests.swift:12",
+            "result": "Not run: Swift is unavailable in this container. The test stubs the published manifest and recent-sheet responses locally."
+          }
+        ]
+      }
+    },
+    {
+      "id": "AC-2",
+      "status": "not_run",
+      "verification": {
+        "kind": "unit_or_service_test",
+        "references": [
+          {
+            "locator": "docs/openapi-client-migration-pr.md:5",
+            "result": "Pending implementation: generated types and the generated-client adapter are not permitted in this tests-only phase."
+          }
+        ]
+      }
+    },
+    {
+      "id": "AC-3",
+      "status": "not_run",
+      "verification": {
+        "kind": "unit_or_service_test",
+        "references": [
+          {
+            "locator": "iOS/Tests/ColorMatchingLPSAppTests/APIClientTests.swift:9",
+            "result": "Not run: all existing and added tests use MockURLProtocol rather than a live server; ranked-results coverage remains pending."
+          }
+        ]
+      }
+    },
+    {
+      "id": "AC-4",
+      "status": "passed",
+      "verification": {
+        "kind": "human_or_external_evidence",
+        "references": [
+          {
+            "locator": "docs/openapi-client-migration-pr.md:17",
+            "result": "Records inspected provider issue #110, route coverage, contract deltas, and the current ranked-results client gap."
+          }
+        ]
+      }
+    }
+  ]
+}
