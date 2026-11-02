@@ -1,0 +1,116 @@
+{
+  "status": "passed",
+  "summary": "Tests-writing phase for issue #5 (replace hand-written API layer with generated OpenAPI Swift client). Committed: (1) permanent contract tests guarding the to-be-vendored OpenAPI document (iOS/Tests/ColorMatchingLPSAppTests/OpenAPIDocumentContractTests.swift) - compiles today against the existing test target and fails red via assertions until the spec is vendored at iOS/OpenAPI/color-matching-openapi.json; (2) generated-client tests against stubbed URLProtocol responses (iOS/Tests/ColorMatchingOpenAPITests/OpenAPIClientTests.swift) - inert until the implementation run declares the ColorMatchingOpenAPITests target and generates the ColorMatchingOpenAPI module per docs/ios-openapi-generated-client.md; (3) LID doc recording the contract deltas between docs/color-matching-api-contract.md and the published spec derived from viamin/color_matching main (api_schemas.ex, api_spec.ex, test_sheet_controller.ex, capture_controller.ex, 2026-11-02): measurement/judgment uploads return 200 + counted JSON (not 204), measurement stats and top-level scoring_algorithm_version are absent from the published request schema, normalized_linear_rgb_median is required, manifest omits patches/pairs/page/registration_markers/manifest_url, white_balance_gains is opaque, capture create accepts a flat anyOf variant with exposure_duration/rejection_reasons naming, ranked results gained schema_version lps-ranked-results/v1. Environment limits: no Swift toolchain in this container (swift: command not found), so swift test could not be executed here; no live server (by design - all new tests use stubbed responses). Package.swift/target/deps changes are blocked for this phase by the tests-only commit rules and are specified in the LID doc for the implementation run.",
+  "acceptance_criteria": [
+    {
+      "id": "AC-1",
+      "description": "Add swift-openapi-generator + swift-openapi-runtime to the iOS package; fetch or vendor the OpenAPI document from viamin/color_matching#110",
+      "status": "not_run",
+      "verification": {
+        "kind": "permanent_system_test",
+        "references": [
+          {
+            "locator": "iOS/Tests/ColorMatchingLPSAppTests/OpenAPIDocumentContractTests.swift:21",
+            "result": "red (expected) - vendored document missing at iOS/OpenAPI/color-matching-openapi.json; turns green when the implementation run vendors it"
+          },
+          {
+            "locator": "docs/ios-openapi-generated-client.md:17",
+            "result": "vendoring path, dependencies, and target layout specified for the implementation run (Package.swift is outside this phase's commit allowlist)"
+          }
+        ],
+        "reason": "Dependency and document vendoring are implementation-path changes not permitted in this tests-only phase; upstream spec confirmed published (viamin/color_matching#110 closed 2026-10-30, spec sources read on main)."
+      }
+    },
+    {
+      "id": "AC-2",
+      "description": "Generate the client for the surfaces the app uses today: test-sheet manifest + recent sheets, capture session creation, measurement upload, judgment upload, ranked results",
+      "status": "not_run",
+      "verification": {
+        "kind": "unit_or_service_test",
+        "references": [
+          {
+            "locator": "iOS/Tests/ColorMatchingOpenAPITests/OpenAPIClientTests.swift:47",
+            "result": "written - stubbed-response tests for all six generated operations; compiled and executed by the implementation run once the ColorMatchingOpenAPITests target exists"
+          },
+          {
+            "locator": "iOS/Tests/ColorMatchingLPSAppTests/OpenAPIDocumentContractTests.swift:53",
+            "result": "red (expected) - pins the six paths/verbs/operationIds the generated client must cover"
+          }
+        ],
+        "reason": "Code generation requires Package.swift + plugin changes, blocked for this phase; test contract is in place."
+      }
+    },
+    {
+      "id": "AC-3",
+      "description": "Replace the app's hand-written API models with generated types; keep purely client-side models as-is",
+      "status": "not_run",
+      "verification": {
+        "kind": "unit_or_service_test",
+        "references": [
+          {
+            "locator": "docs/ios-openapi-generated-client.md:75",
+            "result": "documented endpoint gaps that constrain full replacement: manifest patches/pairs/page/registration_markers and measurement stats are undocumented upstream; purely client-side models stay as-is"
+          }
+        ],
+        "reason": "APIClient.swift and app model code are implementation-path files, blocked for this phase."
+      }
+    },
+    {
+      "id": "AC-4",
+      "description": "Swift tests exercising the generated client against local stubbed responses (no live server in CI)",
+      "status": "passed",
+      "verification": {
+        "kind": "unit_or_service_test",
+        "references": [
+          {
+            "locator": "iOS/Tests/ColorMatchingOpenAPITests/OpenAPIClientTests.swift:1",
+            "result": "written - 7 tests: recent sheets decode incl. null title, manifest enum decode + request formation, ranked results, create capture (201, metadata/quality JSON, auth/content-type headers), measurement upload (RgbPayload object encoding, pair scores, 200 counted response), judgment upload, .undocumented(statusCode:) fallback; all via MockURLProtocol, no live server"
+          },
+          {
+            "locator": "iOS/Tests/ColorMatchingLPSAppTests/OpenAPIDocumentContractTests.swift:1",
+            "result": "written and compiling in the existing target - 11 assertions currently failing red (document not vendored), the intended missing-behavior signal"
+          }
+        ],
+        "note": "swift test not executable in this container (no Swift toolchain); CI (macos-latest, .github/workflows/ci.yml) runs swift test and will exercise both files once the implementation run wires the new target."
+      }
+    },
+    {
+      "id": "AC-5",
+      "description": "PR description records what changed between the prose contract and the published spec, and endpoint gaps discovered",
+      "status": "passed",
+      "verification": {
+        "kind": "human_or_external_evidence",
+        "references": [
+          {
+            "locator": "docs/ios-openapi-generated-client.md:96",
+            "result": "9 numbered contract deltas recorded with sources"
+          },
+          {
+            "locator": "https://raw.githubusercontent.com/viamin/color_matching/main/lib/color_matching_web/api_schemas.ex",
+            "result": "external evidence - published spec schemas read directly (upstream issue #110 closed, spec live)"
+          },
+          {
+            "locator": "https://raw.githubusercontent.com/viamin/color_matching/main/lib/color_matching_web/controllers/capture_controller.ex",
+            "result": "external evidence - upload_measurements/upload_judgments return 200 with counted JSON bodies, create returns 201"
+          }
+        ],
+        "note": "Analysis complete and inspectable in the committed doc; the PR body itself is assembled when Paid publishes this tests-only draft PR - deltas section to be carried into it verbatim."
+      }
+    },
+    {
+      "id": "AC-6",
+      "description": "Exit criterion: swift test --disable-sandbox green with generated types wired in",
+      "status": "not_run",
+      "verification": {
+        "kind": "unit_or_service_test",
+        "references": [
+          {
+            "locator": ".github/workflows/ci.yml:17",
+            "result": "CI job runs swift test on macos-latest; gated on the implementation run landing Package.swift + generated target"
+          }
+        ],
+        "reason": "No Swift toolchain in this container and generated target does not exist until the implementation run; red-phase assertion failures in OpenAPIDocumentContractTests are the expected missing-behavior signal."
+      }
+    }
+  ]
+}
