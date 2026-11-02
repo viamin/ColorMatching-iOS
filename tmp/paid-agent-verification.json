@@ -1,0 +1,98 @@
+{
+  "status": "passed",
+  "summary": "Red-phase test-writing run for issue #5 (generated OpenAPI Swift client). Committed (1) new GeneratedClientTests.swift exercising the planned ColorMatchingAPI generated client against a local stub ClientTransport for all six surfaces the app uses, (2) rewritten APIClientTests.swift pinning the app wrapper's generated-type surface and the spec-conformant wire behavior (200+JSON upload responses, spec-typed measurement/judgment payloads, bearer auth, patch-id format 'pair#side'), and (3) docs/color-matching-openapi-delta.md recording 16 verified contract deltas between docs/color-matching-api-contract.md and the published /api/v1 OpenAPI spec (viamin/color_matching#113, merged), the codegen normalization rule, refresh workflow, and the criterion-to-test mapping. The Swift tests are intentionally red: they cannot compile until the implementation adds the ColorMatchingAPI target (swift-openapi-generator + vendored spec) and rewires APIClient. No Swift toolchain exists in this container (command -v swift fails), so swift test --disable-sandbox could not be executed here; it runs in the repo's macOS CI.",
+  "acceptance_criteria": [
+    {
+      "id": "AC-1",
+      "description": "Add swift-openapi-generator + swift-openapi-runtime to the iOS package; fetch or vendor the OpenAPI document from viamin/color_matching#110",
+      "status": "not_run",
+      "verification": {
+        "kind": "unit_or_service_test",
+        "references": [
+          {
+            "locator": "iOS/Tests/ColorMatchingLPSAppTests/GeneratedClientTests.swift:1",
+            "result": "red_phase_compile_failure_expected",
+            "note": "Imports ColorMatchingAPI and OpenAPIRuntime; fails to build until the generated module and package dependencies exist"
+          },
+          {
+            "locator": "docs/color-matching-openapi-delta.md",
+            "result": "present",
+            "note": "Records spec provenance (viamin/color_matching#113, merge 094bd6d), package layout contract, vendoring + refresh workflow"
+          }
+        ],
+        "reason": "Implementation-pending in tests-only phase; no Swift toolchain in container to execute"
+      }
+    },
+    {
+      "id": "AC-2",
+      "description": "Generate the client for the surfaces the app uses today: manifest, recent sheets, capture creation, measurement upload, judgment upload, ranked results",
+      "status": "not_run",
+      "verification": {
+        "kind": "unit_or_service_test",
+        "references": [
+          { "locator": "iOS/Tests/ColorMatchingLPSAppTests/GeneratedClientTests.swift:testManifestOperationBuildsSpecRequestAndDecodesTypedManifest", "result": "red_phase_compile_failure_expected" },
+          { "locator": "iOS/Tests/ColorMatchingLPSAppTests/GeneratedClientTests.swift:testRecentSheetsOperationDecodesNullableTitle", "result": "red_phase_compile_failure_expected" },
+          { "locator": "iOS/Tests/ColorMatchingLPSAppTests/GeneratedClientTests.swift:testCreateCaptureSendsMetadataAndQualityAndDecodesCaptureID", "result": "red_phase_compile_failure_expected" },
+          { "locator": "iOS/Tests/ColorMatchingLPSAppTests/GeneratedClientTests.swift:testUploadMeasurementsEncodesSpecTypedFieldsAndDecodesCounts", "result": "red_phase_compile_failure_expected" },
+          { "locator": "iOS/Tests/ColorMatchingLPSAppTests/GeneratedClientTests.swift:testUploadJudgmentsEncodesWirePayloadAndDecodesCount", "result": "red_phase_compile_failure_expected" },
+          { "locator": "iOS/Tests/ColorMatchingLPSAppTests/GeneratedClientTests.swift:testRankedResultsOperationDecodesSchemaVersionAndIgnoresUntypedFields", "result": "red_phase_compile_failure_expected" }
+        ],
+        "reason": "Tests committed against the exact operationId-derived symbols (colorMatchingWeb_TestSheetController_manifest etc., derivation documented in docs/color-matching-openapi-delta.md); cannot compile until codegen is wired"
+      }
+    },
+    {
+      "id": "AC-3",
+      "description": "Replace hand-written API models with generated types; keep purely client-side models as-is",
+      "status": "not_run",
+      "verification": {
+        "kind": "unit_or_service_test",
+        "references": [
+          { "locator": "iOS/Tests/ColorMatchingLPSAppTests/APIClientTests.swift:testCreateCaptureSendsGeneratedMetadataAndQualityAndReturnsCaptureID", "result": "red_phase_compile_failure_expected", "note": "Constructs generated CaptureMetadata input and asserts generated CaptureCreatedResponse.captureId" },
+          { "locator": "iOS/Tests/ColorMatchingLPSAppTests/APIClientTests.swift:testUploadMeasurementsSendsSpecTypedPayloadAndReturnsCounts", "result": "red_phase_compile_failure_expected", "note": "Asserts MeasurementUploadResponse counts and that only spec-typed keys are sent" },
+          { "locator": "iOS/Tests/ColorMatchingLPSAppTests/APIClientTests.swift:testFetchManifestDecodesFullClientSideManifestModel", "result": "red_phase_compile_failure_expected", "note": "Pins that MeasurementCore.SheetManifest (purely client-side) keeps decoding the full manifest" }
+        ],
+        "reason": "Implementation-pending; wrapper API surface (generated return types) does not exist yet, so the suite is red by design"
+      }
+    },
+    {
+      "id": "AC-4",
+      "description": "Swift tests exercising the generated client against local stubbed responses (no live server in CI)",
+      "status": "not_run",
+      "verification": {
+        "kind": "unit_or_service_test",
+        "references": [
+          { "locator": "iOS/Tests/ColorMatchingLPSAppTests/GeneratedClientTests.swift", "result": "committed_red_phase", "note": "All responses served by an in-process StubTransport (ClientTransport); no network" },
+          { "locator": "iOS/Tests/ColorMatchingLPSAppTests/APIClientTests.swift", "result": "committed_red_phase", "note": "Wrapper tests use the existing MockURLProtocol pattern with stubbed JSON" }
+        ],
+        "reason": "Tests written but not executable in this container (no swift toolchain); swift test --disable-sandbox runs in macOS CI and in the implementation run"
+      }
+    },
+    {
+      "id": "AC-5",
+      "description": "PR description records what changed between the prose contract and the published spec, and any endpoint gaps discovered",
+      "status": "passed",
+      "verification": {
+        "kind": "human_or_external_evidence",
+        "references": [
+          {
+            "locator": "docs/color-matching-openapi-delta.md",
+            "result": "present",
+            "note": "16 verified deltas (thin manifest typing, patch-id format, printer_profile shape, opaque white_balance_gains, untyped stats/scoring_algorithm_version, required normalized median, polymorphic RgbPayload, one-of score fields, 200+JSON upload responses, stringified capture ids, minimal ranked-results typing, fractional-second timestamps, 8 undocumented endpoints, bearer scheme) sourced from upstream code at merge 094bd6d; PR body should carry this table"
+          }
+        ]
+      }
+    },
+    {
+      "id": "AC-6",
+      "description": "Exit criterion: swift test --disable-sandbox green with generated types wired in",
+      "status": "not_run",
+      "verification": {
+        "kind": "unit_or_service_test",
+        "references": [
+          { "locator": ".github/workflows/ci.yml", "result": "existing_macos_ci", "note": "swift test runs on macos-latest; the committed suite is expected to fail compilation until the implementation lands" }
+        ],
+        "reason": "Deliberately unsatisfied in the red phase: committing tests that expose the missing behavior is the deliverable of this run; no Swift toolchain exists in this container"
+      }
+    }
+  ]
+}
