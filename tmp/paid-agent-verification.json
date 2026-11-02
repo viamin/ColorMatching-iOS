@@ -1,0 +1,96 @@
+{
+  "status": "failed",
+  "summary": "Tests-only (red-phase) run for issue #5: generated OpenAPI client contract committed as a new Swift test target plus LID docs. Wrote 20 stub-based tests pinning the generated-client surface (module ColorMatchingOpenAPI, 6 operations) and the APIClient facade contract (generated result types, typed APIError cases, preserved wire shape). Contract-delta analysis between docs/color-matching-api-contract.md and the published spec (viamin/color_matching#110, verified live upstream: api_spec.ex, api_schemas.ex, controllers, TestSheetJSON renderer) committed as PR-body source material. Red phase is by design: the generated module and Package.swift wiring land in the implementation run, so the new tests cannot compile or execute here; additionally this container has no Swift toolchain, so swift test --disable-sandbox could not be run at all (environment limitation, not a test failure).",
+  "acceptance_criteria": [
+    {
+      "id": "AC-1",
+      "description": "swift-openapi-generator + swift-openapi-runtime added to the iOS package; OpenAPI document fetched/vendored from viamin/color_matching#110",
+      "status": "failed",
+      "reason": "Red phase: package wiring and vendoring are implementation-run work. Compile-time verification is committed: GeneratedClientTests imports ColorMatchingOpenAPI / OpenAPIRuntime / OpenAPIURLSession and constructs the generated Client with URLSessionTransport, so the criterion turns green exactly when the packages and vendored document exist. Upstream dependency confirmed satisfied: viamin/color_matching#110 is closed and serves GET /api/v1/openapi.json (verified via GitHub API).",
+      "verification": {
+        "kind": "unit_or_service_test",
+        "references": [
+          { "locator": "iOS/Tests/ColorMatchingOpenAPITests/GeneratedClientTests.swift:1", "result": "red_phase_committed" },
+          { "locator": "iOS/Tests/ColorMatchingOpenAPITests/GeneratedClientTests.swift:242", "result": "red_phase_committed" },
+          { "locator": "docs/openapi-client-test-plan.md", "result": "layout_and_vendoring_rules_documented" }
+        ]
+      }
+    },
+    {
+      "id": "AC-2",
+      "description": "Generate the client for the surfaces the app uses today: test-sheet manifest + recent sheets, capture session creation, measurement upload, judgment upload, ranked results",
+      "status": "failed",
+      "reason": "Red phase: one stubbed round-trip test per operation (manifest also covers wire GET/Accept and documented 404 case). Tests fail to compile until the generated client exists; then they exercise each of the six operations against local stubs.",
+      "verification": {
+        "kind": "unit_or_service_test",
+        "references": [
+          { "locator": "iOS/Tests/ColorMatchingOpenAPITests/GeneratedClientTests.swift:21", "result": "red_phase_committed", "surface": "manifest decode" },
+          { "locator": "iOS/Tests/ColorMatchingOpenAPITests/GeneratedClientTests.swift:42", "result": "red_phase_committed", "surface": "manifest wire GET/Accept" },
+          { "locator": "iOS/Tests/ColorMatchingOpenAPITests/GeneratedClientTests.swift:56", "result": "red_phase_committed", "surface": "manifest 404 case" },
+          { "locator": "iOS/Tests/ColorMatchingOpenAPITests/GeneratedClientTests.swift:72", "result": "red_phase_committed", "surface": "recent sheets" },
+          { "locator": "iOS/Tests/ColorMatchingOpenAPITests/GeneratedClientTests.swift:98", "result": "red_phase_committed", "surface": "capture creation" },
+          { "locator": "iOS/Tests/ColorMatchingOpenAPITests/GeneratedClientTests.swift:152", "result": "red_phase_committed", "surface": "measurement upload" },
+          { "locator": "iOS/Tests/ColorMatchingOpenAPITests/GeneratedClientTests.swift:188", "result": "red_phase_committed", "surface": "judgment upload" },
+          { "locator": "iOS/Tests/ColorMatchingOpenAPITests/GeneratedClientTests.swift:220", "result": "red_phase_committed", "surface": "ranked results" }
+        ]
+      }
+    },
+    {
+      "id": "AC-3",
+      "description": "Replace hand-written API models with generated types; keep purely client-side models as-is",
+      "status": "failed",
+      "reason": "Red phase: facade tests force the swap at compile time (createCapture/uploadMeasurements/uploadJudgments/fetchRecentSheets/fetchRankedResults return generated result types; old APIError.badStatus replaced by typed cases) while pinning that client-side SheetManifest and MeasurementCore domain models are kept. Replacement/retention scope is enumerated in the test plan.",
+      "verification": {
+        "kind": "unit_or_service_test",
+        "references": [
+          { "locator": "iOS/Tests/ColorMatchingOpenAPITests/APIClientFacadeTests.swift:23", "result": "red_phase_committed", "note": "client-side SheetManifest mapping kept" },
+          { "locator": "iOS/Tests/ColorMatchingOpenAPITests/APIClientFacadeTests.swift:90", "result": "red_phase_committed", "note": "generated CaptureCreatedResponse result" },
+          { "locator": "iOS/Tests/ColorMatchingOpenAPITests/APIClientFacadeTests.swift:113", "result": "red_phase_committed", "note": "generated MeasurementUploadResponse result + preserved wire shape" },
+          { "locator": "iOS/Tests/ColorMatchingOpenAPITests/APIClientFacadeTests.swift:175", "result": "red_phase_committed", "note": "typed APIError from documented error body" },
+          { "locator": "docs/openapi-client-test-plan.md", "result": "model_replacement_scope_documented" }
+        ]
+      }
+    },
+    {
+      "id": "AC-4",
+      "description": "Swift tests exercising the generated client against local stubbed responses (no live server in CI)",
+      "status": "skipped",
+      "reason": "Tests are written and committed, and are stub-only by construction (every request is served by StubbedURLProtocol; no network I/O). They could not be executed in this run: the generated module does not exist yet (implementation run adds it) and this container has no Swift toolchain (swift: command not found), so no execution evidence exists yet. Execution evidence is due from the implementation run via swift test --disable-sandbox.",
+      "verification": {
+        "kind": "unit_or_service_test",
+        "references": [
+          { "locator": "iOS/Tests/ColorMatchingOpenAPITests/TestSupport.swift:204", "result": "committed", "note": "URLProtocol-based stubbing, no live server" },
+          { "locator": "iOS/Tests/ColorMatchingOpenAPITests/TestSupport.swift:10", "result": "committed", "note": "fixtures mirror real Phoenix payloads" },
+          { "locator": "iOS/Tests/ColorMatchingOpenAPITests/GeneratedClientTests.swift", "result": "not_executed_no_swift_toolchain" },
+          { "locator": "iOS/Tests/ColorMatchingOpenAPITests/APIClientFacadeTests.swift", "result": "not_executed_no_swift_toolchain" }
+        ]
+      }
+    },
+    {
+      "id": "AC-5",
+      "description": "PR description records contract deltas between docs/color-matching-api-contract.md and the real API, plus endpoint gaps",
+      "status": "skipped",
+      "reason": "The PR body is published when the implementation run opens the PR (this tests-only run does not push or open a PR). The required analysis is complete, evidence-backed against upstream source (api_schemas.ex, controllers, TestSheetJSON, router at viamin/color_matching@main), and committed for direct inclusion: 15 numbered schema deltas plus an endpoint-gap table.",
+      "verification": {
+        "kind": "human_or_external_evidence",
+        "references": [
+          { "locator": "docs/openapi-contract-deltas.md", "result": "committed_analysis_pending_pr_body" },
+          { "locator": "docs/openapi-client-test-plan.md", "result": "criterion_mapping_recorded" }
+        ]
+      }
+    },
+    {
+      "id": "EC-1",
+      "description": "swift test --disable-sandbox green with generated types wired in",
+      "status": "not_run",
+      "reason": "Exit criterion for the implementation run. Not runnable in this environment: no Swift toolchain installed and the generated target is not wired into Package.swift (off-limits in the tests-only phase). Baseline suite state is preserved: no existing test files were modified, and the new test directory is inert until Package.swift declares the ColorMatchingOpenAPITests target.",
+      "verification": {
+        "kind": "unit_or_service_test",
+        "references": [
+          { "locator": "iOS/Package.swift", "result": "unchanged_in_this_run" },
+          { "locator": "docs/openapi-client-test-plan.md", "result": "run_command_documented" }
+        ]
+      }
+    }
+  ]
+}
