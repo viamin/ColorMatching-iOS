@@ -1,0 +1,70 @@
+{
+  "status": "partial_red_phase",
+  "summary": "Tests-only run for issue #5 (generated OpenAPI Swift client). Added two test files plus the plan/delta documentation. The vendored-document coverage tests run today and fail red (document not vendored yet, as expected in this phase); the generated-client tests are canImport-gated and were validated off-tree: all 19 tests pass against a real swift-openapi-generator 1.9.0 client built from docs/openapi-vendored-reference.json with swift-openapi-runtime 1.9.0 / swift-http-types 1.8.0. No Swift toolchain exists in the repo CI environment for this run's local suite; validation ran on Linux aarch64 Swift 6.0.3 off-tree.",
+  "acceptance_criteria": [
+    {
+      "id": "AC-1",
+      "description": "Add swift-openapi-generator + swift-openapi-runtime to the iOS package; fetch or vendor the OpenAPI document from viamin/color_matching#110",
+      "status": "failed_red",
+      "verification": {
+        "kind": "unit_or_service_test",
+        "evidence": "Fails red at PR head (expected in tests-only phase): iOS/Sources/OpenAPIGenerated/openapi.json does not exist, so all 12 OpenAPIDocumentCoverageTests fail with an actionable vendoring message. Off-tree validation with the reference document: all pass.",
+        "references": [
+          { "locator": "iOS/Tests/ColorMatchingLPSAppTests/OpenAPIDocumentCoverageTests.swift:31 (loadDocument)", "result": "red_at_head_green_off_tree" },
+          { "locator": "docs/openapi-generated-client-plan.md (§2 generation pipeline contract)", "result": "present" },
+          { "locator": "docs/openapi-vendored-reference.json", "result": "validated_with_generator_1.9.0" }
+        ]
+      }
+    },
+    {
+      "id": "AC-2",
+      "description": "Generate the client for the six app-used surfaces (manifest, recent sheets, capture creation, measurement upload, judgment upload, ranked results)",
+      "status": "failed_red",
+      "verification": {
+        "kind": "unit_or_service_test",
+        "evidence": "Coverage tests pin path+verb+stable operationId+typed schemas for all six operations (red at head); GeneratedClientTests exercise all six generated methods against stubbed transports (validated off-tree: 7/7 pass against real generator output).",
+        "references": [
+          { "locator": "iOS/Tests/ColorMatchingLPSAppTests/OpenAPIDocumentCoverageTests.swift:141 (testAppUsedOperationsAreDocumentedWithStableOperationIDs)", "result": "red_at_head_green_off_tree" },
+          { "locator": "iOS/Tests/ColorMatchingLPSAppTests/GeneratedClientTests.swift:44-300", "result": "compiled_out_at_head_pass_off_tree" }
+        ]
+      }
+    },
+    {
+      "id": "AC-3",
+      "description": "Replace the app's hand-written API models with generated types; keep purely client-side models as-is",
+      "status": "not_run",
+      "verification": {
+        "kind": "unit_or_service_test",
+        "evidence": "Implementation-run work. The test contract is in place: GeneratedClientTests construct generated Components.Schemas payloads (CaptureRequest, MeasurementUploadRequest, JudgmentUploadRequest) and decode generated response types, so the rewiring lands against these tests. Client-side models (MeasurementCore geometry types) are documented to stay as-is.",
+        "references": [
+          { "locator": "docs/openapi-generated-client-plan.md (§2 item 6 app wiring)", "result": "specified" },
+          { "locator": "iOS/Tests/ColorMatchingLPSAppTests/APIClientTests.swift", "result": "green_at_head_pending_rewire" }
+        ]
+      }
+    },
+    {
+      "id": "AC-4",
+      "description": "Swift tests exercising the generated client against local stubbed responses (no live server in CI)",
+      "status": "failed_red",
+      "verification": {
+        "kind": "unit_or_service_test",
+        "evidence": "GeneratedClientTests uses StubTransport (a ClientTransport) returning canned JSON for all six operations plus a 404 case; zero network. Validated off-tree: 7/7 pass. At head the file compiles out (canImport gate) until the generated target exists.",
+        "references": [
+          { "locator": "iOS/Tests/ColorMatchingLPSAppTests/GeneratedClientTests.swift:346 (StubTransport.send)", "result": "compiled_out_at_head_pass_off_tree" }
+        ]
+      }
+    },
+    {
+      "id": "AC-5",
+      "description": "PR description records what changed between the prose contract and the published spec, and any endpoint gaps",
+      "status": "passed",
+      "verification": {
+        "kind": "human_or_external_evidence",
+        "evidence": "16 numbered deltas with upstream file citations (api_schemas.ex, controllers, test_sheet_json.ex from viamin/color_matching@main after PR #113) recorded in docs/openapi-generated-client-plan.md §5, ready to be cited in the PR description of the implementation run. This run cannot open the final PR (tests-only draft).",
+        "references": [
+          { "locator": "docs/openapi-generated-client-plan.md §5 (contract deltas table)", "result": "present_with_upstream_citations" }
+        ]
+      }
+    }
+  ]
+}
