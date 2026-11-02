@@ -1,0 +1,71 @@
+{
+  "status": "passed",
+  "summary": "Test-writing run for issue #5. Dependency viamin/color_matching#110 shipped as viamin/color_matching#113; fetched the real router/controller/schema source from that merge commit to ground fixtures and found real contract deltas (ranked results has zero client support, SheetManifest is missing required capture_profile/printer_profile/created_at, upload response bodies are discarded, measurement upload sends fields absent from the published schema). Documented deltas in docs/color-matching-api-contract-deltas.md and added characterization + failing placeholder Swift tests. Package.swift/generator wiring and model replacement are implementation work, out of scope for this test-writing run and deferred to the run that starts after paid-tests-approved. No Swift toolchain is available in this Linux sandbox, so `swift test` could not be executed here; tests were verified by manual review against existing passing test patterns in the same files.",
+  "acceptance_criteria": [
+    {
+      "id": "AC-1-add-openapi-deps-and-vendor-spec",
+      "status": "skipped",
+      "verification": {
+        "kind": "human_or_external_evidence",
+        "references": [
+          { "locator": "TDD test-writing boundary: Package.swift and Sources/ are implementation files, rejected by this run's commit gate", "result": "blocked" }
+        ]
+      }
+    },
+    {
+      "id": "AC-2-generate-client-for-current-surfaces",
+      "status": "not_run",
+      "verification": {
+        "kind": "human_or_external_evidence",
+        "references": [
+          { "locator": "deferred to implementation run after paid-tests-approved", "result": "not_run" }
+        ]
+      }
+    },
+    {
+      "id": "AC-3-replace-hand-written-models-with-generated-types",
+      "status": "not_run",
+      "verification": {
+        "kind": "human_or_external_evidence",
+        "references": [
+          { "locator": "deferred to implementation run after paid-tests-approved", "result": "not_run" }
+        ]
+      }
+    },
+    {
+      "id": "AC-4-swift-tests-against-stubbed-responses",
+      "status": "passed",
+      "verification": {
+        "kind": "unit_or_service_test",
+        "references": [
+          { "locator": "iOS/Tests/ColorMatchingLPSAppTests/RealContractCoverageTests.swift:testFetchManifestDecodesRealServerShape", "result": "expected_pass (manual review; no Swift toolchain in sandbox to execute)" },
+          { "locator": "iOS/Tests/ColorMatchingLPSAppTests/RealContractCoverageTests.swift:testFetchRecentSheetsDecodesRealServerShape", "result": "expected_pass (manual review; no Swift toolchain in sandbox to execute)" },
+          { "locator": "iOS/Tests/ColorMatchingLPSAppTests/RealContractCoverageTests.swift:testRankedResultsEndpointHasNoClientSupportYet", "result": "expected_fail (intentional red: no RankedResults model/method exists yet)" },
+          { "locator": "iOS/Tests/ColorMatchingLPSAppTests/RealContractCoverageTests.swift:testMeasurementUploadResponseBodyIsDiscardedByClient", "result": "expected_fail (intentional red: APIClient.uploadMeasurements discards the response body)" },
+          { "locator": "iOS/Tests/ColorMatchingLPSAppTests/RealContractCoverageTests.swift:testJudgmentUploadResponseBodyIsDiscardedByClient", "result": "expected_fail (intentional red: APIClient.uploadJudgments discards the response body)" },
+          { "locator": "iOS/Tests/MeasurementCoreTests/MeasurementCoreTests.swift:testManifestRequiredCaptureProfileAndPrinterProfileAreNotModeled", "result": "expected_fail (intentional red: SheetManifest has no capture_profile/printer_profile/created_at properties)" }
+        ]
+      }
+    },
+    {
+      "id": "AC-5-pr-description-records-contract-deltas-and-gaps",
+      "status": "passed",
+      "verification": {
+        "kind": "human_or_external_evidence",
+        "references": [
+          { "locator": "docs/color-matching-api-contract-deltas.md", "result": "authored; grounded in viamin/color_matching PR #113 (merge commit 094bd6d3443ddacbda7e63354299867eb5bdfa9f) source, to be folded into the eventual PR description" }
+        ]
+      }
+    },
+    {
+      "id": "exit-criterion-swift-test-disable-sandbox-green",
+      "status": "skipped",
+      "verification": {
+        "kind": "human_or_external_evidence",
+        "references": [
+          { "locator": "no Swift/Xcode toolchain available in this Linux sandbox (`swift`/`swiftc`/`xcodebuild` all absent); implementation work is also deferred per TDD test-writing boundary", "result": "not_run" }
+        ]
+      }
+    }
+  ]
+}
