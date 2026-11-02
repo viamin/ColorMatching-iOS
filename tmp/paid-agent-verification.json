@@ -1,0 +1,80 @@
+{
+  "status": "not_run",
+  "summary": "Red-phase test-writing run for issue #5 (generated OpenAPI Swift client). Two permanent Swift test files and the criterion/delta plan doc are committed; no Swift toolchain exists in this container, so no test was executed locally. Expected red state: OpenAPISpecCoverageTests fails 3/3 by design (no vendored spec at iOS/OpenAPI/, no swift-openapi-generator/runtime in Package.swift, no ColorMatchingOpenAPI target - all inspectable at this commit); OpenAPIClientStubbedResponseTests is canImport-gated (compiles inert, 0 tests) until the implementation run adds the generated target and package deps. Upstream spec (viamin/color_matching#110) is unfetchable here: GitHub API proxy returns Repository mismatch for cross-repo access, so prose-vs-spec reconciliation deltas (D1-D6 seeded in docs/openapi-client-test-plan.md) must be completed when the spec is vendored. Execution evidence for all criteria is deferred to CI swift test on macOS at the implementation PR head.",
+  "acceptance_criteria": [
+    {
+      "id": "AC-1",
+      "status": "failed",
+      "verification": {
+        "kind": "unit_or_service_test",
+        "references": [
+          { "locator": "iOS/Tests/ColorMatchingLPSAppTests/OpenAPISpecCoverageTests.swift:14", "result": "not_run", "expected": "red", "note": "iOS/OpenAPI/openapi.{json,yaml,yml} absent at this commit; failure determinable by inspection (FileManager existence check). Not executable locally: no Swift toolchain." },
+          { "locator": "iOS/Tests/ColorMatchingLPSAppTests/OpenAPISpecCoverageTests.swift:35", "result": "not_run", "expected": "red", "note": "iOS/Package.swift contains neither swift-openapi-generator, swift-openapi-runtime, nor ColorMatchingOpenAPI at this commit; string-contains assertions fail by inspection." }
+        ]
+      }
+    },
+    {
+      "id": "AC-2",
+      "status": "failed",
+      "verification": {
+        "kind": "unit_or_service_test",
+        "references": [
+          { "locator": "iOS/Tests/ColorMatchingLPSAppTests/OpenAPISpecCoverageTests.swift:23", "result": "not_run", "expected": "red", "note": "Requires the vendored OpenAPI 3.x spec covering all six path+method combinations; spec absent at this commit." },
+          { "locator": "iOS/Tests/ColorMatchingLPSAppTests/OpenAPIClientStubbedResponseTests.swift:17", "result": "not_run", "note": "Generated-client method per surface (getTestSheetManifest, listRecentTestSheets, createCapture, uploadMeasurements, uploadJudgments, getRankedResults); file is #if canImport(ColorMatchingOpenAPI)-gated and contributes 0 tests until the generated target exists." }
+        ]
+      }
+    },
+    {
+      "id": "AC-3",
+      "status": "not_run",
+      "verification": {
+        "kind": "unit_or_service_test",
+        "references": [
+          { "locator": "iOS/Tests/ColorMatchingLPSAppTests/APIClientTests.swift:14", "result": "not_run", "note": "Unchanged regression guard for the model swap; must stay green after hand-written models are replaced. Local execution impossible: no Swift toolchain in container." },
+          { "locator": "iOS/Tests/MeasurementCoreTests/MeasurementCoreTests.swift", "result": "not_run", "note": "Purely client-side MeasurementCore models must remain untouched; suite must stay green through the swap." }
+        ]
+      }
+    },
+    {
+      "id": "AC-4",
+      "status": "not_run",
+      "verification": {
+        "kind": "unit_or_service_test",
+        "references": [
+          { "locator": "iOS/Tests/ColorMatchingLPSAppTests/OpenAPIClientStubbedResponseTests.swift:200", "result": "not_run", "note": "All 8 tests route through URLSessionTransport over OpenAPIStubURLProtocol (URLProtocol stub) with inline JSON fixtures - no live server; cannot execute until generated target exists." },
+          { "locator": "iOS/Tests/ColorMatchingLPSAppTests/OpenAPIClientStubbedResponseTests.swift:223", "result": "not_run", "note": "Bearer auth asserted on the wire via ClientMiddleware + stubbed transport." }
+        ]
+      }
+    },
+    {
+      "id": "AC-5",
+      "status": "not_run",
+      "verification": {
+        "kind": "human_or_external_evidence",
+        "references": [
+          { "locator": "docs/openapi-client-test-plan.md", "result": "seeded", "note": "Contract deltas D1-D6 derived from repo evidence (ranked_results has no prose schema; no status codes; hand-written SheetManifest drops printer_profile/capture_profile/created_at; prose-only auth; prose-only enums; nullable title). Cross-repo spec fetch blocked by repo-scoped GitHub proxy ('Repository mismatch'); final prose-vs-published-spec narrative must be completed at implementation/PR time." }
+        ]
+      }
+    },
+    {
+      "id": "EXIT-1",
+      "status": "not_run",
+      "verification": {
+        "kind": "human_or_external_evidence",
+        "references": [
+          { "locator": ".github/workflows/ci.yml", "result": "not_run", "note": "swift test on macOS runs the suite; expected red at this commit (3 coverage failures). Green with generated types wired in closes this criterion at the implementation PR head." }
+        ]
+      }
+    },
+    {
+      "id": "EXIT-2",
+      "status": "not_run",
+      "verification": {
+        "kind": "human_or_external_evidence",
+        "references": [
+          { "locator": "docs/openapi-client-test-plan.md", "result": "seeded", "note": "PR body should copy the Contract deltas table plus the reconciliation column completed against the vendored spec." }
+        ]
+      }
+    }
+  ]
+}
