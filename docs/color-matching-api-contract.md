@@ -2,6 +2,12 @@
 
 This contract describes the API that `viamin/color_matching` should expose for the iOS companion app. The implementation belongs in the Phoenix app, not in this repository.
 
+> **Superseded as the source of truth.** `viamin/color_matching` now publishes a
+> machine-readable OpenAPI 3 spec at `GET /api/v1/openapi.json` (viamin/color_matching#110).
+> The iOS app generates its client from that spec; this prose document is kept for
+> historical context only. The known deltas between this document and the published
+> spec are recorded in `docs/openapi-client-migration.md`.
+
 ## Authentication
 
 MVP authentication can be a shared bearer token:
