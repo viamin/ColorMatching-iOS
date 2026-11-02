@@ -1,0 +1,81 @@
+{
+  "status": "test_writing_phase_red",
+  "summary": "Test-writing run for #5 (replace hand-written API layer with generated OpenAPI Swift client). Wrote red-phase tests specifying the vendored-spec contract and the generated-client service surface, plus a committed deltas document comparing docs/color-matching-api-contract.md against the published OpenAPI spec from viamin/color_matching#110. No Swift toolchain exists in this Linux container, so swift test could not be executed locally; both files were verified structurally (delimiter balance scan, JSON fixture parsing). CI (macos-latest, .github/workflows/ci.yml) will execute them.",
+  "acceptance_criteria": [
+    {
+      "id": "AC-1",
+      "description": "swift-openapi-generator + runtime added to the iOS package; OpenAPI document fetched or vendored from viamin/color_matching#110",
+      "status": "not_run",
+      "verification": {
+        "kind": "unit_or_service_test",
+        "references": [
+          { "locator": "iOS/Tests/ColorMatchingLPSAppTests/OpenAPISpecCoverageTests.swift:14", "result": "red — compiles against current package; fails until iOS/OpenAPI/color-matching-api-v1.json is vendored (file absent at PR head; expected red)" },
+          { "locator": "docs/color-matching-openapi-deltas.md#required-vendored-spec-extensions", "result": "vendors plan + required extensions recorded" }
+        ],
+        "reason": "Tests-only phase: Package.swift and the vendored document are implementation artifacts and land in the implementation run after paid-tests-approved. Cannot execute: no Swift toolchain in container."
+      }
+    },
+    {
+      "id": "AC-2",
+      "description": "Generated client covering manifest, recent sheets, capture creation, measurement upload, judgment upload, ranked results",
+      "status": "not_run",
+      "verification": {
+        "kind": "unit_or_service_test",
+        "references": [
+          { "locator": "iOS/Tests/ColorMatchingLPSAppTests/GeneratedClientServiceTests.swift:13", "result": "red — does not compile until generated module ColorMatchingOpenAPIClient and ColorMatchingService wrapper exist; stubbed tests for all six operations" },
+          { "locator": "iOS/Tests/ColorMatchingLPSAppTests/OpenAPISpecCoverageTests.swift:20", "result": "red — asserts the vendored spec documents all six operations with operationIds and 2xx responses" }
+        ],
+        "reason": "Tests-only phase; generation itself is implementation. Cannot execute: no Swift toolchain in container."
+      }
+    },
+    {
+      "id": "AC-3",
+      "description": "Replace hand-written API models with generated types; keep purely client-side models",
+      "status": "not_run",
+      "verification": {
+        "kind": "unit_or_service_test",
+        "references": [
+          { "locator": "iOS/Tests/ColorMatchingLPSAppTests/GeneratedClientServiceTests.swift:15", "result": "red — expects generated Components.Schemas types as return values with app-side CaptureMetadata/CaptureQuality/PatchMeasurement/PairScore/PairJudgment as inputs" },
+          { "locator": "docs/color-matching-openapi-deltas.md#expected-ios-implementation-surface", "result": "expected wrapper/type surface contract recorded for the implementation run" }
+        ],
+        "reason": "Tests-only phase: replacing iOS/Sources/ColorMatchingLPSAppCore/APIClient.swift models is implementation."
+      }
+    },
+    {
+      "id": "AC-4",
+      "description": "Swift tests exercising the generated client against local stubbed responses (no live server in CI)",
+      "status": "not_run",
+      "verification": {
+        "kind": "unit_or_service_test",
+        "references": [
+          { "locator": "iOS/Tests/ColorMatchingLPSAppTests/GeneratedClientServiceTests.swift:293", "result": "red — StubURLProtocol serves local canned responses; no network required" }
+        ],
+        "reason": "Tests written but not executed: no Swift toolchain in this container; CI runs swift test on macos-latest."
+      }
+    },
+    {
+      "id": "AC-5",
+      "description": "PR description records contract deltas between docs/color-matching-api-contract.md and the published spec, and endpoint gaps discovered",
+      "status": "passed",
+      "verification": {
+        "kind": "human_or_external_evidence",
+        "references": [
+          { "locator": "docs/color-matching-openapi-deltas.md", "result": "committed deltas document: 10 numbered deltas + endpoint-coverage table (no endpoint gaps for the six app surfaces) + upstream follow-ups" },
+          { "locator": "viamin/color_matching main: lib/color_matching_web/api_spec.ex, lib/color_matching_web/api_schemas.ex, lib/color_matching_web/controllers/test_sheet_json.ex, lib/color_matching_web/controllers/capture_controller.ex, lib/color_matching/persistence/capture_upload.ex, lib/color_matching/persistence/pair_finding_observation.ex", "result": "external evidence inspected at 2026-11-02 via raw.githubusercontent.com (issue #110 closed: 'Publish OpenAPI 3 spec for the /api/v1 API and enforce it in CI')" }
+        ]
+      }
+    },
+    {
+      "id": "AC-6",
+      "description": "Exit criterion: swift test --disable-sandbox green with generated types wired in",
+      "status": "not_run",
+      "verification": {
+        "kind": "unit_or_service_test",
+        "references": [
+          { "locator": ".github/workflows/ci.yml", "result": "CI job 'Swift and iOS Tests' runs swift test on macos-latest once implementation lands" }
+        ],
+        "reason": "Red phase by design: suite is expected to fail until the implementation run adds the generated client. Local execution impossible (no Swift toolchain in Linux container)."
+      }
+    }
+  ]
+}
