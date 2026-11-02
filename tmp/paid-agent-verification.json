@@ -1,0 +1,83 @@
+{
+  "status": "failed",
+  "summary": "Tests-writing (red-phase) run for issue #5 (generated OpenAPI Swift client). Committed: 21 permanent unit tests across three files pinning the generated-client contract, the app facade over generated types, and the vendored OpenAPI document itself; plus LID docs reconstructing the published spec from viamin/color_matching (vendored YAML validated as OpenAPI 3.0.3 with openapi-spec-validator; every test fixture schema-validated against it) and the contract-delta analysis for the PR description. The Swift tests are intentionally red: they import the ColorMatchingOpenAPI module that the implementation run must add (tests-only phase cannot modify iOS/Package.swift or add sources). No Swift toolchain exists in this container (command not found), so swift test --disable-sandbox could not be executed locally; CI (macOS) runs it. Expected implementation deltas are enumerated in docs/color-matching-openapi-deltas.md (D1-D8, G1-G4, N1-N4, V1-V4).",
+  "acceptance_criteria": [
+    {
+      "id": "AC-1",
+      "description": "Add swift-openapi-generator + swift-openapi-runtime to the iOS package; fetch or vendor the OpenAPI document from viamin/color_matching#110",
+      "status": "skipped",
+      "verification": {
+        "kind": "unit_or_service_test",
+        "references": [
+          { "locator": "docs/color-matching-openapi-v1.yaml", "result": "present", "note": "vendored spec reconstructed from viamin/color_matching main (ApiSpec + ApiSchemas + controller operation specs); validated: openapi-spec-validator => VALID OpenAPI 3.0.3" },
+          { "locator": "iOS/Tests/ColorMatchingLPSAppTests/OpenAPISpecContractTests.swift:22", "result": "red", "note": "guards the vendored document at iOS/Sources/ColorMatchingOpenAPI/openapi.yaml once the implementation copies it there" },
+          { "locator": "docs/openapi-generated-client-plan.md", "result": "present", "note": "pins Package.swift dependency/target shape for the implementation run" }
+        ],
+        "reason": "Tests-only phase: Package.swift and iOS/Sources changes are rejected at commit time, so the dependency wiring itself is deferred to the implementation run. The vendored document (the substantive half of this criterion) is authored, validated, and guarded by a permanent test."
+      }
+    },
+    {
+      "id": "AC-2",
+      "description": "Generate the client for the surfaces the app uses today: test-sheet manifest + recent sheets, capture session creation, measurement upload, judgment upload, ranked results",
+      "status": "failed",
+      "verification": {
+        "kind": "unit_or_service_test",
+        "references": [
+          { "locator": "iOS/Tests/ColorMatchingLPSAppTests/OpenAPIGeneratedClientTests.swift:32", "result": "red", "note": "manifest GET: path/operationId + generated type decoding" },
+          { "locator": "iOS/Tests/ColorMatchingLPSAppTests/OpenAPIGeneratedClientTests.swift:60", "result": "red", "note": "recent sheets GET with nullable title" },
+          { "locator": "iOS/Tests/ColorMatchingLPSAppTests/OpenAPIGeneratedClientTests.swift:88", "result": "red", "note": "capture creation POST (201) wire body + response" },
+          { "locator": "iOS/Tests/ColorMatchingLPSAppTests/OpenAPIGeneratedClientTests.swift:134", "result": "red", "note": "measurement upload POST wire shape (no stats, no top-level algorithm version) + counts response" },
+          { "locator": "iOS/Tests/ColorMatchingLPSAppTests/OpenAPIGeneratedClientTests.swift:196", "result": "red", "note": "judgment upload POST + judgment_count response" },
+          { "locator": "iOS/Tests/ColorMatchingLPSAppTests/OpenAPIGeneratedClientTests.swift:225", "result": "red", "note": "ranked results GET aggregate decoding" },
+          { "locator": "iOS/Tests/ColorMatchingLPSAppTests/OpenAPIGeneratedClientTests.swift:254", "result": "red", "note": ".notFound generated Output case" },
+          { "locator": "iOS/Tests/ColorMatchingLPSAppTests/OpenAPIGeneratedClientTests.swift:270", "result": "red", "note": ".unprocessableContent generated Output case" }
+        ],
+        "reason": "Red by design: the ColorMatchingOpenAPI module does not exist until the implementation run adds the generator plugin and vendored spec; the whole test target therefore fails to build (the Swift compile-time form of a failing red assertion). Fixtures were schema-validated offline against the vendored spec so they will decode once generated."
+      }
+    },
+    {
+      "id": "AC-3",
+      "description": "Replace the app's hand-written API models with generated types; keep purely client-side models as-is",
+      "status": "failed",
+      "verification": {
+        "kind": "unit_or_service_test",
+        "references": [
+          { "locator": "iOS/Tests/ColorMatchingLPSAppTests/OpenAPIFacadeTests.swift:36", "result": "red", "note": "facade returns generated TestSheetManifest (bearer token + geometry decode)" },
+          { "locator": "iOS/Tests/ColorMatchingLPSAppTests/OpenAPIFacadeTests.swift:81", "result": "red", "note": "createCapture takes generated CaptureMetadata, client-side CaptureQuality kept" },
+          { "locator": "iOS/Tests/ColorMatchingLPSAppTests/OpenAPIFacadeTests.swift:120", "result": "red", "note": "uploadMeasurements keeps client-side PatchMeasurement/PairScore inputs, returns generated MeasurementUploadResponse" },
+          { "locator": "iOS/Tests/ColorMatchingLPSAppTests/OpenAPIFacadeTests.swift:170", "result": "red", "note": "uploadJudgments uses generated PairJudgment, returns JudgmentUploadResponse" },
+          { "locator": "iOS/Tests/ColorMatchingLPSAppTests/OpenAPIFacadeTests.swift:195", "result": "red", "note": "new ranked-results facade surface over generated RankedResults" },
+          { "locator": "docs/openapi-generated-client-plan.md", "result": "present", "note": "facade contract: which models are replaced vs kept (MeasurementCore geometry/scoring models stay)" }
+        ],
+        "reason": "Red by design for the same missing-module reason; the model deletion itself lands in the implementation run and is code review evidence there."
+      }
+    },
+    {
+      "id": "AC-4",
+      "description": "Swift tests exercising the generated client against local stubbed responses (no live server in CI)",
+      "status": "failed",
+      "verification": {
+        "kind": "unit_or_service_test",
+        "references": [
+          { "locator": "iOS/Tests/ColorMatchingLPSAppTests/OpenAPIGeneratedClientTests.swift:292", "result": "red", "note": "RecordedTransport: in-process ClientTransport stub, zero network" },
+          { "locator": "iOS/Tests/ColorMatchingLPSAppTests/OpenAPIFacadeTests.swift:324", "result": "red", "note": "StubURLProtocol: URLSession-level stub, zero network" },
+          { "locator": "iOS/Tests/ColorMatchingLPSAppTests/OpenAPISpecContractTests.swift", "result": "red", "note": "file-based spec contract checks, no network" }
+        ],
+        "reason": "21 tests across three files stub all HTTP locally (no live server anywhere). They cannot execute in this container because no Swift toolchain is installed (swift: command not found) and cannot compile until the implementation run lands; macOS CI (.github/workflows/ci.yml, swift test) executes them."
+      }
+    },
+    {
+      "id": "AC-5",
+      "description": "PR description records: what changed between the prose contract and the published spec, and any endpoint gaps discovered",
+      "status": "passed",
+      "verification": {
+        "kind": "human_or_external_evidence",
+        "references": [
+          { "locator": "docs/color-matching-openapi-deltas.md", "result": "passed", "note": "delta analysis D1-D8 (behavior changes), G1-G4 (endpoint/schema gaps incl. thin manifest + ranked-results schemas), N1-N4 (real wire shapes vs prose), V1-V4 (vendoring normalizations), each verified against viamin/color_matching source (api_schemas.ex, test_sheet_json.ex, controllers)" },
+          { "locator": "docs/color-matching-openapi-v1.yaml", "result": "passed", "note": "every deviation marked inline with [vendored ...] provenance notes" }
+        ],
+        "reason": "The delta record is complete, inspectable, and GitHub-visible at this head; the Paid draft PR body carries it when the PR is published from this run."
+      }
+    }
+  ]
+}
