@@ -1,0 +1,78 @@
+{
+  "status": "failed",
+  "summary": "Red-phase tests-writing run for issue #5 (generated OpenAPI Swift client). GeneratedClientTests.swift (9 tests) pins the full generated-client surface (module OpenAPIGenerated; operationIds getTestSheetManifest/listRecentTestSheets/createCapture/uploadMeasurements/uploadJudgments/getRankedResults) against local URLProtocol stubs built from the real upstream spec and controllers. It intentionally fails to build ('no such module OpenAPIGenerated') until the implementation run vendors the spec; that is the red-phase missing-behavior signal. Existing APIClientTests fixtures were corrected from 204 to the real 200+JSON-receipt responses and stay green. Contract deltas and endpoint gaps between docs/color-matching-api-contract.md and the published spec (viamin/color_matching#113) are recorded in docs/generated-openapi-client-plan.md for the PR description. No Swift toolchain exists in this container (and the SwiftUI executable target cannot build on Linux), so swift test could not be executed here; the tests run in macOS CI per .github/workflows/ci.yml.",
+  "acceptance_criteria": [
+    {
+      "id": "AC-1-dependency-met",
+      "status": "passed",
+      "verification": {
+        "kind": "human_or_external_evidence",
+        "references": [
+          { "locator": "viamin/color_matching PR #113 (merged 2026-10-30, closes #110)", "result": "verified via GitHub API: lib/color_matching_web/api_spec.ex and api_schemas.ex exist on main; spec served at GET /api/v1/openapi.json" },
+          { "locator": "docs/generated-openapi-client-plan.md", "result": "dependency status section records the evidence" }
+        ]
+      }
+    },
+    {
+      "id": "AC-2-add-generator-deps-and-vendor-spec",
+      "status": "not_run",
+      "verification": {
+        "kind": "unit_or_service_test",
+        "references": [
+          { "locator": "docs/generated-openapi-client-plan.md#implementation-contract", "result": "blocked in tests-only phase: Package.swift is an implementation file; package deps and vendored openapi.yaml are fully specified (including a copy-ready YAML skeleton) for the implementation run" }
+        ]
+      }
+    },
+    {
+      "id": "AC-3-generate-client-for-six-surfaces",
+      "status": "failed",
+      "verification": {
+        "kind": "unit_or_service_test",
+        "references": [
+          { "locator": "iOS/Tests/ColorMatchingLPSAppTests/GeneratedClientTests.swift:12", "result": "red: expected build failure 'no such module OpenAPIGenerated' demonstrates the client is not generated yet; tests pin method names, paths, request bodies, decoded response types, and 200/201/401/404/422 status-case mapping for all six surfaces" }
+        ]
+      }
+    },
+    {
+      "id": "AC-4-replace-handwritten-models-keep-clientside-models",
+      "status": "not_run",
+      "verification": {
+        "kind": "unit_or_service_test",
+        "references": [
+          { "locator": "iOS/Tests/ColorMatchingLPSAppTests/APIClientTests.swift", "result": "facade regression guard retained (authorization header, paths, JSON keys); fixtures updated to the published spec's real 200+receipt responses so they stay green before and after the internal swap to generated types; implementation itself deferred" }
+        ]
+      }
+    },
+    {
+      "id": "AC-5-stubbed-response-tests-no-live-server",
+      "status": "not_run",
+      "verification": {
+        "kind": "unit_or_service_test",
+        "references": [
+          { "locator": "iOS/Tests/ColorMatchingLPSAppTests/GeneratedClientTests.swift", "result": "9 tests written; all HTTP served by StubAPIURLProtocol (iOS/Tests/ColorMatchingLPSAppTests/GeneratedClientTestSupport.swift), no network; could not be executed here - no Swift toolchain in container (Linux cannot build the SwiftUI executable target); execution deferred to macOS CI (.github/workflows/ci.yml swift test)" }
+        ]
+      }
+    },
+    {
+      "id": "AC-6-record-contract-deltas-and-gaps",
+      "status": "passed",
+      "verification": {
+        "kind": "human_or_external_evidence",
+        "references": [
+          { "locator": "docs/generated-openapi-client-plan.md#contract-deltas-prose-contract-vs-published-spec", "result": "13 numbered deltas (upload receipts, printer_profile shape, flat capture variant, undocumented stats/scoring_algorithm_version, integer iso, required capture_profile scoring version, patch-id encoding, null titles, string numeric capture_id, machine-enforced schema_version enums, documented errors) each traceable to upstream api_schemas.ex/test_sheet_json.ex/controllers" },
+          { "locator": "docs/generated-openapi-client-plan.md#endpoint-gaps-discovered", "result": "gaps recorded: ranked-results and manifest schemas are stubs relative to served payloads; six endpoints absent from the prose contract; upstream follow-up noted" }
+        ]
+      }
+    },
+    {
+      "id": "AC-7-swift-test-green-with-generated-types",
+      "status": "not_run",
+      "verification": {
+        "kind": "unit_or_service_test",
+        "references": [
+          { "locator": ".github/workflows/ci.yml", "result": "exit criterion: swift test must be green on macOS CI after the implementation run wires the generated types; not verifiable in this container (no Swift toolchain)" }
+        ]
+      }
+    }
+  ]
+}
