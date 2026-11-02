@@ -1,0 +1,88 @@
+{
+  "status": "passed",
+  "summary": "Test-writing (red-phase) run for issue #5 'Replace hand-written API layer with a generated OpenAPI Swift client'. Deliverables of this run: (1) permanent Swift contract suite driving the to-be-generated client through the APIClient facade with all HTTP stubbed at the URLSession layer (no live server), covering manifest, recent sheets, capture creation, measurement upload, judgment upload, ranked results, bearer auth, and error mapping; (2) generated-module anchor test (import ColorMatchingAPI + documented Client(serverURL:transport:) init); (3) committed contract-delta analysis between docs/color-matching-api-contract.md and the published OpenAPI spec (viamin/color_matching#110, inspected from the Phoenix repo source: api_spec.ex, api_schemas.ex, capture_controller.ex, test_sheet_controller.ex, test_sheet_json.ex, open_api_controller_test.ex), including 12 deltas (D1-D12) and 3 endpoint gaps (G1-G3). Swift toolchain is not installed in this container, so tests cannot be executed locally; they are committed red by design (no such module 'ColorMatchingAPI'/'OpenAPIURLSession') and become green in the follow-up implementation run, verified on macOS CI via `swift test`.",
+  "acceptance_criteria": [
+    {
+      "id": "AC-1",
+      "description": "Add swift-openapi-generator + swift-openapi-runtime to the iOS package; fetch or vendor the OpenAPI document from viamin/color_matching#110",
+      "status": "not_run",
+      "reason": "Implementation-phase criterion (Package.swift and Sources are outside permitted test-writing paths this run). Verification instrument is in place: GeneratedClientTests only compiles when the target + deps exist.",
+      "verification": {
+        "kind": "unit_or_service_test",
+        "references": [
+          { "locator": "iOS/Tests/ColorMatchingLPSAppTests/GeneratedClientTests.swift:30", "result": "red_compile_missing_module (expected)" },
+          { "locator": "docs/openapi-client-migration.md", "result": "target/module naming + vendoring instructions recorded (operationIds preserved verbatim)" }
+        ]
+      }
+    },
+    {
+      "id": "AC-2",
+      "description": "Generate the client for the surfaces the app uses today: test-sheet manifest + recent sheets, capture session creation, measurement upload, judgment upload, ranked results",
+      "status": "not_run",
+      "reason": "Blocked on implementation run (generated target). Each surface has a dedicated permanent unit test pinning path, method, auth header, wire request shape, and decoded output against published-spec fixtures.",
+      "verification": {
+        "kind": "unit_or_service_test",
+        "references": [
+          { "locator": "iOS/Tests/ColorMatchingLPSAppTests/APIClientTests.swift:28", "result": "red_compile_pending_facade (expected); covers GET /api/v1/test_sheets/{id}/manifest" },
+          { "locator": "iOS/Tests/ColorMatchingLPSAppTests/APIClientTests.swift:64", "result": "red_compile_pending_facade (expected); covers GET /api/v1/test_sheets/recent" },
+          { "locator": "iOS/Tests/ColorMatchingLPSAppTests/APIClientTests.swift:87", "result": "red_compile_pending_facade (expected); covers GET /api/v1/test_sheets/{id}/ranked_results" },
+          { "locator": "iOS/Tests/ColorMatchingLPSAppTests/APIClientTests.swift:106", "result": "red_compile_pending_facade (expected); covers POST /api/v1/test_sheets/{id}/captures" },
+          { "locator": "iOS/Tests/ColorMatchingLPSAppTests/APIClientTests.swift:146", "result": "red_compile_pending_facade (expected); covers POST /api/v1/captures/{id}/measurements" },
+          { "locator": "iOS/Tests/ColorMatchingLPSAppTests/APIClientTests.swift:202", "result": "red_compile_pending_facade (expected); covers POST /api/v1/captures/{id}/judgments" }
+        ]
+      }
+    },
+    {
+      "id": "AC-3",
+      "description": "Replace the app's hand-written API models with generated types; keep purely client-side models as-is",
+      "status": "not_run",
+      "reason": "Implementation-phase criterion. Pinned by tests: measurement-upload test asserts the generated wire shape (no hand-written stats/scoring_algorithm_version encoders), summaries decode via generated response types, and MeasurementCore client-side models are exercised unchanged.",
+      "verification": {
+        "kind": "unit_or_service_test",
+        "references": [
+          { "locator": "iOS/Tests/ColorMatchingLPSAppTests/APIClientTests.swift:174", "result": "UploadSummary/JudgmentSummary decoded from documented 200 bodies (D7/D8)" },
+          { "locator": "iOS/Tests/ColorMatchingLPSAppTests/APIClientTests.swift:179", "result": "asserts published request shape: no stats (G2), no top-level scoring_algorithm_version (D6), normalized_linear_rgb_median present" },
+          { "locator": "iOS/Tests/MeasurementCoreTests/MeasurementCoreTests.swift", "result": "untouched; client-side models remain valid (no Swift toolchain locally to execute)" }
+        ]
+      }
+    },
+    {
+      "id": "AC-4",
+      "description": "Swift tests exercising the generated client against local stubbed responses (no live server in CI)",
+      "status": "not_run",
+      "reason": "Tests are written with full local stubbing (MockURLProtocol beneath URLSessionTransport; host example.test never resolves), but cannot be executed in this container: no Swift toolchain installed (swift: command not found). Execution evidence lands on macOS CI in the implementation run.",
+      "verification": {
+        "kind": "unit_or_service_test",
+        "references": [
+          { "locator": "iOS/Tests/ColorMatchingLPSAppTests/TestSupport.swift:13", "result": "MockURLProtocol: all HTTP stubbed, zero network egress" },
+          { "locator": "iOS/Tests/ColorMatchingLPSAppTests/TestSupport.swift:94", "result": "wire fixtures built from the published spec + actual Phoenix rendering" }
+        ]
+      }
+    },
+    {
+      "id": "AC-5",
+      "description": "PR description records what changed between the prose contract and the published spec, and any endpoint gaps discovered",
+      "status": "passed",
+      "reason": "Delta analysis complete and inspectable: 12 deltas (D1-D12) and 3 endpoint gaps (G1-G3) documented in a committed artifact; the implementation PR body carries this table verbatim. The PR itself is opened by Paid after this run (no gh CLI / push here), so the PR-body copy is mechanical from the committed doc.",
+      "verification": {
+        "kind": "human_or_external_evidence",
+        "references": [
+          { "locator": "docs/openapi-client-migration.md", "result": "D1-D12 delta table + G1-G3 gaps, sources cited (api_spec.ex / api_schemas.ex / test_sheet_json.ex / capture_controller.ex at viamin/color_matching main)" }
+        ]
+      }
+    },
+    {
+      "id": "AC-6",
+      "description": "swift test --disable-sandbox green with generated types wired in",
+      "status": "not_run",
+      "reason": "Requires the implementation run output and a macOS Swift toolchain; this Linux container has none (swift: command not found), so no subset of Swift tests could be executed locally.",
+      "verification": {
+        "kind": "unit_or_service_test",
+        "references": [
+          { "locator": ".github/workflows/ci.yml", "result": "macos-latest `swift test` job is the execution vehicle for the implementation PR" },
+          { "locator": "docs/openapi-client-migration.md", "result": "'Red-phase expectations' section defines exactly which compile errors disappear when the implementation lands" }
+        ]
+      }
+    }
+  ]
+}
