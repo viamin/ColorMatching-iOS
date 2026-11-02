@@ -1,0 +1,69 @@
+{
+  "status": "skipped",
+  "summary": "Test-writing red phase for issue #5 (generated OpenAPI client). Added OpenAPISpecCoverageTests (gates vendoring of the published spec at iOS/OpenAPI/color-matching-openapi.json and coverage/wiring of all six /api/v1 surfaces) and OpenAPIWireConformanceTests (stubbed-response wire-format tests for manifest, recent sheets, capture creation, measurement upload, judgment upload; includes one deliberately red drift test asserting the spec-required normalized_linear_rgb_median). Contract deltas between docs/color-matching-api-contract.md and the published spec (viamin/color_matching#113, not #110) are recorded in docs/openapi-generated-client-verification.md for the PR description. No Swift toolchain exists in this container, so swift test --disable-sandbox could not be executed; test logic was validated by JSON-parsing all embedded fixtures and replaying coverage assertions against a faithful reconstruction of the served document. Implementation (vendoring, swift-openapi-generator wiring, generated types, ranked-results behavioral test) is deferred to the implementation run per phase rules.",
+  "acceptance_criteria": [
+    {
+      "id": "AC-1",
+      "description": "Add swift-openapi-generator + swift-openapi-runtime; fetch or vendor the OpenAPI document",
+      "status": "not_run",
+      "verification": {
+        "kind": "unit_or_service_test",
+        "references": [
+          { "locator": "iOS/Tests/ColorMatchingLPSAppTests/OpenAPISpecCoverageTests.swift:24", "result": "not_run", "note": "testVendoredOpenAPIDocumentExistsAtContractLocation — red until spec vendored at iOS/OpenAPI/color-matching-openapi.json" },
+          { "locator": "iOS/Tests/ColorMatchingLPSAppTests/OpenAPISpecCoverageTests.swift:36", "result": "not_run", "note": "OpenAPI 3.x + bearerAuth scheme validation" }
+        ],
+        "reason": "Implementation deferred to post-paid-tests-approved run; swift toolchain unavailable in container so tests could not execute"
+      }
+    },
+    {
+      "id": "AC-2",
+      "description": "Generate the client for the surfaces the app uses today (manifest, recent sheets, capture creation, measurement upload, judgment upload, ranked results)",
+      "status": "not_run",
+      "verification": {
+        "kind": "unit_or_service_test",
+        "references": [
+          { "locator": "iOS/Tests/ColorMatchingLPSAppTests/OpenAPISpecCoverageTests.swift:52", "result": "not_run", "note": "all six operations asserted present with correct methods" },
+          { "locator": "iOS/Tests/ColorMatchingLPSAppTests/OpenAPISpecCoverageTests.swift:87", "result": "not_run", "note": "request-body schema wiring for codegen" },
+          { "locator": "iOS/Tests/ColorMatchingLPSAppTests/OpenAPISpecCoverageTests.swift:114", "result": "not_run", "note": "ranked_results 200 schema wiring; behavioral ranked-results stub test is a documented follow-up at implementation time (compile-blocked in red phase)" }
+        ],
+        "reason": "Generated client does not exist yet by design in the test-writing phase"
+      }
+    },
+    {
+      "id": "AC-3",
+      "description": "Replace hand-written API models with generated types; keep purely client-side models",
+      "status": "not_run",
+      "verification": {
+        "kind": "unit_or_service_test",
+        "references": [
+          { "locator": "iOS/Tests/ColorMatchingLPSAppTests/OpenAPIWireConformanceTests.swift:131", "result": "not_run", "note": "red drift test: published MeasurementUploadRequest requires normalized_linear_rgb_median per measurement; hand-written PatchMeasurement omits it when nil" }
+        ],
+        "reason": "Model replacement is implementation-phase work; the red test defines the acceptance boundary and is implementation-agnostic (wire-format level)"
+      }
+    },
+    {
+      "id": "AC-4",
+      "description": "Swift tests exercising the generated client against local stubbed responses (no live server in CI)",
+      "status": "not_run",
+      "verification": {
+        "kind": "unit_or_service_test",
+        "references": [
+          { "locator": "iOS/Tests/ColorMatchingLPSAppTests/OpenAPIWireConformanceTests.swift:19", "result": "not_run", "note": "seven stubbed-response tests via SpecStubURLProtocol; all embedded fixtures validated as JSON; no network access required" }
+        ],
+        "reason": "No Swift toolchain in container; swift test --disable-sandbox could not be run"
+      }
+    },
+    {
+      "id": "AC-5",
+      "description": "PR description records contract deltas between prose contract and published spec, and endpoint gaps",
+      "status": "skipped",
+      "verification": {
+        "kind": "human_or_external_evidence",
+        "references": [
+          { "locator": "docs/openapi-generated-client-verification.md", "result": "not_run", "note": "nine documented deltas incl. spec PR is viamin/color_matching#113 (issue cited #110, which does not exist), weakened manifest/ranked-results schemas, required normalized_linear_rgb_median, 200-with-body upload responses; to be carried into the PR description" }
+        ],
+        "reason": "No pull request exists yet in this phase (draft PR published by Paid after approval); delta evidence is recorded and inspectable in the docs file"
+      }
+    }
+  ]
+}
