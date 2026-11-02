@@ -1,0 +1,80 @@
+{
+  "status": "failed",
+  "summary": "Tests-only red-phase change set for issue #5 (replace hand-written API layer with a generated OpenAPI Swift client). Five acceptance criteria were mapped to verifications in docs/openapi-client-migration-tests.md. New compile-safe tests encode the missing deliverables: vendored OpenAPI document + operation coverage (red: no spec vendored), Package.swift wiring of swift-openapi-generator/-runtime/OpenAPIGenerator plugin (red: absent), removal of the six hand-written API wire envelope structs (red: still declared in APIClient.swift). Stubbed-response behavioral tests for the manifest and recent-sheets surfaces plus the existing capture/measurement/judgment tests form the green migration harness. No Swift toolchain exists in this container, so swift test could not be executed here; red/green state was established by replaying each test's decision logic against the real repository tree (evidence recorded in docs/openapi-client-migration-tests.md) and must be confirmed on the macOS CI runners. This is the intended state for the test-writing phase: implementation lands after paid-tests-approved.",
+  "acceptance_criteria": [
+    {
+      "id": "AC-1",
+      "description": "swift-openapi-generator + swift-openapi-runtime added to the iOS package; OpenAPI document fetched or vendored from viamin/color_matching#110",
+      "status": "failed",
+      "verification": {
+        "kind": "unit_or_service_test",
+        "references": [
+          { "locator": "iOS/Tests/ColorMatchingLPSAppTests/OpenAPIPackageWiringTests.swift:10", "result": "red_expected_failure" },
+          { "locator": "iOS/Tests/ColorMatchingLPSAppTests/OpenAPIPackageWiringTests.swift:23", "result": "red_expected_failure" },
+          { "locator": "iOS/Tests/ColorMatchingLPSAppTests/OpenAPISpecArtifactTests.swift:13", "result": "red_expected_failure" },
+          { "locator": "iOS/Package.swift", "result": "inspected_absent_dependencies" }
+        ],
+        "notes": "Red-phase assertion failures demonstrating missing behavior: repository walk finds no *openapi*.{yaml,yml,json} document and Package.swift contains neither swift-openapi-generator, swift-openapi-runtime, nor an OpenAPIGenerator plugin. Verified by replaying the tests' exact scan logic against the repo tree (documented in docs/openapi-client-migration-tests.md) because no Swift toolchain exists in this container."
+      }
+    },
+    {
+      "id": "AC-2",
+      "description": "Generated client covers: manifest, recent sheets, capture creation, measurement upload, judgment upload, ranked results",
+      "status": "failed",
+      "verification": {
+        "kind": "unit_or_service_test",
+        "references": [
+          { "locator": "iOS/Tests/ColorMatchingLPSAppTests/OpenAPISpecArtifactTests.swift:36", "result": "red_expected_failure" },
+          { "locator": "iOS/Tests/ColorMatchingLPSAppTests/APIClientStubbedResponseTests.swift:18", "result": "green_expected_pass" },
+          { "locator": "iOS/Tests/ColorMatchingLPSAppTests/APIClientStubbedResponseTests.swift:68", "result": "green_expected_pass" },
+          { "locator": "iOS/Tests/ColorMatchingLPSAppTests/APIClientTests.swift:12", "result": "existing_green" },
+          { "locator": "iOS/Tests/ColorMatchingLPSAppTests/APIClientTests.swift:49", "result": "existing_green" },
+          { "locator": "iOS/Tests/ColorMatchingLPSAppTests/APIClientTests.swift:74", "result": "existing_green" }
+        ],
+        "notes": "testVendoredSpecCoversEveryAppAPIOperation pins all six operations (methods + path structure, tolerant of param naming and /api/v1 prefix) and fails red because no spec is vendored yet. Ranked-results BEHAVIORAL test is deferred to the implementation change set: no client method exists today, and a Swift test referencing it would break compilation of the entire suite (infrastructure failure, not red-phase evidence) — deferral recorded in docs/openapi-client-migration-tests.md. Stubbed fixtures for the manifest/recent-sheets surfaces were verified key-by-key against the current Codable models' required CodingKeys, so those tests compile and pass today and act as the migration harness."
+      }
+    },
+    {
+      "id": "AC-3",
+      "description": "Replace hand-written API models with generated types; keep purely client-side models as-is",
+      "status": "failed",
+      "verification": {
+        "kind": "unit_or_service_test",
+        "references": [
+          { "locator": "iOS/Tests/ColorMatchingLPSAppTests/HandWrittenAPIModelMigrationTests.swift:8", "result": "red_expected_failure" },
+          { "locator": "iOS/Tests/ColorMatchingLPSAppTests/HandWrittenAPIModelMigrationTests.swift:31", "result": "green_expected_pass" },
+          { "locator": "iOS/Sources/ColorMatchingLPSAppCore/APIClient.swift:171", "result": "inspected_wire_structs_still_declared" }
+        ],
+        "notes": "Red: all six hand-written wire envelope structs (CreateCaptureRequest, MeasurementUploadRequest, MeasurementUpload, MeasurementStatsUpload, JudgmentUploadRequest, RecentSheetsResponse) are still declared in APIClient.swift (verified by source scan). Green guard: the seven purely client-side types (RGB, Point, Rect, DetectedMarker, SampleOverlayRegion, SheetAnalysis, ChannelStats) remain declared in MeasurementCore."
+      }
+    },
+    {
+      "id": "AC-4",
+      "description": "Swift tests exercising the generated client against local stubbed responses (no live server in CI)",
+      "status": "not_run",
+      "verification": {
+        "kind": "unit_or_service_test",
+        "references": [
+          { "locator": "iOS/Tests/ColorMatchingLPSAppTests/APIClientStubbedResponseTests.swift:18", "result": "written_not_executed" },
+          { "locator": "iOS/Tests/ColorMatchingLPSAppTests/APIClientStubbedResponseTests.swift:68", "result": "written_not_executed" },
+          { "locator": "iOS/Tests/ColorMatchingLPSAppTests/APIClientStubbedResponseTests.swift:91", "result": "written_not_executed" },
+          { "locator": "iOS/Tests/ColorMatchingLPSAppTests/APIClientTests.swift:12", "result": "written_previously_green_not_executed_here" }
+        ],
+        "notes": "Tests are written and compile-safe (stubbed via URLProtocol subclass; no network), but swift test could not be executed in this container because no Swift toolchain is installed (swift/swiftc/xcrun absent). Expected green by fixture-vs-model key verification; actual execution deferred to macOS CI (.github/workflows/ci.yml runs `swift test`). Full satisfaction of this criterion also requires the generated client to be wired in (implementation phase)."
+      }
+    },
+    {
+      "id": "AC-5",
+      "description": "PR description records contract deltas between docs/color-matching-api-contract.md and the published spec, and endpoint gaps",
+      "status": "not_run",
+      "verification": {
+        "kind": "human_or_external_evidence",
+        "references": [
+          { "locator": "docs/openapi-client-migration-tests.md", "result": "checklist_scaffolded" },
+          { "locator": "docs/color-matching-api-contract.md", "result": "baseline_document_untouched" }
+        ],
+        "notes": "Human/external criterion: the delta narrative belongs to the PR description written when the implementation change set vendors the spec. An eight-point delta checklist (auth, manifest provenance fields, title nullability, rejection/judgment enums, stats min/max, ranked-results schema presence, path/style deltas) is scaffolded in docs/openapi-client-migration-tests.md; the prose contract is left untouched as the comparison baseline."
+      }
+    }
+  ]
+}
