@@ -1,0 +1,105 @@
+{
+  "status": "passed",
+  "summary": "Tests-writing run for issue #5 (generated OpenAPI Swift client). Added permanent unit tests that pin the vendored OpenAPI document contract and exercise the generated client against stubbed server responses, plus the contract-delta record. Red phase verified: 14/14 new tests fail at this PR head for exactly the two missing artifacts (vendored spec document, generated ColorMatchingOpenAPI module). Compile/runtime validity of the generated-client tests was proven end to end in a scratch SwiftPM package: real swift-openapi-generator 1.13.1 output + the repo test file => all 10 stubbed-transport tests green; a conforming vendored document => all 13 coverage tests green; updated APIClientTests remain green against the current hand-written client (Linux, Swift 6.1, with FoundationNetworking shim in scratch copies only).",
+  "acceptance_criteria": [
+    {
+      "id": "AC-1",
+      "description": "swift-openapi-generator + swift-openapi-runtime in the iOS package; OpenAPI document fetched or vendored from viamin/color_matching#110",
+      "status": "failed",
+      "verification": {
+        "kind": "unit_or_service_test",
+        "references": [
+          {
+            "locator": "iOS/Tests/ColorMatchingLPSAppTests/OpenAPISpecCoverageTests.swift",
+            "result": "failed (expected red phase: iOS/OpenAPI/color-matching-v1.json absent; 13 tests fail with actionable message)"
+          },
+          {
+            "locator": "iOS/Tests/ColorMatchingLPSAppTests/GeneratedClientStubbedServerTests.swift:610",
+            "result": "failed (expected red phase: ColorMatchingOpenAPI module absent; canImport marker test fails)"
+          },
+          {
+            "locator": "docs/openapi-client-generation.md",
+            "result": "passed (implementation contract: package layout, config yaml with accessModifier public + namingStrategy idiomatic, placeholder-source gotcha, validated version pins)"
+          }
+        ],
+        "note": "Package.swift/OpenAPI directory changes are implementation-run work (TDD phase boundary); the tests that will verify them are in place and red."
+      }
+    },
+    {
+      "id": "AC-2",
+      "description": "Generate the client for the surfaces the app uses today (manifest, recent sheets, capture creation, measurement upload, judgment upload, ranked results)",
+      "status": "failed",
+      "verification": {
+        "kind": "unit_or_service_test",
+        "references": [
+          {
+            "locator": "iOS/Tests/ColorMatchingLPSAppTests/GeneratedClientStubbedServerTests.swift",
+            "result": "red at PR head (module missing). Validated green outside the repo in a scratch package against real swift-openapi-generator 1.13.1 output: all 10 tests passed (manifest x3, recent sheets, capture creation, bearer middleware, measurements, judgments, ranked results)"
+          },
+          {
+            "locator": "iOS/Tests/ColorMatchingLPSAppTests/OpenAPISpecCoverageTests.swift:testAppFacingOperationsExistWithPinnedOperationIDs",
+            "result": "failed (expected red phase) - pins the six operation IDs the generated methods come from"
+          }
+        ]
+      }
+    },
+    {
+      "id": "AC-3",
+      "description": "Replace hand-written API models with generated types; keep purely client-side models",
+      "status": "not_run",
+      "verification": {
+        "kind": "unit_or_service_test",
+        "references": [
+          {
+            "locator": "iOS/Tests/ColorMatchingLPSAppTests/APIClientTests.swift",
+            "result": "passed (3/3 on Linux scratch build with current hand-written client; stubs updated from 204-empty to the published 200+JSON upload responses so they stay the regression net across the model swap)"
+          }
+        ],
+        "note": "The swap itself is implementation-run work; the wire-behavior regression net is in place and green."
+      }
+    },
+    {
+      "id": "AC-4",
+      "description": "Swift tests exercising the generated client against local stubbed responses (no live server in CI)",
+      "status": "passed",
+      "verification": {
+        "kind": "unit_or_service_test",
+        "references": [
+          {
+            "locator": "iOS/Tests/ColorMatchingLPSAppTests/GeneratedClientStubbedServerTests.swift",
+            "result": "tests written; stubbed via URLProtocol + URLSessionTransport (no live server); compile- and run-validated green in scratch package (10/10)"
+          }
+        ]
+      }
+    },
+    {
+      "id": "AC-5",
+      "description": "PR description records contract deltas between docs/color-matching-api-contract.md and the published spec, and endpoint gaps",
+      "status": "passed",
+      "verification": {
+        "kind": "human_or_external_evidence",
+        "references": [
+          {
+            "locator": "docs/color-matching-api-contract-deltas.md",
+            "result": "14-row drift table + 6 endpoint gaps derived from the served spec (api_schemas.ex, controllers, TestSheetJSON, capture_upload.ex, router.ex), including the anyOf+properties sibling incompatibility, 200-vs-204 upload responses, and manifest/ranked-results under-documentation"
+          }
+        ],
+        "note": "PR body to be assembled from this record when the tests-only draft PR is published."
+      }
+    },
+    {
+      "id": "AC-6",
+      "description": "Exit criterion: swift test --disable-sandbox green with generated types wired in",
+      "status": "not_run",
+      "verification": {
+        "kind": "unit_or_service_test",
+        "references": [
+          {
+            "locator": "iOS/Tests/ColorMatchingLPSAppTests (repo head)",
+            "result": "not_run - no Swift toolchain in the base environment; equivalent suite validated green in scratch packages on Linux (Swift 6.1) with --disable-sandbox for plugin runs; macOS CI executes swift test post-implementation"
+          }
+        ]
+      }
+    }
+  ]
+}
