@@ -1,0 +1,86 @@
+{
+  "status": "skipped",
+  "summary": "Test-writing phase for issue #5 (replace hand-written API layer with generated OpenAPI Swift client) completed; implementation criteria are deferred to the follow-up implementation run by phase rules. Committed: (a) OpenAPISpecConformanceTests — Foundation-only tests in the already-wired ColorMatchingLPSAppTests target that read the to-be-vendored iOS/Sources/ColorMatchingOpenAPI/openapi.json and fail while it is absent (red-phase evidence for the vendoring deliverable); (b) iOS/Tests/ColorMatchingOpenAPITests/ — stubbed-transport tests driving the future generated client over all six app surfaces, with a README pinning the Package.swift wiring contract; (c) docs/openapi-client-migration.md — acceptance-criterion verification plan plus the prose-contract-vs-published-spec deltas and endpoint gaps derived from viamin/color_matching main (issue #110 landed upstream; spec served at GET /api/v1/openapi.json). No Swift toolchain exists in this container (swift: command not found; the app executable target also requires SwiftUI/AVFoundation, so a Linux toolchain would not build the package), so no test executed locally; CI's macOS runner runs 'swift test' once the implementation run wires the new target. swift test --disable-sandbox is expected red at this head only because of the deliberately-missing vendored spec file.",
+  "acceptance_criteria": [
+    {
+      "id": "AC-1",
+      "description": "Add swift-openapi-generator + swift-openapi-runtime to the iOS package; vendor the OpenAPI document from viamin/color_matching#110",
+      "status": "not_run",
+      "verification": {
+        "kind": "unit_or_service_test",
+        "references": [
+          { "locator": "iOS/Tests/ColorMatchingLPSAppTests/OpenAPISpecConformanceTests.swift:23", "result": "not_run — wired into the existing target; fails by design while iOS/Sources/ColorMatchingOpenAPI/openapi.json is absent (upstream spec published at GET /api/v1/openapi.json per viamin/color_matching#110, closed)" },
+          { "locator": "iOS/Tests/ColorMatchingLPSAppTests/OpenAPISpecConformanceTests.swift:31", "result": "not_run — asserts all six app operations with stable operation ids in the vendored document" },
+          { "locator": "iOS/Tests/ColorMatchingOpenAPITests/README.md", "result": "wiring contract for Package.swift dependencies and the ColorMatchingOpenAPI target (implementation run)" }
+        ],
+        "reason": "Vendoring the document and editing Package.swift are implementation changes not permitted in the test-writing phase; no Swift toolchain in this container, so the red test could not be executed locally"
+      }
+    },
+    {
+      "id": "AC-2",
+      "description": "Generate the client for the surfaces the app uses today: test-sheet manifest + recent sheets, capture session creation, measurement upload, judgment upload, ranked results",
+      "status": "not_run",
+      "verification": {
+        "kind": "unit_or_service_test",
+        "references": [
+          { "locator": "iOS/Tests/ColorMatchingOpenAPITests/GeneratedClientTests.swift:16", "result": "not_run — manifest operation" },
+          { "locator": "iOS/Tests/ColorMatchingOpenAPITests/GeneratedClientTests.swift:42", "result": "not_run — recent sheets operation" },
+          { "locator": "iOS/Tests/ColorMatchingOpenAPITests/GeneratedClientTests.swift:95", "result": "not_run — capture creation operation" },
+          { "locator": "iOS/Tests/ColorMatchingOpenAPITests/GeneratedClientTests.swift:139", "result": "not_run — measurement upload operation" },
+          { "locator": "iOS/Tests/ColorMatchingOpenAPITests/GeneratedClientTests.swift:190", "result": "not_run — judgment upload operation" },
+          { "locator": "iOS/Tests/ColorMatchingOpenAPITests/GeneratedClientTests.swift:70", "result": "not_run — ranked results operation" }
+        ],
+        "reason": "Tests are written but cannot build until the implementation run adds the generated ColorMatchingOpenAPI target to Package.swift (compiled-language red phase)"
+      }
+    },
+    {
+      "id": "AC-3",
+      "description": "Replace the app's hand-written API models with generated types; keep purely client-side models as-is",
+      "status": "not_run",
+      "verification": {
+        "kind": "unit_or_service_test",
+        "references": [
+          { "locator": "iOS/Tests/ColorMatchingLPSAppTests/APIClientTests.swift", "result": "not_run — existing facade behavior tests retained as the safety net for the model swap; implementation run updates prose-shaped expectations (204 stubs, stats, scoring_algorithm_version) per docs/openapi-client-migration.md section 4" }
+        ],
+        "reason": "Implementation-phase change; this run may only commit tests and docs"
+      }
+    },
+    {
+      "id": "AC-4",
+      "description": "Swift tests exercising the generated client against local stubbed responses (no live server in CI)",
+      "status": "not_run",
+      "verification": {
+        "kind": "unit_or_service_test",
+        "references": [
+          { "locator": "iOS/Tests/ColorMatchingOpenAPITests/StubTransport.swift", "result": "not_run — ClientTransport stub records requests and serves canned JSON responses; no network involved" },
+          { "locator": "iOS/Tests/ColorMatchingOpenAPITests/GeneratedClientTests.swift:222", "result": "not_run — also covers the typed .notFound case replacing the hand-written client's generic badStatus" }
+        ],
+        "reason": "Tests exist and are inspectable but were not executed: target intentionally unwired until implementation, and no Swift toolchain in this container"
+      }
+    },
+    {
+      "id": "AC-5",
+      "description": "PR description records what changed between the prose contract and the published spec, and any endpoint gaps discovered",
+      "status": "passed",
+      "verification": {
+        "kind": "human_or_external_evidence",
+        "references": [
+          { "locator": "docs/openapi-client-migration.md", "result": "passed — 12 contract deltas (section 2) and the endpoint-gap inventory (section 3) derived from upstream sources of truth: viamin/color_matching lib/color_matching_web/{api_schemas.ex,router.ex,controllers/capture_controller.ex,controllers/test_sheet_controller.ex,controllers/test_sheet_json.ex} at main; issue #110 confirmed closed via the GitHub API" },
+          { "locator": "iOS/Tests/ColorMatchingLPSAppTests/OpenAPISpecConformanceTests.swift:104", "result": "the two highest-impact deltas (dropped stats/scoring_algorithm_version; bodied 200 responses) are pinned as executable assertions" }
+        ]
+      }
+    },
+    {
+      "id": "AC-6",
+      "description": "swift test --disable-sandbox green with generated types wired in",
+      "status": "not_run",
+      "verification": {
+        "kind": "unit_or_service_test",
+        "references": [
+          { "locator": ".github/workflows/ci.yml", "result": "not_run — CI runs 'swift test' on a macOS runner; at this tests-only head the suite is expected red solely from the deliberately-missing vendored spec file" }
+        ],
+        "reason": "Exit criterion for the implementation phase; unexecutable in this container (swift: command not found; executable target requires SwiftUI/AVFoundation so a Linux toolchain would not build the package)"
+      }
+    }
+  ]
+}
