@@ -1,0 +1,100 @@
+{
+  "status": "failed",
+  "summary": "Test-writing phase only. TDD boundary blocks Package.swift/Sources changes needed to add swift-openapi-generator/runtime and generate the client, so the full migration (deliverables 1-3) cannot be implemented in this run. Added 4 red Swift tests pinning real contract shapes discovered by reading viamin/color_matching at merge commit 094bd6d (PR #113, closing issue #110), and a docs file recording contract deltas/endpoint gaps for the PR description. Tests intentionally reference client methods/types that do not exist yet (expected red state); a follow-up implementation run must add swift-openapi-generator/runtime to iOS/Package.swift, vendor or fetch the OpenAPI document, generate the client, and wire these surfaces before swift test can pass.",
+  "acceptance_criteria": [
+    {
+      "id": "AC-1-add-openapi-deps-and-vendor-spec",
+      "status": "not_run",
+      "verification": {
+        "kind": "human_or_external_evidence",
+        "references": [
+          {
+            "locator": "iOS/Package.swift",
+            "result": "blocked: adding swift-openapi-generator/swift-openapi-runtime requires editing Package.swift, which is outside permitted test/doc paths in this test-writing-only run"
+          },
+          {
+            "locator": "docs/color-matching-api-contract-deltas.md#no-static-spec-file-to-vendor",
+            "result": "confirmed via source read of viamin/color_matching@094bd6d: the OpenAPI document is generated at runtime by OpenApiSpex (served at GET /api/v1/openapi.json), not checked into the repo as a static file, so there is nothing to vendor without a running Phoenix instance"
+          }
+        ]
+      }
+    },
+    {
+      "id": "AC-2-generate-client-for-five-surfaces",
+      "status": "not_run",
+      "verification": {
+        "kind": "human_or_external_evidence",
+        "references": [
+          {
+            "locator": "iOS/Sources/ColorMatchingLPSAppCore/APIClient.swift",
+            "result": "blocked: code generation and Sources/ changes are implementation-file changes, out of scope for this test-only phase; deferred to implementation run"
+          }
+        ]
+      }
+    },
+    {
+      "id": "AC-3-replace-hand-written-models",
+      "status": "not_run",
+      "verification": {
+        "kind": "human_or_external_evidence",
+        "references": [
+          {
+            "locator": "iOS/Sources/MeasurementCore/Models.swift",
+            "result": "blocked: same Sources/ restriction; current SheetManifest gap (missing printerProfile/captureProfile) documented and pinned by a red test instead"
+          }
+        ]
+      }
+    },
+    {
+      "id": "AC-4-swift-tests-against-stubbed-responses",
+      "status": "failed",
+      "verification": {
+        "kind": "unit_or_service_test",
+        "references": [
+          {
+            "locator": "iOS/Tests/ColorMatchingLPSAppTests/GeneratedClientContractTests.swift:testFetchRankedResultsDecodesRealResponseShape",
+            "result": "red by design: APIClient has no fetchRankedResults method and RankedResults type does not exist yet"
+          },
+          {
+            "locator": "iOS/Tests/ColorMatchingLPSAppTests/GeneratedClientContractTests.swift:testUploadMeasurementsDecodesCaptureIdAndCounts",
+            "result": "red by design: uploadMeasurements currently returns Void, discarding the real MeasurementUploadResponse body"
+          },
+          {
+            "locator": "iOS/Tests/ColorMatchingLPSAppTests/GeneratedClientContractTests.swift:testUploadJudgmentsDecodesCaptureIdAndCount",
+            "result": "red by design: uploadJudgments currently returns Void, discarding the real JudgmentUploadResponse body"
+          },
+          {
+            "locator": "iOS/Tests/ColorMatchingLPSAppTests/GeneratedClientContractTests.swift:testFetchManifestDecodesPrinterProfileAndCaptureProfileFromRealServerShape",
+            "result": "red by design: SheetManifest has no printerProfile/captureProfile properties today"
+          }
+        ]
+      }
+    },
+    {
+      "id": "AC-5-pr-description-records-contract-deltas-and-gaps",
+      "status": "passed",
+      "verification": {
+        "kind": "human_or_external_evidence",
+        "references": [
+          {
+            "locator": "docs/color-matching-api-contract-deltas.md",
+            "result": "passed: records contract deltas and endpoint gaps found by reading viamin/color_matching source at merge commit 094bd6d (closes issue #110 via PR #113), for inclusion in the eventual implementation PR description"
+          }
+        ]
+      }
+    },
+    {
+      "id": "exit-criterion-swift-test-green",
+      "status": "not_run",
+      "verification": {
+        "kind": "human_or_external_evidence",
+        "references": [
+          {
+            "locator": "iOS/",
+            "result": "no Swift toolchain available in this sandbox (swift: command not found) and no production code changes permitted in this phase; swift test --disable-sandbox was not run and is expected to fail to build until the implementation run lands"
+          }
+        ]
+      }
+    }
+  ]
+}
