@@ -46,6 +46,62 @@ final class APIClientTests: XCTestCase {
         XCTAssertEqual(quality["rejections"] as? [String], [])
     }
 
+    func testFetchManifestDecodesLocalStubResponse() async throws {
+        MockURLProtocol.handler = { request in
+            XCTAssertEqual(request.httpMethod, "GET")
+            XCTAssertEqual(request.url?.path, "/api/v1/test_sheets/sheet_1/manifest")
+            XCTAssertEqual(request.value(forHTTPHeaderField: "Authorization"), "Bearer token")
+            return (Self.response(for: request), Data(Self.manifestJSON.utf8))
+        }
+
+        let manifest = try await client().fetchManifest(
+            baseURL: URL(string: "https://example.test")!,
+            sheetCode: "sheet_1"
+        )
+
+        XCTAssertEqual(manifest.sheetID, "sheet_1")
+        XCTAssertEqual(manifest.pairs.map(\.id), ["pair_1"])
+    }
+
+    func testFetchRecentSheetsDecodesLocalStubResponse() async throws {
+        MockURLProtocol.handler = { request in
+            XCTAssertEqual(request.httpMethod, "GET")
+            XCTAssertEqual(request.url?.path, "/api/v1/test_sheets/recent")
+            return (Self.response(for: request), Data(#"""
+            {"sheets":[{"sheet_id":"sheet_1","manifest_url":"https://example.test/api/v1/test_sheets/sheet_1/manifest","title":"LPS sheet"}]}
+            """#.utf8))
+        }
+
+        let sheets = try await client().fetchRecentSheets(baseURL: URL(string: "https://example.test")!)
+
+        XCTAssertEqual(sheets.map(\.sheetID), ["sheet_1"])
+        XCTAssertEqual(sheets.first?.title, "LPS sheet")
+    }
+
+    func testGeneratedOpenAPIInputsDeclareEveryUsedSurface() throws {
+        let packageDirectory = URL(fileURLWithPath: #filePath)
+            .deletingLastPathComponent()
+            .deletingLastPathComponent()
+            .deletingLastPathComponent()
+        let package = try String(contentsOf: packageDirectory.appending(path: "Package.swift"))
+        let specification = try String(contentsOf: packageDirectory.appending(path: "OpenAPI/color-matching.yaml"))
+        let generatorConfiguration = try String(contentsOf: packageDirectory.appending(path: "openapi-generator-config.yaml"))
+
+        XCTAssertTrue(package.contains("swift-openapi-generator"))
+        XCTAssertTrue(package.contains("swift-openapi-runtime"))
+        XCTAssertTrue(generatorConfiguration.contains("generate:"))
+        [
+            "/api/v1/test_sheets/{sheet_id}/manifest",
+            "/api/v1/test_sheets/recent",
+            "/api/v1/test_sheets/{sheet_id}/captures",
+            "/api/v1/captures/{capture_id}/measurements",
+            "/api/v1/captures/{capture_id}/judgments",
+            "/api/v1/test_sheets/{sheet_id}/ranked_results"
+        ].forEach { endpoint in
+            XCTAssertTrue(specification.contains(endpoint), "Missing generated-client surface: \(endpoint)")
+        }
+    }
+
     func testUploadMeasurementsEncodesScoresWithAlgorithmVersion() async throws {
         var capturedBody: Data?
         MockURLProtocol.handler = { request in
@@ -101,6 +157,23 @@ final class APIClientTests: XCTestCase {
     private static func jsonObject(from data: Data?) throws -> Any {
         try JSONSerialization.jsonObject(with: XCTUnwrap(data))
     }
+
+    private static func response(for request: URLRequest, statusCode: Int = 200) -> HTTPURLResponse {
+        HTTPURLResponse(url: try! XCTUnwrap(request.url), statusCode: statusCode, httpVersion: nil, headerFields: nil)!
+    }
+
+    private static let manifestJSON = #"""
+    {
+      "schema_version":"lps-sheet-manifest/v1",
+      "sheet_version":"lps-letter-grid-v1",
+      "sheet_id":"sheet_1",
+      "manifest_url":"https://example.test/api/v1/test_sheets/sheet_1/manifest",
+      "page":{"units":"mm","width":215.9,"height":279.4},
+      "registration_markers":[],
+      "patches":[],
+      "pairs":[{"id":"pair_1","first_patch_id":"first","second_patch_id":"second","source_colors":["#000000","#FFFFFF"],"grid_row":0,"grid_col":0}]
+    }
+    """#
 
     private static func readBody(_ stream: InputStream) -> Data {
         stream.open()
