@@ -1,0 +1,80 @@
+{
+  "status": "passed",
+  "summary": "Red-phase test-writing run for issue #5 (generated OpenAPI Swift client). Committed 10 ungated structural tests (iOS/Tests/ColorMatchingLPSAppTests/OpenAPIArtifactTests.swift) that fail today because the vendored spec and OpenAPI toolchain do not exist yet, plus 8 gated stubbed-response tests (GeneratedClientContractTests.swift, compiled out via #if canImport(OpenAPIGeneratedCore) until the implementation run lands). Contract deltas between docs/color-matching-api-contract.md and the real published spec (viamin/color_matching#110, closed) were researched from the server source at viamin/color_matching@main and recorded in docs/openapi-client-test-plan.md for the implementation PR description. No Swift toolchain exists in this Linux container, so no Swift tests could be executed here; they run on macOS CI (swift test).",
+  "acceptance_criteria": [
+    {
+      "id": "AC-1",
+      "description": "swift-openapi-generator + swift-openapi-runtime in the iOS package; OpenAPI document vendored",
+      "status": "failed",
+      "verification": {
+        "kind": "unit_or_service_test",
+        "references": [
+          { "locator": "iOS/Tests/ColorMatchingLPSAppTests/OpenAPIArtifactTests.swift:13", "result": "not_run_in_container_red_by_design", "detail": "testVendoredOpenAPIDocumentExists — fails: iOS/OpenAPI/color-matching-openapi.json does not exist yet (expected red)" },
+          { "locator": "iOS/Tests/ColorMatchingLPSAppTests/OpenAPIArtifactTests.swift:242", "result": "not_run_in_container_red_by_design", "detail": "testPackageManifestWiresOpenAPIToolchain — fails: Package.swift has no OpenAPI deps yet (expected red)" }
+        ],
+        "reason": "Tests written and committed; cannot execute in this container (no Swift toolchain). Red by design until implementation run lands."
+      }
+    },
+    {
+      "id": "AC-2",
+      "description": "Generated client for the six surfaces the app uses (manifest, recent sheets, capture creation, measurement upload, judgment upload, ranked results)",
+      "status": "failed",
+      "verification": {
+        "kind": "unit_or_service_test",
+        "references": [
+          { "locator": "iOS/Tests/ColorMatchingLPSAppTests/OpenAPIArtifactTests.swift:28", "result": "not_run_in_container_red_by_design", "detail": "testVendoredSpecCoversSurfacesAppUses — pins all 6 paths/methods/operationIds" },
+          { "locator": "iOS/Tests/ColorMatchingLPSAppTests/GeneratedClientContractTests.swift:13", "result": "not_run_in_container_gated", "detail": "Stubbed-response test per operation; compiled out until OpenAPIGeneratedCore target exists" }
+        ],
+        "reason": "Behavior tests committed; activation requires the implementation run."
+      }
+    },
+    {
+      "id": "AC-3",
+      "description": "Replace hand-written API models with generated types; keep purely client-side models",
+      "status": "not_run",
+      "verification": {
+        "kind": "unit_or_service_test",
+        "references": [
+          { "locator": "iOS/Tests/ColorMatchingLPSAppTests/OpenAPIArtifactTests.swift:259", "result": "not_run_in_container_red_by_design", "detail": "testGeneratedTargetIsWiredIntoCoreAndTests — asserts ColorMatchingLPSAppCore and ColorMatchingLPSAppTests depend on OpenAPIGeneratedCore" }
+        ],
+        "reason": "Wiring assertion committed; model replacement itself is implementation-run work (MeasurementCore client-side models documented as keep-as-is in docs/openapi-client-test-plan.md)."
+      }
+    },
+    {
+      "id": "AC-4",
+      "description": "Swift tests exercising the generated client against local stubbed responses (no live server)",
+      "status": "not_run",
+      "verification": {
+        "kind": "permanent_system_test",
+        "references": [
+          { "locator": "iOS/Tests/ColorMatchingLPSAppTests/GeneratedClientContractTests.swift:337", "result": "not_run_in_container_gated", "detail": "8 tests driven by a test ClientTransport stub (no network): per-operation request building, JSON payload encoding, real-shaped response decoding, bearer auth via ClientMiddleware, 401 projection" }
+        ],
+        "reason": "Tests written and committed; require the generated target to compile. Execution deferred to macOS CI (swift test --disable-sandbox per issue exit criteria)."
+      }
+    },
+    {
+      "id": "AC-5",
+      "description": "PR description records prose-contract vs published-spec deltas and endpoint gaps",
+      "status": "passed",
+      "verification": {
+        "kind": "human_or_external_evidence",
+        "references": [
+          { "locator": "docs/openapi-client-test-plan.md", "result": "passed", "detail": "Delta tables (R-1/R-2, Q-1..Q-6, M-1..M-4, K-1, S-1..S-3) and gaps (G-1..G-3) derived from viamin/color_matching@main: lib/color_matching_web/api_schemas.ex, controllers/capture_controller.ex, controllers/test_sheet_controller.ex, controllers/test_sheet_json.ex, router.ex" },
+          { "locator": "https://github.com/viamin/color_matching/issues/110", "result": "passed", "detail": "Dependency issue confirmed closed; spec served at GET /api/v1/openapi.json" }
+        ]
+      }
+    },
+    {
+      "id": "EXIT-1",
+      "description": "swift test --disable-sandbox green with generated types wired in",
+      "status": "not_run",
+      "verification": {
+        "kind": "unit_or_service_test",
+        "references": [
+          { "locator": ".github/workflows/ci.yml:25", "result": "not_run", "detail": "macOS CI runs swift test in iOS/; cannot run in this Linux container (no Swift toolchain installed)" }
+        ],
+        "reason": "Blocked by environment: no Swift toolchain and no macOS host in this container. This is the implementation run's exit gate."
+      }
+    }
+  ]
+}
