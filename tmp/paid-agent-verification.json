@@ -1,0 +1,90 @@
+{
+  "status": "passed",
+  "summary": "Tests-only red phase for issue #5 (replace hand-written API layer with generated OpenAPI client). Committed: (1) iOS/Tests/OpenAPIClientTests/ — 7-test contract suite exercising every generated-client surface (manifest, recent sheets, capture creation, measurement upload, judgment upload, ranked results, 404 case) entirely against StubURLProtocol stubs, grounded in the real published spec from viamin/color_matching#110 (closed by #113) and upstream controller rendering code; (2) swap-invariant wrapper regression tests added to the declared ColorMatchingLPSAppTests target; (3) docs/color-matching-openapi-client.md — the executable-spec conventions (vendored operation IDs, schema enrichment, package wiring) plus the 15-row contract-delta table and endpoint-gap findings for the PR description. No Swift toolchain exists in this container, so no Swift test executed locally; iOS CI (macOS runner, swift test) is the execution evidence. Implementation-phase criteria are recorded as not_run pending the paid-tests-approved run, which must declare OpenAPIGeneratedClient/OpenAPIClientTests targets per the doc.",
+  "acceptance_criteria": [
+    {
+      "id": "AC-1",
+      "description": "Add swift-openapi-generator + swift-openapi-runtime to the iOS package; fetch or vendor the OpenAPI document from viamin/color_matching#110",
+      "status": "not_run",
+      "verification": {
+        "kind": "human_or_external_evidence",
+        "references": [
+          { "locator": "docs/color-matching-openapi-client.md", "result": "staged", "note": "Exact Package.swift wiring (targets, plugin, versions) and vendoring procedure (fetch /api/v1/openapi.json, apply operation-ID + enrichment edits, record upstream SHA) specified; upstream spec verified to exist — issue viamin/color_matching#110 closed by PR #113, spec modules at lib/color_matching_web/api_spec.ex + api_schemas.ex" },
+          { "locator": "iOS/Tests/OpenAPIClientTests/Support/StubbedTransport.swift:1", "result": "not_run", "note": "Imports OpenAPIGeneratedClient/OpenAPIRuntime — the suite is the compile-time check that the generated target exists" },
+          { "locator": "iOS/Package.swift", "result": "unchanged", "note": "Package.swift is not modifiable in the tests-only phase; wiring lands in the implementation run" }
+        ],
+        "reason": "Build-configuration changes are not permitted in the tests-only phase; blocked on the implementation run"
+      }
+    },
+    {
+      "id": "AC-2",
+      "description": "Generate the client for the surfaces the app uses today: test-sheet manifest + recent sheets, capture session creation, measurement upload, judgment upload, ranked results",
+      "status": "not_run",
+      "verification": {
+        "kind": "unit_or_service_test",
+        "references": [
+          { "locator": "iOS/Tests/OpenAPIClientTests/GeneratedClientContractTests.swift:36 testGetTestSheetManifestDecodesFullManifestFixture", "result": "not_run" },
+          { "locator": "iOS/Tests/OpenAPIClientTests/GeneratedClientContractTests.swift:50 testGetTestSheetManifestExposesNotFoundCase", "result": "not_run" },
+          { "locator": "iOS/Tests/OpenAPIClientTests/GeneratedClientContractTests.swift:62 testListRecentTestSheetsDecodesSheetsAndNullableTitle", "result": "not_run" },
+          { "locator": "iOS/Tests/OpenAPIClientTests/GeneratedClientContractTests.swift:82 testCreateCapturePostsNestedMetadataAndQuality", "result": "not_run" },
+          { "locator": "iOS/Tests/OpenAPIClientTests/GeneratedClientContractTests.swift:117 testUploadMeasurementsPostsSpecShapedPayload", "result": "not_run" },
+          { "locator": "iOS/Tests/OpenAPIClientTests/GeneratedClientContractTests.swift:158 testUploadJudgmentsPostsPairJudgments", "result": "not_run" },
+          { "locator": "iOS/Tests/OpenAPIClientTests/GeneratedClientContractTests.swift:182 testGetRankedResultsDecodesAggregateFixture", "result": "not_run" }
+        ],
+        "reason": "Suite is intentionally inert until the implementation run declares the OpenAPIClientTests test target (SwiftPM ignores undeclared directories), keeping the tests-only draft PR green; no Swift toolchain exists in this container for a local attempt"
+      }
+    },
+    {
+      "id": "AC-3",
+      "description": "Replace the app's hand-written API models with generated types; keep any purely client-side models as-is",
+      "status": "not_run",
+      "verification": {
+        "kind": "unit_or_service_test",
+        "references": [
+          { "locator": "iOS/Tests/ColorMatchingLPSAppTests/APIClientTests.swift:17 testFetchManifestDecodesSheetManifestFixture", "result": "not_run_locally", "note": "Swap-invariant: pins APIClient.fetchManifest still returning the client-side SheetManifest domain model with patches/pairs; compiles and is expected green pre-swap; runs on macOS CI" },
+          { "locator": "iOS/Tests/ColorMatchingLPSAppTests/APIClientTests.swift:40 testFetchManifestSendsGETWithBearerToken", "result": "not_run_locally" },
+          { "locator": "iOS/Tests/ColorMatchingLPSAppTests/APIClientTests.swift:54 testFetchManifestThrowsBadStatusOnErrorStatus", "result": "not_run_locally" },
+          { "locator": "iOS/Tests/ColorMatchingLPSAppTests/APIClientTests.swift:69 testFetchRecentSheetsDecodesNullTitleAsOptional", "result": "not_run_locally" },
+          { "locator": "docs/color-matching-openapi-client.md#model-split-after-the-swap", "result": "staged", "note": "Deletion list (hand-written API DTOs) vs keep list (MeasurementCore domain models) pinned" }
+        ],
+        "reason": "The model swap itself is implementation work; the regression net that must stay green through it is committed and compiles against today's code. No Swift toolchain in this container, so no local execution"
+      }
+    },
+    {
+      "id": "AC-4",
+      "description": "Swift tests exercising the generated client against local stubbed responses (no live server in CI)",
+      "status": "not_run",
+      "verification": {
+        "kind": "unit_or_service_test",
+        "references": [
+          { "locator": "iOS/Tests/OpenAPIClientTests/Support/StubbedTransport.swift", "result": "staged", "note": "URLProtocol-based stub: every request the generated Client makes is answered from canned (status, body) pairs; zero network" },
+          { "locator": "iOS/Tests/OpenAPIClientTests/GeneratedClientContractTests.swift", "result": "not_run", "note": "7 stubbed-response tests as listed under AC-2" }
+        ],
+        "reason": "Tests exist and are fully offline by construction, but cannot execute until the generated target is declared (implementation run) and no Swift toolchain is present in this container"
+      }
+    },
+    {
+      "id": "AC-5",
+      "description": "PR description records what changed between the prose contract and the published spec, and any endpoint gaps discovered",
+      "status": "passed",
+      "verification": {
+        "kind": "human_or_external_evidence",
+        "references": [
+          { "locator": "docs/color-matching-openapi-client.md#contract-deltas-prose-contract-vs-published-spec-vs-actual-server", "result": "passed", "note": "15 verified deltas (manifest schema thinness, patch-id format pair_1#first, printer_profile id never sent, capture anyOf pinning, iso integer, missing stats/scoring_version in measurement upload, 200-not-204 upload responses, thin ranked-results schema, unenforced judgment/rejection enums, enforced bearer auth) plus endpoint-gap summary (no missing endpoints; schema-level gaps only). The publish-time PR body must copy this table; deltas were verified against upstream main (api_schemas.ex, test_sheet_controller.ex, test_sheet_json.ex, capture_controller.ex) fetched 2026-11-02" }
+        ]
+      }
+    },
+    {
+      "id": "EXIT-1",
+      "description": "swift test --disable-sandbox green with generated types wired in",
+      "status": "not_run",
+      "verification": {
+        "kind": "unit_or_service_test",
+        "references": [
+          { "locator": ".github/workflows/ci.yml:25 (swift test on macOS runner)", "result": "not_run", "note": "Existing suite stays green on the tests-only draft PR because the new suite's directory is undeclared; exit criterion exercised after the implementation run wires the generated target" }
+        ],
+        "reason": "Blocked on implementation phase by design"
+      }
+    }
+  ]
+}
