@@ -1,0 +1,61 @@
+{
+  "status": "passed",
+  "summary": "Tests-only red phase for issue #5 (replace hand-written API layer with generated OpenAPI client) complete. Added permanent unit/service tests: OpenAPISpecCoverageTests (vendored openapi.json presence + coverage of all six app surfaces) and OpenAPIClientTests (six per-surface tests driving the generated client through a stub ClientTransport with canned responses, no live server), plus the test-first plan doc mapping ACs to verification and seeding the contract-delta checklist. Red by design: spec file and generated target do not exist yet (implementation run adds them). Swift toolchain is not installed in this container, so swift test could not be executed here.",
+  "acceptance_criteria": [
+    {
+      "id": "AC-1",
+      "status": "failed",
+      "verification": {
+        "kind": "unit_or_service_test",
+        "references": [
+          { "locator": "iOS/Tests/ColorMatchingLPSAppTests/OpenAPISpecCoverageTests.swift:11", "result": "failed (expected red: vendored iOS/Sources/ColorMatchingOpenAPI/openapi.json absent until implementation run vendors it from viamin/color_matching#110)" },
+          { "locator": "docs/openapi-generated-client-plan.md", "result": "naming/dependency contract recorded for implementation run" }
+        ]
+      }
+    },
+    {
+      "id": "AC-2",
+      "status": "failed",
+      "verification": {
+        "kind": "unit_or_service_test",
+        "references": [
+          { "locator": "iOS/Tests/ColorMatchingLPSAppTests/OpenAPIClientTests.swift:7", "result": "failed (expected red: #if canImport(ColorMatchingOpenAPI) gate compiles the #else XCTFail stubs until the generated client target is wired into iOS/Package.swift)" },
+          { "locator": "iOS/Tests/ColorMatchingLPSAppTests/OpenAPIClientTests.swift:361", "result": "red-phase stub branch covering all six surfaces" }
+        ]
+      }
+    },
+    {
+      "id": "AC-3",
+      "status": "not_run",
+      "verification": {
+        "kind": "human_or_external_evidence",
+        "references": [
+          { "locator": "iOS/Tests/ColorMatchingLPSAppTests/OpenAPIClientTests.swift:108", "result": "wire-format assertions prepared (snake_case request keys) to prove generated types encode the contract; model replacement itself is settled by implementation-run PR diff review" }
+        ],
+        "reason": "Criterion is about the implementation change set (delete hand-written API models, keep client-side models); lands in the follow-up implementation run after paid-tests-approved."
+      }
+    },
+    {
+      "id": "AC-4",
+      "status": "skipped",
+      "verification": {
+        "kind": "unit_or_service_test",
+        "references": [
+          { "locator": "iOS/Tests/ColorMatchingLPSAppTests/OpenAPIClientTests.swift:332", "result": "StubTransport implements ClientTransport with canned HTTPResponse/HTTPBody and records outbound requests; zero network use" }
+        ],
+        "reason": "Tests are written and inspectable, but no Swift toolchain exists in this container (swift: command not found), so they could not be executed here; exit criterion swift test --disable-sandbox green is verified in the implementation run."
+      }
+    },
+    {
+      "id": "AC-5",
+      "status": "not_run",
+      "verification": {
+        "kind": "human_or_external_evidence",
+        "references": [
+          { "locator": "docs/openapi-generated-client-plan.md", "result": "contract-delta/endpoint-gap checklist seeded (7 items incl. unspecified ranked_results schema, unspecified status codes, error shapes, auth scheme)" }
+        ],
+        "reason": "Deltas require the published spec from viamin/color_matching#110 (external dependency) and must be recorded in the implementation PR description."
+      }
+    }
+  ]
+}
