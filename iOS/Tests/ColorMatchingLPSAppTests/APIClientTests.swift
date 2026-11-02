@@ -92,6 +92,126 @@ final class APIClientTests: XCTestCase {
         XCTAssertEqual((json["judgments"] as? [[String: Any]])?.first?["judgment"] as? String, "near_match")
     }
 
+    func testFetchManifestDecodesSheetManifestAndAuthorizesRequest() async throws {
+        var capturedRequest: URLRequest?
+        MockURLProtocol.handler = { request in
+            capturedRequest = request
+            return (HTTPURLResponse(url: request.url!, statusCode: 200, httpVersion: nil, headerFields: nil)!, Data(Self.sheetManifestJSON.utf8))
+        }
+
+        let manifest = try await client().fetchManifest(
+            baseURL: URL(string: "https://example.test")!,
+            sheetCode: "sheet_123"
+        )
+
+        XCTAssertEqual(capturedRequest?.url?.path, "/api/v1/test_sheets/sheet_123/manifest")
+        XCTAssertEqual(capturedRequest?.value(forHTTPHeaderField: "Authorization"), "Bearer token")
+        XCTAssertEqual(manifest.schemaVersion, "lps-sheet-manifest/v1")
+        XCTAssertEqual(manifest.sheetID, "sheet_123")
+        XCTAssertEqual(manifest.manifestURL.absoluteString, "https://example.test/api/v1/test_sheets/sheet_123/manifest")
+        XCTAssertEqual(manifest.page.units, "mm")
+        XCTAssertEqual(manifest.page.width, 215.9, accuracy: 0.0001)
+        XCTAssertEqual(manifest.registrationMarkers.first?.role, "top_left")
+        XCTAssertEqual(manifest.patches.first?.sourceColor, "#FF0000")
+        XCTAssertEqual(manifest.patches.first?.safeInsetMM ?? 0, 1.5, accuracy: 0.0001)
+        XCTAssertEqual(manifest.pairs.first?.id, "pair_1")
+    }
+
+    func testFetchRecentSheetsDecodesNullableTitles() async throws {
+        var capturedRequest: URLRequest?
+        MockURLProtocol.handler = { request in
+            capturedRequest = request
+            return (HTTPURLResponse(url: request.url!, statusCode: 200, httpVersion: nil, headerFields: nil)!, Data(Self.recentSheetsJSON.utf8))
+        }
+
+        let sheets = try await client().fetchRecentSheets(baseURL: URL(string: "https://example.test")!)
+
+        XCTAssertEqual(capturedRequest?.url?.path, "/api/v1/test_sheets/recent")
+        XCTAssertEqual(capturedRequest?.value(forHTTPHeaderField: "Authorization"), "Bearer token")
+        XCTAssertEqual(sheets.count, 2)
+        let first = try XCTUnwrap(sheets.first)
+        XCTAssertEqual(first.sheetID, "sheet_123")
+        XCTAssertEqual(first.manifestURL.absoluteString, "https://example.test/api/v1/test_sheets/sheet_123/manifest")
+        XCTAssertNil(first.title)
+        XCTAssertEqual(sheets.last?.title, "July LPS comparison sheet")
+    }
+
+    func testUploadMeasurementsAcceptsJsonSuccessResponse() async throws {
+        var capturedRequest: URLRequest?
+        MockURLProtocol.handler = { request in
+            capturedRequest = request
+            return (HTTPURLResponse(url: request.url!, statusCode: 200, httpVersion: nil, headerFields: nil)!, Data(#"{"capture_id":"cap_1","measurement_count":1,"pair_score_count":1}"#.utf8))
+        }
+
+        let rgb = RGB(r: 0.2, g: 0.3, b: 0.4)
+        let stats = ChannelStats(median: rgb, mean: rgb, standardDeviation: RGB(r: 0.01, g: 0.01, b: 0.01), min: rgb, max: rgb, sampleCount: 9, clippingFraction: 0)
+        try await client().uploadMeasurements(
+            captureID: "cap_1",
+            baseURL: URL(string: "https://example.test")!,
+            measurements: [PatchMeasurement(patchID: "patch_1", linearRGBMedian: rgb, normalizedLinearRGBMedian: rgb, stats: stats)],
+            scores: [PairScore(pairID: "pair_1", distance: 0.1, similarity: 0.9, algorithmVersion: LPSScorer.algorithmVersion)]
+        )
+
+        XCTAssertEqual(capturedRequest?.url?.path, "/api/v1/captures/cap_1/measurements")
+    }
+
+    private static let sheetManifestJSON = #"""
+    {
+      "schema_version": "lps-sheet-manifest/v1",
+      "sheet_version": "lps-letter-grid-v1",
+      "sheet_id": "sheet_123",
+      "manifest_url": "https://example.test/api/v1/test_sheets/sheet_123/manifest",
+      "created_at": "2026-07-25T12:00:00Z",
+      "page": {"units": "mm", "width": 215.9, "height": 279.4},
+      "registration_markers": [
+        {"role": "top_left", "shape": "solid_square", "rect": {"x": 12, "y": 12, "width": 8, "height": 8}}
+      ],
+      "printer_profile": {
+        "id": "printer_profile_1",
+        "name": "Research printer",
+        "paper": "paper name",
+        "ink": "ink set",
+        "settings": {}
+      },
+      "capture_profile": {
+        "expected_illuminant": "low_pressure_sodium",
+        "preferred_camera": "built_in_wide_angle_rear",
+        "scoring_algorithm_version": "lps-distance-v1"
+      },
+      "patches": [
+        {
+          "id": "patch_1",
+          "role": "pair_color",
+          "pair_id": "pair_1",
+          "pair_side": "first",
+          "reference_role": null,
+          "source_color": "#FF0000",
+          "safe_inset_mm": 1.5,
+          "rect": {"x": 16, "y": 38, "width": 16, "height": 10}
+        }
+      ],
+      "pairs": [
+        {
+          "id": "pair_1",
+          "first_patch_id": "patch_1",
+          "second_patch_id": "patch_2",
+          "source_colors": ["#FF0000", "#00FF00"],
+          "grid_row": 0,
+          "grid_col": 1
+        }
+      ]
+    }
+    """#
+
+    private static let recentSheetsJSON = #"""
+    {
+      "sheets": [
+        {"sheet_id": "sheet_123", "manifest_url": "https://example.test/api/v1/test_sheets/sheet_123/manifest", "title": null},
+        {"sheet_id": "sheet_456", "manifest_url": "https://example.test/api/v1/test_sheets/sheet_456/manifest", "title": "July LPS comparison sheet"}
+      ]
+    }
+    """#
+
     private func client() -> APIClient {
         let configuration = URLSessionConfiguration.ephemeral
         configuration.protocolClasses = [MockURLProtocol.self]
