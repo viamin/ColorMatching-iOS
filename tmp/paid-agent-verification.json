@@ -1,0 +1,68 @@
+{
+  "status": "failed",
+  "summary": "Test-writing (red-phase) run for issue #5. Committed permanent tests that expose the missing generated-OpenAPI-client behavior: OpenAPISpecContractTests (13 tests validating the vendored document at iOS/Sources/OpenAPIGeneratedClient/openapi.json — currently failing because the spec is not vendored yet) and GeneratedClientStubbedResponseTests (7 tests exercising all six app surfaces through a stubbed ClientTransport — compiled out via #if canImport until the OpenAPIGeneratedClient target exists, with an XCTFail availability marker active now). Contract deltas between docs/color-matching-api-contract.md and the published spec (fetched and analyzed from viamin/color_matching PR #113) are recorded in docs/openapi-client-generation.md for the PR description. No Swift toolchain exists in this container, so swift test --disable-sandbox could not be executed locally; the red failures are expected to surface in CI (macOS). Implementation lands in the separate Paid implementation run after tests approval.",
+  "acceptance_criteria": [
+    {
+      "id": "AC-1",
+      "description": "Add swift-openapi-generator + swift-openapi-runtime to the iOS package; fetch or vendor the OpenAPI document from viamin/color_matching#110",
+      "status": "failed",
+      "verification": {
+        "kind": "unit_or_service_test",
+        "references": [
+          { "locator": "iOS/Tests/ColorMatchingLPSAppTests/OpenAPISpecContractTests.swift:52", "result": "expected_red_failure", "note": "Fails with vendoring instructions while iOS/Sources/OpenAPIGeneratedClient/openapi.json is absent" },
+          { "locator": "iOS/Tests/ColorMatchingLPSAppTests/GeneratedClientStubbedResponseTests.swift:332", "result": "expected_red_failure", "note": "GeneratedClientAvailabilityTests XCTFail while the generated module is not wired into the package" }
+        ]
+      }
+    },
+    {
+      "id": "AC-2",
+      "description": "Generate the client for the surfaces the app uses today: manifest, recent sheets, capture creation, measurement upload, judgment upload, ranked results",
+      "status": "failed",
+      "verification": {
+        "kind": "unit_or_service_test",
+        "references": [
+          { "locator": "iOS/Tests/ColorMatchingLPSAppTests/GeneratedClientStubbedResponseTests.swift:78", "result": "not_compiled_until_implementation", "note": "manifest GET + versioned decode" },
+          { "locator": "iOS/Tests/ColorMatchingLPSAppTests/GeneratedClientStubbedResponseTests.swift:128", "result": "not_compiled_until_implementation", "note": "recent sheets incl. null title" },
+          { "locator": "iOS/Tests/ColorMatchingLPSAppTests/GeneratedClientStubbedResponseTests.swift:171", "result": "not_compiled_until_implementation", "note": "capture creation: nested metadata+quality encode, 201 capture_id decode" },
+          { "locator": "iOS/Tests/ColorMatchingLPSAppTests/GeneratedClientStubbedResponseTests.swift:220", "result": "not_compiled_until_implementation", "note": "measurement upload: RgbPayload object encode, counts decode" },
+          { "locator": "iOS/Tests/ColorMatchingLPSAppTests/GeneratedClientStubbedResponseTests.swift:283", "result": "not_compiled_until_implementation", "note": "judgment upload encode + count decode" },
+          { "locator": "iOS/Tests/ColorMatchingLPSAppTests/GeneratedClientStubbedResponseTests.swift:313", "result": "not_compiled_until_implementation", "note": "ranked results GET + versioned decode" }
+        ]
+      }
+    },
+    {
+      "id": "AC-3",
+      "description": "Replace the app's hand-written API models with generated types; keep purely client-side models as-is",
+      "status": "not_run",
+      "verification": {
+        "kind": "unit_or_service_test",
+        "references": [
+          { "locator": "iOS/Tests/ColorMatchingLPSAppTests/APIClientTests.swift", "result": "not_run", "note": "Existing hand-written-client tests stay green until the implementation run replaces APIClient; they are updated/retired there. Implementation files cannot change in this test-writing run." }
+        ]
+      }
+    },
+    {
+      "id": "AC-4",
+      "description": "Swift tests exercising the generated client against local stubbed responses (no live server in CI)",
+      "status": "not_run",
+      "verification": {
+        "kind": "unit_or_service_test",
+        "references": [
+          { "locator": "iOS/Tests/ColorMatchingLPSAppTests/GeneratedClientStubbedResponseTests.swift:25", "result": "written_not_executed", "note": "StubTransport (actor ClientTransport) replays canned responses; no network. Container has no Swift toolchain: swift test --disable-sandbox not runnable locally; expected to run (red) in CI" }
+        ]
+      }
+    },
+    {
+      "id": "AC-5",
+      "description": "PR description records what changed between the prose contract and the published spec, and any endpoint gaps discovered",
+      "status": "skipped",
+      "verification": {
+        "kind": "human_or_external_evidence",
+        "references": [
+          { "locator": "docs/openapi-client-generation.md", "result": "passed", "note": "10-row contract-delta table + endpoint-gap analysis derived from viamin/color_matching PR #113 sources (api_schemas.ex, controllers, router); to be lifted into the PR description" },
+          { "locator": "PR body", "result": "not_run", "note": "No PR opened in this run (no push permitted); PR description lands with the implementation run" }
+        ]
+      }
+    }
+  ]
+}
