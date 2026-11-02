@@ -305,4 +305,46 @@ final class MeasurementCoreTests: XCTestCase {
         XCTAssertEqual(pair.secondPatchID, "pair-abc#second")
         XCTAssertEqual(pair.sourceColors, ["#FF4444", "#BB55BB"])
     }
+
+    func testManifestRequiredCaptureProfileAndPrinterProfileAreNotModeled() {
+        // The published OpenAPI schema for TestSheetManifest
+        // (ColorMatchingWeb.ApiSchemas.Manifest, viamin/color_matching#110)
+        // declares `capture_profile` as a *required* property, with
+        // `capture_profile.scoring_algorithm_version` itself required and
+        // enum-constrained to ["lps-distance-v1"]. The real response also
+        // always includes `printer_profile` and `created_at`. SheetManifest
+        // has no properties for any of the three, so the client can decode
+        // the response (testDecodesContractManifestFromServer, above) but
+        // cannot read the one piece of data (scoring_algorithm_version) the
+        // spec actually guarantees. See
+        // docs/color-matching-api-contract-deltas.md.
+        let json = #"""
+        {
+          "schema_version": "lps-sheet-manifest/v1",
+          "sheet_version": "lps-letter-grid-v1",
+          "sheet_id": "LPSM-DEV3",
+          "manifest_url": "http://localhost:4000/api/v1/test_sheets/LPSM-DEV3/manifest",
+          "created_at": "2026-07-28T20:10:19Z",
+          "page": {"units": "mm", "width": 215.9, "height": 279.4},
+          "registration_markers": [],
+          "printer_profile": {"printer_make_model": "Generic Inkjet", "paper_type": "Plain", "ink_type": "Dye"},
+          "capture_profile": {"expected_illuminant": "low_pressure_sodium", "preferred_camera": "built_in_wide_angle_rear", "scoring_algorithm_version": "lps-distance-v1"},
+          "patches": [],
+          "pairs": []
+        }
+        """#
+
+        let manifest = try! JSONDecoder().decode(SheetManifest.self, from: Data(json.utf8))
+        XCTAssertEqual(manifest.sheetID, "LPSM-DEV3")
+
+        XCTFail(
+            """
+            SheetManifest has no property for capture_profile (required by the \
+            published schema, and the only place scoring_algorithm_version lives), \
+            printer_profile, or created_at. The decode above succeeds only because \
+            Decodable silently ignores unknown keys. See issue #5 and \
+            docs/color-matching-api-contract-deltas.md.
+            """
+        )
+    }
 }
