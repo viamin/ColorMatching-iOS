@@ -1,0 +1,73 @@
+{
+  "status": "passed",
+  "summary": "Tests-only red-phase PR for issue #5 (replace hand-written API layer with a generated OpenAPI Swift client). Added 3 permanent Swift test files under iOS/Tests/ColorMatchingLPSAppTests/ plus a test-plan/delta doc. Layer-1 tests (package deps + vendored spec contract) compile and run today and fail for exactly the missing deliverables; Layer-2 stubbed-response tests are canImport-gated and skip until the ColorMatchingOpenAPI generated target exists, and were proven green (7/7) plus the spec-contract suite (19/19) in a reference scratch harness on Linux Swift 6.1.2 against a real swift-openapi-generator 1.13.1 client. Contract deltas between docs/color-matching-api-contract.md and the published viamin/color_matching spec are recorded in docs/openapi-generated-client-test-plan.md.",
+  "acceptance_criteria": [
+    {
+      "id": "AC-1",
+      "description": "Add swift-openapi-generator + swift-openapi-runtime to the iOS package; fetch or vendor the OpenAPI document from viamin/color_matching#110",
+      "status": "failed",
+      "reason": "Expected red phase: implementation deliverable not yet present; verifying tests exist, compile, and fail on exactly the missing package dependencies and vendored document.",
+      "verification": {
+        "kind": "unit_or_service_test",
+        "references": [
+          { "locator": "iOS/Tests/ColorMatchingLPSAppTests/OpenAPIGeneratedClientPackageTests.swift:13", "result": "failed", "detail": "Package.swift lacks swift-openapi-generator/runtime/urlsession (expected red)" },
+          { "locator": "iOS/Tests/ColorMatchingLPSAppTests/OpenAPIGeneratedClientPackageTests.swift:52", "result": "failed", "detail": "Sources/ColorMatchingOpenAPI/openapi.json + openapi-generator-config.yaml missing (expected red)" },
+          { "locator": "iOS/Tests/ColorMatchingLPSAppTests/OpenAPISpecContractTests.swift:34", "result": "failed", "detail": "vendored spec missing (expected red)" }
+        ]
+      }
+    },
+    {
+      "id": "AC-2",
+      "description": "Generate the client for the surfaces the app uses today: manifest, recent sheets, capture creation, measurement upload, judgment upload, ranked results",
+      "status": "failed",
+      "reason": "Expected red phase: no generated target yet. Spec-coverage tests pin all six operations; stubbed-response tests are canImport-gated (skip) until the target exists.",
+      "verification": {
+        "kind": "unit_or_service_test",
+        "references": [
+          { "locator": "iOS/Tests/ColorMatchingLPSAppTests/OpenAPISpecContractTests.swift:56", "result": "failed", "detail": "six-operation coverage assertions (expected red: spec missing)" },
+          { "locator": "iOS/Tests/ColorMatchingLPSAppTests/GeneratedClientStubbedResponseTests.swift:24", "result": "skipped", "detail": "canImport gate; XCTSkip fallback records missing ColorMatchingOpenAPI target" },
+          { "locator": "tmp scratch harness (not committed)", "result": "passed", "detail": "same file set: 7/7 GeneratedClientStubbedResponseTests + 19/19 OpenAPISpecContractTests green against generated client (swift-openapi-generator 1.13.1, Swift 6.1.2)" }
+        ]
+      }
+    },
+    {
+      "id": "AC-3",
+      "description": "Replace the app's hand-written API models with generated types; keep purely client-side models as-is",
+      "status": "failed",
+      "reason": "Expected red phase: implementation PR work. Package test requires ColorMatchingLPSAppCore to depend on ColorMatchingOpenAPI; existing APIClientTests remain as wire-behavior preservation suite.",
+      "verification": {
+        "kind": "unit_or_service_test",
+        "references": [
+          { "locator": "iOS/Tests/ColorMatchingLPSAppTests/OpenAPIGeneratedClientPackageTests.swift:43", "result": "failed", "detail": "AppCore -> ColorMatchingOpenAPI dependency missing (expected red)" },
+          { "locator": "iOS/Tests/ColorMatchingLPSAppTests/APIClientTests.swift", "result": "not_run", "detail": "existing wire-behavior suite; Linux run blocked by pre-existing FoundationNetworking gap in Sources/ColorMatchingLPSAppCore/APIClient.swift (macOS CI authoritative)" }
+        ]
+      }
+    },
+    {
+      "id": "AC-4",
+      "description": "Swift tests exercising the generated client against local stubbed responses (no live server in CI)",
+      "status": "skipped",
+      "reason": "Suite present and compile-verified; activates automatically once the generated target lands (XCTSkip until then). Green path proven in reference harness.",
+      "verification": {
+        "kind": "unit_or_service_test",
+        "references": [
+          { "locator": "iOS/Tests/ColorMatchingLPSAppTests/GeneratedClientStubbedResponseTests.swift:31", "result": "skipped", "detail": "six happy-path stubbed tests + undocumented-status drift test behind canImport(ColorMatchingOpenAPI)" },
+          { "locator": "tmp scratch harness (not committed)", "result": "passed", "detail": "7/7 green against real generated client with URLProtocol-stubbed URLSessionTransport" }
+        ]
+      }
+    },
+    {
+      "id": "AC-5",
+      "description": "PR description records: what changed between the prose contract and the published spec, and any endpoint gaps discovered",
+      "status": "passed",
+      "reason": "Delta inventory from the real published spec (viamin/color_matching main, api_spec.ex/api_schemas.ex/controllers) is documented, including the CaptureRequest/PairScoreRequest anyOf field-dropping hazard, the thin manifest schema, upload response bodies, and the ranked-results payload gap.",
+      "verification": {
+        "kind": "human_or_external_evidence",
+        "references": [
+          { "locator": "docs/openapi-generated-client-test-plan.md", "result": "passed", "detail": "Contract deltas section (9 deltas) + vendoring/normalization decisions" },
+          { "locator": "https://github.com/viamin/color_matching/issue/110 (published spec source: lib/color_matching_web/api_spec.ex on main, inspected 2026-10-31)", "result": "passed", "detail": "external evidence base for the delta list" }
+        ]
+      }
+    }
+  ]
+}
