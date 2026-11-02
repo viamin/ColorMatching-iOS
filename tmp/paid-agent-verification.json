@@ -1,0 +1,101 @@
+{
+  "status": "passed",
+  "summary": "Tests-only (red-phase) run for issue #5. Committed 14 XCTest methods in a new test-target directory iOS/Tests/ColorMatchingLPSAPITests/ that exercise the to-be-generated OpenAPI client (module ColorMatchingLPSAPI, Client + Components.Schemas.*) against a local StubTransport conforming to ClientTransport -- no live server. Fixtures and expected wire formats are taken from docs/color-matching-api-contract.md. The normative OpenAPI 3.1 document, generator config (accessModifier: public, default defensive naming), and Package.swift wiring the implementation run must apply are recorded in docs/openapi-generated-client-test-plan.md, including the prose-vs-spec contract delta analysis (8 deltas, largest: ranked_results has no schema in the prose contract). Limitation: no Swift toolchain exists in this container, so swift test could not be executed here; the test target is also intentionally not yet registered in iOS/Package.swift (implementation file, out of phase scope) so the existing suite is unaffected at this commit. Evidence below references file locators at this commit head; execution-based statuses are recorded honestly as not_run/skipped.",
+  "acceptance_criteria": [
+    {
+      "id": "AC-1",
+      "description": "Add swift-openapi-generator + swift-openapi-runtime to the iOS package; fetch or vendor the OpenAPI document from viamin/color_matching#110",
+      "status": "not_run",
+      "verification": {
+        "kind": "human_or_external_evidence",
+        "references": [
+          {
+            "locator": "docs/openapi-generated-client-test-plan.md (sections 'Package wiring', 'Generator config', 'OpenAPI document')",
+            "result": "prepared_not_applied"
+          }
+        ],
+        "reason": "Package.swift and iOS/Sources/ColorMatchingLPSAPI/openapi.yaml are implementation files outside this test-writing phase's allowlist. Upstream spec viamin/color_matching#110 does not exist yet (GitHub API returns 404 for the PR; verified during this run), so the document is derived from docs/color-matching-api-contract.md and provided verbatim for the implementation run to vendor."
+      }
+    },
+    {
+      "id": "AC-2",
+      "description": "Generate the client for the surfaces the app uses today: manifest + recent sheets, capture session creation, measurement upload, judgment upload, ranked results",
+      "status": "not_run",
+      "verification": {
+        "kind": "unit_or_service_test",
+        "references": [
+          {
+            "locator": "iOS/Tests/ColorMatchingLPSAPITests/SheetSurfaceTests.swift",
+            "result": "written_not_executed"
+          },
+          {
+            "locator": "iOS/Tests/ColorMatchingLPSAPITests/CaptureFlowTests.swift",
+            "result": "written_not_executed"
+          },
+          {
+            "locator": "iOS/Tests/ColorMatchingLPSAPITests/RankedResultsTests.swift",
+            "result": "written_not_executed"
+          }
+        ],
+        "reason": "All six operations (getTestSheetManifest, listRecentTestSheets, createCaptureSession, uploadMeasurements, uploadJudgments, getRankedResults) have focused tests with request-shape and decoded-response assertions, but they cannot execute until the implementation run registers the ColorMatchingLPSAPI target and test target in Package.swift. Swift toolchain is also unavailable in this container."
+      }
+    },
+    {
+      "id": "AC-3",
+      "description": "Replace hand-written API models with generated types; keep client-side models as-is",
+      "status": "not_run",
+      "verification": {
+        "kind": "unit_or_service_test",
+        "references": [
+          {
+            "locator": "iOS/Tests/ColorMatchingLPSAppTests/APIClientTests.swift",
+            "result": "existing_suite_untouched"
+          },
+          {
+            "locator": "iOS/Tests/MeasurementCoreTests/MeasurementCoreTests.swift",
+            "result": "existing_suite_untouched"
+          }
+        ],
+        "reason": "Model replacement lives in iOS/Sources/ (implementation phase). Purely client-side MeasurementCore models (Rect.inset, ChannelStats min/max, SheetAnalysis) are not covered by the generated types and are documented as staying as-is in docs/openapi-generated-client-test-plan.md."
+      }
+    },
+    {
+      "id": "AC-4",
+      "description": "Swift tests exercising the generated client against local stubbed responses (no live server in CI)",
+      "status": "skipped",
+      "verification": {
+        "kind": "unit_or_service_test",
+        "references": [
+          {
+            "locator": "iOS/Tests/ColorMatchingLPSAPITests/TestSupport.swift",
+            "result": "written_not_executed"
+          },
+          {
+            "locator": "iOS/Tests/ColorMatchingLPSAPITests/SheetSurfaceTests.swift:26 (testUnknownPatchRoleSurfacesAsDecodingError)",
+            "result": "written_not_executed"
+          },
+          {
+            "locator": "iOS/Tests/ColorMatchingLPSAPITests/RankedResultsTests.swift:36 (testUndocumentedStatusSurfacesAsSwiftCase)",
+            "result": "written_not_executed"
+          }
+        ],
+        "reason": "14 test methods written; every response is a canned (HTTPResponse, HTTPBody) from StubTransport (ClientTransport conformance, no network). JSON fixtures validated as parseable and schema-conformant against the normative spec via script during this run. Execution blocked: no Swift toolchain in container (swift: command not found) and target registration deferred to implementation run. Exit criterion 'swift test --disable-sandbox green' remains for the implementation run."
+      }
+    },
+    {
+      "id": "AC-5",
+      "description": "PR description records what changed between the prose contract and the published spec, and endpoint gaps discovered",
+      "status": "skipped",
+      "verification": {
+        "kind": "human_or_external_evidence",
+        "references": [
+          {
+            "locator": "docs/openapi-generated-client-test-plan.md (section 'Contract deltas: prose contract vs. published spec')",
+            "result": "prepared_not_published"
+          }
+        ],
+        "reason": "Eight deltas and two endpoint gaps (ranked_results never implemented client-side; 'recent' literal vs {sheet_id} routing) are documented for copying into the PR description. The PR itself is not opened from this run (do-not-push phase); publishing and human review of the PR description happen in the implementation run."
+      }
+    }
+  ]
+}
