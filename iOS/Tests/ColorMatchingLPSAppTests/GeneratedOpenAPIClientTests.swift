@@ -37,7 +37,7 @@ final class GeneratedOpenAPIClientTests: XCTestCase {
         guard case .json(let manifest) = ok.body else { return XCTFail("expected JSON body, got \(ok.body)") }
         XCTAssertEqual(manifest.schemaVersion, .lpsSheetManifestV1)
         XCTAssertEqual(manifest.sheetId, "sheet_123")
-        XCTAssertEqual(manifest.captureProfile?.scoringAlgorithmVersion, .lpsDistanceV1)
+        XCTAssertEqual(manifest.captureProfile.scoringAlgorithmVersion, .lpsDistanceV1)
     }
 
     func testFetchManifestSurfacesNotFoundError() async throws {
@@ -48,6 +48,16 @@ final class GeneratedOpenAPIClientTests: XCTestCase {
         )
 
         guard case .notFound = response else { return XCTFail("expected .notFound, got \(response)") }
+    }
+
+    func testFetchManifestSurfacesUnauthorizedError() async throws {
+        transport.respond(status: 401, json: #"{"errors":{"detail":"Unauthorized"}}"#)
+
+        let response = try await client.colorMatchingWeb_TestSheetController_manifest(
+            .init(path: .init(sheetId: "sheet_123"))
+        )
+
+        guard case .unauthorized = response else { return XCTFail("expected .unauthorized, got \(response)") }
     }
 
     func testFetchManifestSurfacesUndocumentedStatusAsUndocumented() async throws {
@@ -110,24 +120,15 @@ final class GeneratedOpenAPIClientTests: XCTestCase {
     func testCreateCapturePostsNestedMetadataAndQualityAndDecodesCaptureID() async throws {
         transport.respond(status: 201, json: #"{"capture_id":"105"}"#)
 
-        let metadata = Components.Schemas.CaptureMetadata(
-            deviceModel: "iPhone 15 Pro",
-            lens: "built_in_wide_angle",
-            imageWidth: 4032,
-            imageHeight: 3024,
-            appVersion: "0.1.0",
-            timestamp: Date(timeIntervalSince1970: 0)
-        )
-        let quality = Components.Schemas.CaptureRequest.Quality(
-            detectedMarkerCount: 4,
-            blurScore: 0.82,
-            rejections: []
+        let request = try Self.decodeGenerated(
+            Self.captureRequestJSON,
+            as: Components.Schemas.CaptureRequest.self
         )
 
         let response = try await client.colorMatchingWeb_CaptureController_create(
             .init(
                 path: .init(sheetId: "sheet_123"),
-                body: .json(Components.Schemas.CaptureRequest(metadata: metadata, quality: quality))
+                body: .json(request)
             )
         )
 
@@ -149,6 +150,26 @@ final class GeneratedOpenAPIClientTests: XCTestCase {
         guard case .created(let created) = response else { return XCTFail("expected .created, got \(response)") }
         guard case .json(let capture) = created.body else { return XCTFail("expected JSON body") }
         XCTAssertEqual(capture.captureId, "105")
+    }
+
+    /// The app builds the capture metadata from camera values, so the generated
+    /// metadata type has to be constructible from Swift.
+    func testCaptureMetadataIsConstructibleFromAppValues() throws {
+        let metadata = Components.Schemas.CaptureMetadata(
+            deviceModel: "iPhone 15 Pro",
+            lens: "built_in_wide_angle",
+            imageWidth: 4032,
+            imageHeight: 3024,
+            appVersion: "0.1.0",
+            timestamp: Date(timeIntervalSince1970: 0)
+        )
+
+        XCTAssertEqual(metadata.deviceModel, "iPhone 15 Pro")
+        XCTAssertEqual(metadata.lens, "built_in_wide_angle")
+        XCTAssertEqual(metadata.imageWidth, 4032)
+        XCTAssertEqual(metadata.imageHeight, 3024)
+        XCTAssertEqual(metadata.appVersion, "0.1.0")
+        XCTAssertEqual(metadata.timestamp, Date(timeIntervalSince1970: 0))
     }
 
     // MARK: - Measurement upload
@@ -259,6 +280,25 @@ private extension GeneratedOpenAPIClientTests {
         }
         """
 
+    /// The nested capture shape the app sends: metadata plus quality.
+    static let captureRequestJSON = """
+        {
+          "metadata": {
+            "device_model": "iPhone 15 Pro",
+            "lens": "built_in_wide_angle",
+            "image_width": 4032,
+            "image_height": 3024,
+            "app_version": "0.1.0",
+            "timestamp": "1970-01-01T00:00:00Z"
+          },
+          "quality": {
+            "detected_marker_count": 4,
+            "blur_score": 0.82,
+            "rejections": []
+          }
+        }
+        """
+
     static let measurementsJSON = """
         {
           "measurements": [
@@ -278,6 +318,15 @@ private extension GeneratedOpenAPIClientTests {
           ]
         }
         """
+
+    /// Decodes a wire payload into a generated type. The generated types use
+    /// `Date` for `date-time` fields, so the decoder needs the ISO-8601
+    /// strategy the runtime's converter uses.
+    static func decodeGenerated<T: Decodable>(_ json: String, as type: T.Type) throws -> T {
+        let decoder = JSONDecoder()
+        decoder.dateDecodingStrategy = .iso8601
+        return try decoder.decode(type, from: Data(json.utf8))
+    }
 }
 
 // MARK: - Request assertions
@@ -346,8 +395,8 @@ import XCTest
 /// Red-phase marker: the generated OpenAPI client from issue #5 is not wired
 /// into the Swift package yet. This test stops failing once the target
 /// `ColorMatchingOpenAPI` (built by the OpenAPIGenerator plugin from
-/// `iOS/OpenAPI/color-matching.json`) and `swift-openapi-runtime` are
-/// dependencies of this test target.
+/// `iOS/Sources/ColorMatchingOpenAPI/openapi.json`) and
+/// `swift-openapi-runtime` are dependencies of this test target.
 final class GeneratedOpenAPIClientAvailabilityTests: XCTestCase {
     func testGeneratedOpenAPIClientIsWiredIntoPackage() {
         XCTFail(

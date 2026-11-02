@@ -18,10 +18,11 @@ diff or compile error instead of a runtime surprise.
 
 | AC | Deliverable (from issue #5) | Smallest credible verification | Kind |
 |----|-----------------------------|--------------------------------|------|
-| AC-1 | Add `swift-openapi-generator` + `swift-openapi-runtime`; vendor the OpenAPI document | `OpenAPISpecCoverageTests` reads `iOS/Package.swift` (plugin + deps + generated target) and the vendored `iOS/OpenAPI/color-matching.json` (parses, `openapi` 3.x) | Permanent unit test |
+| AC-1 | Add `swift-openapi-generator` + `swift-openapi-runtime`; vendor the OpenAPI document | `OpenAPISpecCoverageTests` reads `iOS/Package.swift` (package URLs, plugin, generated target, target wiring), the generator configuration (`openapi-generator-config.yaml`), and the vendored `iOS/Sources/ColorMatchingOpenAPI/openapi.json` (parses, `openapi` 3.x) | Permanent unit test |
 | AC-2 | Generate the client for the six app surfaces (manifest, recent sheets, capture creation, measurement upload, judgment upload, ranked results) | `OpenAPISpecCoverageTests` pins each path/method/operationId/path-params/response statuses; `GeneratedOpenAPIClientTests` exercises each generated method | Permanent unit tests |
-| AC-3 | Replace hand-written API models with generated types; keep purely client-side models | `GeneratedOpenAPIClientTests` uses `Components.Schemas.*` for every wire payload; existing `APIClientTests` pin the wrapper's wire behavior and must stay green after the swap | Permanent unit tests |
-| AC-4 | Swift tests against local stubbed responses, no live server | `GeneratedOpenAPIClientTests` injects a `ClientTransport` stub (no network); `BearerAuthenticationMiddlewareTests` injects a capturing `next` closure | Permanent unit tests || AC-5 | PR description records prose-contract vs published-spec deltas and endpoint gaps | "Contract deltas" section below; PR body cites it | Human/external evidence |
+| AC-3 | Replace hand-written API models with generated types; keep purely client-side models | `GeneratedOpenAPIClientTests` uses `Components.Schemas.*` for every wire payload; `APIClientTests` pins the hand-written wrapper's wire behaviour and must stay green after the swap | Permanent unit tests |
+| AC-4 | Swift tests against local stubbed responses, no live server | `GeneratedOpenAPIClientTests` injects a `ClientTransport` stub (no network); `BearerAuthenticationMiddlewareTests` injects a capturing `next` closure | Permanent unit tests |
+| AC-5 | PR description records prose-contract vs published-spec deltas and endpoint gaps | "Contract deltas" section below; PR body cites it | Human/external evidence |
 | EC-1 | `swift test --disable-sandbox` green with generated types wired in | Full `iOS` test suite at PR head (CI runs `swift test` on macOS) | Permanent test suite |
 
 ## Implementation contract for the implementation run
@@ -31,41 +32,67 @@ changing the tests.
 
 ### Package layout
 
-- Vendored spec: `iOS/OpenAPI/color-matching.json` — a verbatim JSON snapshot
-  of `GET /api/v1/openapi.json` from a `color_matching` server running main
-  (post #113). Vendor it verbatim (do not rename operationIds) so upstream
-  drift shows up as a regeneration diff.
-  Fetch with, e.g.:
+The `OpenAPIGenerator` **build plugin does not read the plugin
+`configuration:` dictionary**. It looks for two files inside the *generated
+target's* sources (`Plugins/PluginsShared/PluginUtils.swift` in
+swift-openapi-generator):
 
-  ```bash
-  curl -H "Authorization: Bearer $TOKEN" \
-    https://<color-matching-host>/api/v1/openapi.json \
-    > iOS/OpenAPI/color-matching.json
-  ```
+- exactly one document named `openapi.json` (or `openapi.yaml`/`openapi.yml`),
+- exactly one config named `openapi-generator-config.yaml` (or `.yml`).
 
-  (Development instances allow unauthenticated requests per the API contract
-  doc.)
-- Dependencies (exact URLs and minimum versions):
+So the target and its files must look like this:
 
-  ```swift
-  .package(url: "https://github.com/apple/swift-openapi-generator", from: "1.14.0"),
-  .package(url: "https://github.com/apple/swift-openapi-runtime", from: "1.13.0"),
-  ```
+```
+iOS/Sources/ColorMatchingOpenAPI/
+  openapi.json                     # vendored snapshot of GET /api/v1/openapi.json
+  openapi-generator-config.yaml    # generate/accessModifier/namingStrategy
+```
 
-- Generated target `ColorMatchingOpenAPI`:
+`iOS/Package.swift` gains:
 
-  ```swift
-  .target(
-      name: "ColorMatchingOpenAPI",
-      dependencies: [.product(name: "OpenAPIRuntime", package: "swift-openapi-runtime")],
-      plugins: [.plugin(name: "OpenAPIGenerator", package: "swift-openapi-generator")]
-  ),
-  ```
+```swift
+dependencies: [
+    .package(url: "https://github.com/apple/swift-openapi-generator", from: "1.14.0"),
+    .package(url: "https://github.com/apple/swift-openapi-runtime", from: "1.13.0"),
+],
+```
 
-- Wire-up: `ColorMatchingLPSAppCore` depends on `ColorMatchingOpenAPI`;
-  the test target `ColorMatchingLPSAppTests` depends on both
-  `ColorMatchingOpenAPI` and `OpenAPIRuntime` (the `#if canImport` gates in
-  the new tests only activate once both are resolvable from the test target).
+```swift
+.target(
+    name: "ColorMatchingOpenAPI",
+    dependencies: [.product(name: "OpenAPIRuntime", package: "swift-openapi-runtime")],
+    plugins: [.plugin(name: "OpenAPIGenerator", package: "swift-openapi-generator")]
+),
+```
+
+`ColorMatchingLPSAppCore` depends on `ColorMatchingOpenAPI` **and**
+`OpenAPIRuntime` (the bearer middleware lives there); the test target
+`ColorMatchingLPSAppTests` depends on `ColorMatchingOpenAPI` and
+`OpenAPIRuntime` — the `#if canImport` gates in the new tests only activate
+once both are resolvable from the test target.
+
+### Generator configuration (required, not optional)
+
+```yaml
+generate:
+  - types
+  - client
+accessModifier: public
+namingStrategy: idiomatic
+```
+
+Two settings are load-bearing:
+
+- **`accessModifier: public`** — the generator's default is `internal`, which
+  would make `Client` and `Components.Schemas.*` invisible to the app module
+  and to the test module.
+- **`namingStrategy: idiomatic`** — the default is `defensive`
+  (`Config.defaultNamingStrategy`, SOAR-0001). The upstream operationIds
+  contain dots (`ColorMatchingWeb.TestSheetController.manifest`), so the
+  defensive strategy yields
+  `colorMatchingWeb_period_TestSheetController_period_manifest` and keeps
+  wire keys as Swift identifiers (`sheet_id` instead of `sheetId`). The
+  idiomatic strategy (SOAR-0013) yields the names the tests pin.
 
 ### Authentication middleware
 
@@ -89,14 +116,30 @@ under the hood; its public wire behavior (bearer header, snake_case JSON,
 paths, response decoding) is pinned by the existing `APIClientTests`, which
 must remain green.
 
+### Where the vendored document comes from
+
+`GET /api/v1/openapi.json` on a running `color_matching` (the upstream test
+`test/color_matching_web/controllers/open_api_controller_test.exs` pins the
+published path set and the component schema names). Without a running
+instance, the document can be reconstructed from the upstream sources, which
+the upstream project serves verbatim:
+
+- `lib/color_matching_web/api_schemas.ex` — component schemas (the schema
+  `title` is the component key).
+- `lib/color_matching_web/api_spec.ex` — `components.securitySchemes`.
+- `lib/color_matching_web/router.ex` — paths and verbs.
+- `lib/color_matching_web/controllers/test_sheet_controller.ex` and
+  `controllers/capture_controller.ex` — operationIds, path parameters,
+  response statuses and the controller-level `security` requirement.
+
 ### Required vendoring adjustments (codegen-driven)
 
-Two adjustments to the vendored snapshot are required by the committed tests,
-because of how the generator's parser (OpenAPIKit) treats composition
-keywords: when a schema has both `anyOf` and `type`/`properties`, OpenAPIKit
-parses it as a pure `anyOf` and **drops the sibling `properties`/`required`
-keywords**, which would degrade both schemas to untyped
-`OpenAPIObjectContainer` enums with no typed fields:
+OpenAPIKit (the parser `swift-openapi-generator` uses) reads a schema that
+carries `anyOf` as a **pure union** and drops the sibling `properties` and
+`required` keywords (`JSONSchema.init(from:)` returns early on `anyOf`;
+`properties` live in `ObjectContext`, which is never decoded for a union).
+Both upstream request schemas combine `anyOf` with `properties`, so two
+adjustments to the vendored snapshot are required:
 
 1. `CaptureRequest`: remove the `anyOf` keyword, keeping the documented
    `properties` (the flat legacy fields stay optional; the app keeps sending
@@ -114,9 +157,10 @@ accept them or restructure the schemas server-side.
 
 ### Generated names (derivation)
 
-OperationIds come from upstream `OpenApiSpex` (`"<Module>.<action>"`).
-`swift-openapi-generator` (SOAR-0013 idiomatic naming) maps them as follows —
-dots become underscores, `_` starts a new camelCase word:
+OperationIds come from upstream `OpenApiSpex` (`"<Module>.<action>"`, see
+`OperationBuilder.build_operation_id`). `swift-openapi-generator` (SOAR-0013
+idiomatic naming) maps them as follows — dots become underscores, `_` starts a
+new camelCase word:
 
 | OperationId (spec) | HTTP | Swift method on `Client` | Operations namespace type |
 |---|---|---|---|
@@ -134,10 +178,25 @@ schema titles: `TestSheetManifest`, `RankedResults`, `RecentSheetsResponse`,
 `JudgmentUploadRequest`, `JudgmentUploadResponse`, `PairScoreRequest`,
 `RgbPayload`, `ApiErrorResponse`. Wire keys stay snake_case (`sheet_id` →
 `sheetId` etc.); string enums generate cases like
-`TestSheetManifest.SchemaVersion.lpsSheetManifestV1` (raw value
+`TestSheetManifest.SchemaVersionPayload.lpsSheetManifestV1` (raw value
 `lps-sheet-manifest/v1`) and
-`TestSheetManifest.CaptureProfile.ScoringAlgorithmVersion.lpsDistanceV1`
+`TestSheetManifest.CaptureProfilePayload.ScoringAlgorithmVersionPayload.lpsDistanceV1`
 (`lps-distance-v1`).
+
+Naming rules worth knowing (they are why the tests avoid naming inline
+types):
+
+- An inline (anonymous) schema becomes a **nested** type whose name is the
+  property name plus the `Payload` suffix
+  (`Constants.Global.inlineTypeSuffix`): `CaptureRequest.quality` →
+  `Components.Schemas.CaptureRequest.QualityPayload`, `schema_version` →
+  `Components.Schemas.TestSheetManifest.SchemaVersionPayload`.
+- Named component schemas keep their title: `Components.Schemas.CaptureMetadata`.
+- Response cases follow the HTTP status: 200 `ok`, 201 `created`, 401
+  `unauthorized`, 404 `notFound`, 422 `unprocessableContent`; anything else
+  lands in `undocumented(statusCode:body:)`.
+- `type: integer` → `Swift.Int`, `type: number` → `Swift.Double`,
+  `format: date-time` → `Foundation.Date` (ISO-8601 on the wire).
 
 If the generator rejects any other verbatim-spec construct, fix the vendored
 copy minimally, record the adjustment in the PR description, and keep
@@ -147,8 +206,8 @@ copy minimally, record the adjustment in the PR description, and keep
 
 Comparison of `docs/color-matching-api-contract.md` (prose) against the
 published spec sources (`lib/color_matching_web/api_schemas.ex`,
-`api_spec.ex`, controllers; viamin/color_matching#113). This section is the
-basis for the PR description required by issue #5.
+`api_spec.ex`, `router.ex`, controllers; viamin/color_matching#113). This
+section is the basis for the PR description required by issue #5.
 
 1. **Manifest schema is much thinner than the prose contract.** The published
    `TestSheetManifest` only documents `schema_version` (enum
@@ -180,9 +239,9 @@ basis for the PR description required by issue #5.
    200 responses with `MeasurementUploadResponse`
    (`capture_id`/`measurement_count`/`pair_score_count`) and
    `JudgmentUploadResponse` (`capture_id`/`judgment_count`). The prose
-   contract showed no response body, and the current hand-written tests stub
-   `204` with an empty body — a real drift discovery; the stubs must move to
-   the documented 200 + JSON shape.
+   contract showed no response body, and the hand-written tests used to stub
+   `204` with an empty body — a real drift discovery; the stubs now answer
+   `200` with the documented JSON shape.
 5. **Pair scores require `algorithm_version` plus one of
    score/similarity/distance** (`PairScoreRequest` anyOf). The prose contract
    showed `distance` and `similarity` always present; the app's

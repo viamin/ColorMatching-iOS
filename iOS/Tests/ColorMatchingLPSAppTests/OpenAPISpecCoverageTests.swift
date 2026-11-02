@@ -16,11 +16,11 @@ final class OpenAPISpecCoverageTests: XCTestCase {
         let manifest = try String(contentsOf: Self.packageManifestURL, encoding: .utf8)
 
         XCTAssertTrue(
-            manifest.contains("swift-openapi-generator"),
+            manifest.contains("https://github.com/apple/swift-openapi-generator"),
             "iOS/Package.swift must depend on apple/swift-openapi-generator (issue #5)"
         )
         XCTAssertTrue(
-            manifest.contains("swift-openapi-runtime"),
+            manifest.contains("https://github.com/apple/swift-openapi-runtime"),
             "iOS/Package.swift must depend on apple/swift-openapi-runtime (issue #5)"
         )
         XCTAssertTrue(
@@ -30,6 +30,79 @@ final class OpenAPISpecCoverageTests: XCTestCase {
         XCTAssertTrue(
             manifest.contains("ColorMatchingOpenAPI"),
             "iOS/Package.swift must declare the generated target 'ColorMatchingOpenAPI' and link it"
+        )
+    }
+
+    func testPackageManifestLinksGeneratedClientIntoAppCoreAndTests() throws {
+        let manifest = try String(contentsOf: Self.packageManifestURL, encoding: .utf8)
+
+        let generated = try Self.targetBlock(named: "ColorMatchingOpenAPI", in: manifest)
+        XCTAssertTrue(
+            generated.contains("OpenAPIGenerator"),
+            "the ColorMatchingOpenAPI target must apply the OpenAPIGenerator plugin"
+        )
+        XCTAssertTrue(
+            generated.contains("OpenAPIRuntime"),
+            "the ColorMatchingOpenAPI target must depend on the OpenAPIRuntime product"
+        )
+
+        let appCore = try Self.targetBlock(named: "ColorMatchingLPSAppCore", in: manifest)
+        XCTAssertTrue(
+            appCore.contains("ColorMatchingOpenAPI"),
+            "ColorMatchingLPSAppCore must depend on the generated target (issue #5)"
+        )
+        XCTAssertTrue(
+            appCore.contains("OpenAPIRuntime"),
+            "ColorMatchingLPSAppCore must depend on OpenAPIRuntime: the bearer middleware lives there"
+        )
+
+        let tests = try Self.targetBlock(named: "ColorMatchingLPSAppTests", in: manifest)
+        XCTAssertTrue(
+            tests.contains("ColorMatchingOpenAPI"),
+            "the test target must depend on the generated target so the generated client can be exercised"
+        )
+        XCTAssertTrue(
+            tests.contains("OpenAPIRuntime"),
+            "the test target must depend on OpenAPIRuntime so the stub transport can be injected"
+        )
+    }
+
+    // MARK: - Generator configuration
+
+    func testGeneratorConfigurationUsesIdiomaticNamingAndPublicAccess() throws {
+        let url = Self.generatorConfigURL
+        guard FileManager.default.fileExists(atPath: url.path) else {
+            XCTFail(
+                """
+                Missing generator configuration at \(url.path).
+                The OpenAPIGenerator build plugin reads 'openapi-generator-config.yaml' from \
+                the generated target's sources; it must select the idiomatic naming strategy \
+                (the upstream operationIds contain dots, e.g. \
+                'ColorMatchingWeb.TestSheetController.manifest') and the public access modifier \
+                (the app and the tests consume the generated types across module boundaries).
+                """
+            )
+            return
+        }
+
+        let config = try String(contentsOf: url, encoding: .utf8)
+        XCTAssertTrue(
+            config.contains("namingStrategy") && config.contains("idiomatic"),
+            "the generator must use the idiomatic naming strategy; the default defensive strategy \
+            would generate 'ColorMatchingWeb_period_TestSheetController_period_manifest' and \
+            'sheet_id' style identifiers"
+        )
+        XCTAssertTrue(
+            config.contains("accessModifier") && config.contains("public"),
+            "the generator must emit public declarations so other modules can use the client"
+        )
+        XCTAssertTrue(
+            config.contains("types"),
+            "the generator must produce the types file (Components.Schemas.*)"
+        )
+        XCTAssertTrue(
+            config.contains("client"),
+            "the generator must produce the client file (Client, Operations.*)"
         )
     }
 
@@ -69,7 +142,10 @@ final class OpenAPISpecCoverageTests: XCTestCase {
         try Self.assertDeclaresPathParameter("capture_id", inOperation: measurements)
 
         let judgments = try Self.operation("post", "/api/v1/captures/{capture_id}/judgments", inPaths: paths)
-        XCTAssertEqual(judgments["operationId"] as? String, "ColorMatchingWeb.CaptureController.upload_judgments")
+        XCTAssertEqual(
+            judgments["operationId"] as? String,
+            "ColorMatchingWeb.CaptureController.upload_judgments"
+        )
         try Self.assertDeclaresPathParameter("capture_id", inOperation: judgments)
     }
 
@@ -161,6 +237,59 @@ final class OpenAPISpecCoverageTests: XCTestCase {
         let missing = expected.filter { schemas[$0] == nil }
         XCTAssertTrue(missing.isEmpty, "vendored spec is missing component schemas: \(missing)")
     }
+
+    /// The generator parses the document with OpenAPIKit, which reads a schema
+    /// that carries `anyOf` as a pure union and drops the sibling `properties`.
+    /// `CaptureRequest` and `PairScoreRequest` therefore ship without `anyOf`
+    /// so the generated types keep their fields; `RgbPayload` keeps its union
+    /// because that is the one shape the generator expresses as an enum.
+    func testVendoredSpecKeepsGeneratorCompatibleSchemaShapes() throws {
+        let schemas = try Self.componentsSchemas()
+
+        let captureRequest = try XCTUnwrap(schemas["CaptureRequest"] as? [String: Any])
+        XCTAssertNil(
+            captureRequest["anyOf"],
+            "CaptureRequest must not carry `anyOf`: OpenAPIKit would drop the sibling `properties` \
+            and the generated type would degrade to an enum without `metadata`/`quality`"
+        )
+        let captureProperties = try XCTUnwrap(captureRequest["properties"] as? [String: Any])
+        XCTAssertNotNil(captureProperties["metadata"], "CaptureRequest must keep the nested `metadata` property")
+        XCTAssertNotNil(captureProperties["quality"], "CaptureRequest must keep the nested `quality` property")
+
+        let captureMetadata = try XCTUnwrap(schemas["CaptureMetadata"] as? [String: Any])
+        XCTAssertEqual(
+            Set(try XCTUnwrap(captureMetadata["required"] as? [String])),
+            ["device_model", "lens", "image_width", "image_height", "app_version", "timestamp"]
+        )
+
+        let pairScore = try XCTUnwrap(schemas["PairScoreRequest"] as? [String: Any])
+        XCTAssertNil(
+            pairScore["anyOf"],
+            "PairScoreRequest must not carry `anyOf`: the sibling `properties` would be dropped"
+        )
+        XCTAssertEqual(
+            Set(try XCTUnwrap(pairScore["required"] as? [String])),
+            ["pair_id", "algorithm_version"]
+        )
+
+        let rgbPayload = try XCTUnwrap(schemas["RgbPayload"] as? [String: Any])
+        XCTAssertEqual(
+            (rgbPayload["anyOf"] as? [Any])?.count,
+            3,
+            "RgbPayload must keep its three-branch union (array, {r,g,b} object, JSON string)"
+        )
+
+        let measurementRequest = try XCTUnwrap(schemas["MeasurementUploadRequest"] as? [String: Any])
+        let measurementProperties = try XCTUnwrap(measurementRequest["properties"] as? [String: Any])
+        XCTAssertNotNil(measurementProperties["measurements"], "MeasurementUploadRequest must keep `measurements`")
+        XCTAssertNotNil(measurementProperties["pair_scores"], "MeasurementUploadRequest must keep `pair_scores`")
+
+        let judgmentRequest = try XCTUnwrap(schemas["JudgmentUploadRequest"] as? [String: Any])
+        XCTAssertEqual(
+            Set(try XCTUnwrap(judgmentRequest["required"] as? [String])),
+            ["judgments"]
+        )
+    }
 }
 
 // MARK: - Helpers
@@ -176,7 +305,16 @@ private extension OpenAPISpecCoverageTests {
 
     static var packageManifestURL: URL { packageRoot.appending(path: "Package.swift") }
 
-    static var vendoredSpecURL: URL { packageRoot.appending(path: "OpenAPI/color-matching.json") }
+    /// The OpenAPIGenerator plugin only accepts a document named
+    /// `openapi.json` (or `.yaml`/`.yml`) that lives inside the generated
+    /// target's sources.
+    static var vendoredSpecURL: URL {
+        packageRoot.appending(path: "Sources/ColorMatchingOpenAPI/openapi.json")
+    }
+
+    static var generatorConfigURL: URL {
+        packageRoot.appending(path: "Sources/ColorMatchingOpenAPI/openapi-generator-config.yaml")
+    }
 
     static let appSurfacePaths = [
         "/api/v1/test_sheets/{sheet_id}/manifest",
@@ -187,6 +325,17 @@ private extension OpenAPISpecCoverageTests {
         "/api/v1/captures/{capture_id}/judgments",
     ]
 
+    /// Every target declared in this package; used to find where a target
+    /// declaration ends inside `Package.swift`.
+    static let packageTargetNames = [
+        "MeasurementCore",
+        "ColorMatchingLPSAppCore",
+        "ColorMatchingLPSApp",
+        "ColorMatchingOpenAPI",
+        "MeasurementCoreTests",
+        "ColorMatchingLPSAppTests",
+    ]
+
     static func loadVendoredSpec() throws -> [String: Any] {
         let url = vendoredSpecURL
         guard FileManager.default.fileExists(atPath: url.path) else {
@@ -194,13 +343,30 @@ private extension OpenAPISpecCoverageTests {
                 """
                 Vendored OpenAPI document missing at \(url.path).
                 Fetch GET /api/v1/openapi.json from color_matching (viamin/color_matching#110) \
-                and commit it verbatim; see docs/openapi-generated-client.md.
+                and commit it next to the generated target as 'openapi.json'; see \
+                docs/openapi-generated-client.md.
                 """
             )
             return [:]
         }
         let object = try JSONSerialization.jsonObject(with: Data(contentsOf: url))
         return try XCTUnwrap(object as? [String: Any], "vendored spec must be a JSON object")
+    }
+
+    /// Returns the `Package.swift` text that belongs to a single target.
+    static func targetBlock(named name: String, in manifest: String) throws -> String {
+        let segments = manifest.components(separatedBy: "name: \"")
+        let start = try XCTUnwrap(
+            segments.firstIndex { $0.hasPrefix("\(name)\"") },
+            "iOS/Package.swift must declare the target '\(name)'"
+        )
+        var block = segments[start]
+        for segment in segments.dropFirst(start + 1) {
+            let identifier = segment.components(separatedBy: "\"").first ?? ""
+            if packageTargetNames.contains(identifier) { break }
+            block += "name: \"" + segment
+        }
+        return block
     }
 
     static func paths(inSpec spec: [String: Any]) throws -> [String: Any] {

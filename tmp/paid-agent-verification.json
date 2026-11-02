@@ -1,0 +1,117 @@
+{
+  "status": "failed",
+  "summary": "Test-writing (red) phase for issue #5: generated OpenAPI Swift client. Committed permanent tests that pin the implementation contract \u2014 package wiring (swift-openapi-generator/-runtime, target ColorMatchingOpenAPI), the vendored iOS/OpenAPI/color-matching.json document, all six API surfaces with upstream operationIds/response statuses/bearerAuth, generated-client behavior against a stubbed ClientTransport, and the BearerAuthenticationMiddleware. Tests are intentionally red until the implementation run lands the generated client (expected in this phase). No Swift toolchain exists in this container, so swift test could not be executed locally; upstream spec sources (viamin/color_matching#113: api_schemas.ex, api_spec.ex, router.ex, controllers) were fetched and used to derive exact generated names, recorded in docs/openapi-generated-client.md. Contract deltas between docs/color-matching-api-contract.md and the published spec (10 findings, incl. thin manifest/ranked-results schemas, 200-JSON upload responses vs prose-implied 204, exposure_duration vs exposure_duration_seconds, anyOf patterns that degrade under OpenAPIKit parsing) are documented for the PR description.",
+  "acceptance_criteria": [
+    {
+      "id": "AC-1",
+      "status": "failed",
+      "verification": {
+        "kind": "unit_or_service_test",
+        "references": [
+          {
+            "locator": "iOS/Tests/ColorMatchingLPSAppTests/OpenAPISpecCoverageTests.swift:15",
+            "result": "failed",
+            "note": "testPackageManifestWiresGeneratorRuntimeAndGeneratedTarget \u2014 red: deps/target not yet added (expected in red phase)"
+          },
+          {
+            "locator": "iOS/Tests/ColorMatchingLPSAppTests/OpenAPISpecCoverageTests.swift:38",
+            "result": "failed",
+            "note": "testVendoredSpecExistsAndDeclaresOpenAPI3 \u2014 red: iOS/OpenAPI/color-matching.json not yet vendored"
+          }
+        ]
+      }
+    },
+    {
+      "id": "AC-2",
+      "status": "failed",
+      "verification": {
+        "kind": "unit_or_service_test",
+        "references": [
+          {
+            "locator": "iOS/Tests/ColorMatchingLPSAppTests/OpenAPISpecCoverageTests.swift:45",
+            "result": "failed",
+            "note": "six app surfaces pinned (path/method/operationId/path params) \u2014 red until spec vendored"
+          },
+          {
+            "locator": "iOS/Tests/ColorMatchingLPSAppTests/GeneratedOpenAPIClientTests.swift:27",
+            "result": "failed",
+            "note": "generated-client behavior tests gated on canImport(ColorMatchingOpenAPI); #else availability marker fails today by design"
+          }
+        ]
+      }
+    },
+    {
+      "id": "AC-3",
+      "status": "failed",
+      "verification": {
+        "kind": "unit_or_service_test",
+        "references": [
+          {
+            "locator": "iOS/Tests/ColorMatchingLPSAppTests/GeneratedOpenAPIClientTests.swift:110",
+            "result": "failed",
+            "note": "tests use Components.Schemas.* generated types for every wire payload \u2014 red until implementation"
+          },
+          {
+            "locator": "iOS/Tests/ColorMatchingLPSAppTests/APIClientTests.swift:12",
+            "result": "not_run",
+            "note": "existing wire-behavior pins must stay green after the model swap; not executed locally (no Swift toolchain in container)"
+          }
+        ]
+      }
+    },
+    {
+      "id": "AC-4",
+      "status": "failed",
+      "verification": {
+        "kind": "unit_or_service_test",
+        "references": [
+          {
+            "locator": "iOS/Tests/ColorMatchingLPSAppTests/GeneratedOpenAPIClientTests.swift:303",
+            "result": "failed",
+            "note": "StubTransport (ClientTransport) \u2014 local stubbed responses, no live server; red via availability marker until wiring lands"
+          },
+          {
+            "locator": "iOS/Tests/ColorMatchingLPSAppTests/BearerAuthenticationMiddlewareTests.swift:15",
+            "result": "failed",
+            "note": "auth middleware exercised against capturing next closure; red until runtime dep + middleware land"
+          }
+        ]
+      }
+    },
+    {
+      "id": "AC-5",
+      "status": "skipped",
+      "verification": {
+        "kind": "human_or_external_evidence",
+        "references": [
+          {
+            "locator": "docs/openapi-generated-client.md",
+            "result": "passed",
+            "note": "10 documented contract deltas + 2 upstream endpoint gaps, derived from fetched upstream spec sources (viamin/color_matching#113)"
+          },
+          {
+            "locator": "PR description",
+            "result": "not_run",
+            "note": "PR body is written at publish time; it must cite docs/openapi-generated-client.md \u00a7 Contract deltas"
+          }
+        ],
+        "reason": "PR-description evidence becomes inspectable only when the PR opens; the delta research and findings are recorded in docs/openapi-generated-client.md"
+      }
+    },
+    {
+      "id": "EC-1",
+      "status": "not_run",
+      "verification": {
+        "kind": "unit_or_service_test",
+        "references": [
+          {
+            "locator": "iOS/Tests/ColorMatchingLPSAppTests",
+            "result": "not_run",
+            "note": "swift test --disable-sandbox green is the implementation-run exit criterion; no Swift toolchain exists in this container (which swift: not found)"
+          }
+        ],
+        "reason": "Cannot run Swift in this environment; suite is red by design in the test-writing phase"
+      }
+    }
+  ]
+}
