@@ -1,0 +1,83 @@
+{
+  "status": "skipped",
+  "summary": "Tests-only red phase for issue #5. Wrote stubbed-response tests for the generated OpenAPI client (all six /api/v1 surfaces) and the app facade's ranked-results surface, plus a LID doc recording the contract deltas between docs/color-matching-api-contract.md and the published spec (viamin/color_matching#113) and the endpoint gaps found. Tests cannot execute in this container: no Swift toolchain is installed, and the ColorMatchingAPIClient target does not exist until the implementation run adds swift-openapi-generator plus the vendored openapi.json. Lint/test commands are not configured for this repo (verified no-ops).",
+  "acceptance_criteria": [
+    {
+      "id": "AC-1",
+      "description": "Add swift-openapi-generator + swift-openapi-runtime to the iOS package; vendor the OpenAPI document from viamin/color_matching#110",
+      "status": "not_run",
+      "verification": {
+        "kind": "human_or_external_evidence",
+        "references": [
+          {
+            "locator": "docs/openapi-generated-client.md#planned-package-integration-implementation-contract",
+            "result": "not_run"
+          },
+          {
+            "locator": "docs/openapi-generated-client.md#upstream-dependency-status",
+            "result": "not_run"
+          }
+        ],
+        "reason": "Implementation change (Package.swift + Sources) is out of scope for the tests-only run; upstream dependency viamin/color_matching#110 was verified complete (PR #113 merged 2026-10-30) with the vendoring command documented."
+      }
+    },
+    {
+      "id": "AC-2",
+      "description": "Generate the client for the surfaces the app uses: manifest, recent sheets, capture creation, measurement upload, judgment upload, ranked results",
+      "status": "not_run",
+      "verification": {
+        "kind": "unit_or_service_test",
+        "references": [
+          { "locator": "iOS/Tests/ColorMatchingLPSAppTests/GeneratedAPIClientTests.swift:9", "result": "not_run" },
+          { "locator": "iOS/Tests/ColorMatchingLPSAppTests/GeneratedAPIClientTests.swift:41", "result": "not_run" },
+          { "locator": "iOS/Tests/ColorMatchingLPSAppTests/GeneratedAPIClientTests.swift:66", "result": "not_run" },
+          { "locator": "iOS/Tests/ColorMatchingLPSAppTests/GeneratedAPIClientTests.swift:83", "result": "not_run" },
+          { "locator": "iOS/Tests/ColorMatchingLPSAppTests/GeneratedAPIClientTests.swift:135", "result": "not_run" },
+          { "locator": "iOS/Tests/ColorMatchingLPSAppTests/GeneratedAPIClientTests.swift:162", "result": "not_run" }
+        ],
+        "reason": "Red-phase tests pin all six surfaces (paths, methods, operation IDs, wire JSON, documented decode fields) but cannot compile until the implementation run adds the generated client target; no Swift toolchain exists in this container to run them."
+      }
+    },
+    {
+      "id": "AC-3",
+      "description": "Replace hand-written API models with generated types; keep purely client-side models",
+      "status": "not_run",
+      "verification": {
+        "kind": "unit_or_service_test",
+        "references": [
+          { "locator": "iOS/Tests/ColorMatchingLPSAppTests/RankedResultsFacadeTests.swift:12", "result": "not_run" },
+          { "locator": "iOS/Tests/ColorMatchingLPSAppTests/APIClientTests.swift:12", "result": "not_run" }
+        ],
+        "reason": "Facade tests pin generated-type exposure (Components.Schemas.RankedResults return type) and existing APIClientTests continue to pin facade wire behavior; migration itself is the implementation run's change."
+      }
+    },
+    {
+      "id": "AC-4",
+      "description": "Swift tests exercising the generated client against local stubbed responses (no live server in CI)",
+      "status": "skipped",
+      "verification": {
+        "kind": "unit_or_service_test",
+        "references": [
+          { "locator": "iOS/Tests/ColorMatchingLPSAppTests/GeneratedAPIClientTests.swift:307", "result": "skipped" },
+          { "locator": "iOS/Tests/ColorMatchingLPSAppTests/RankedResultsFacadeTests.swift:104", "result": "skipped" }
+        ],
+        "reason": "Tests are written entirely against local stubs (stub ClientTransport + URLProtocol) with no live server, but cannot be executed: `swift` is not installed in this container and the referenced ColorMatchingAPIClient module does not exist yet (red phase)."
+      }
+    },
+    {
+      "id": "AC-5",
+      "description": "PR description records contract deltas between the prose contract and the published spec, and endpoint gaps discovered",
+      "status": "not_run",
+      "verification": {
+        "kind": "human_or_external_evidence",
+        "references": [
+          {
+            "locator": "docs/openapi-generated-client.md#contract-deltas-prose-contract-vs-published-spec",
+            "result": "not_run"
+          }
+        ],
+        "reason": "Eleven documented deltas/gaps (including anyOf-sibling hollowing of CaptureRequest/PairScoreRequest, manifest/ranked-results under-documentation, 200-with-body vs 204 uploads) are recorded in the LID doc as the seed for the final PR description; the PR itself is published by Paid after test approval, so PR-description evidence does not exist yet."
+      }
+    }
+  ]
+}
