@@ -1,0 +1,74 @@
+{
+  "status": "passed",
+  "summary": "Red-phase tests-only run for issue #5 (generated OpenAPI Swift client). Committed: (1) OpenAPIContractTests.swift - 10 permanent unit tests pinning the vendored OpenAPI document (JSON, 3.0.x, at iOS/Sources/ColorMatchingOpenAPI/OpenAPI/openapi.json), Package.swift wiring (swift-openapi-generator plugin + OpenAPIRuntime), all six app surfaces with methods/success statuses/operationIds, bearer auth, and the exact schema shapes the app's wire format requires; verified red at head by direct inspection (vendored spec path absent; Package.swift contains none of the required references). (2) APIClientSurfaceTests.swift - green wire-parity keepers (stubbed URLProtocol, no live server) covering manifest decode, recent sheets with null title, and 401 propagation, which must remain green when APIClient is rewired onto the generated client. (3) docs/ios-openapi-client-plan.md - pinned decisions, the full prose-contract vs published-spec delta table (manifest and ranked-results under-declared by upstream spec; measurement upload missing stats/scoring_algorithm_version; uploads now return JSON bodies; capture_id is integer-as-string; patch ids are '<pair>#<side>'), required vendoring patches, and the AC-to-verification map. Execution note: no Swift toolchain exists in this container and the ColorMatchingLPSApp executable target imports iOS-only frameworks, so swift test could not run locally; tests are desk-checked and execute on the macOS CI runner (.github/workflows/ci.yml runs swift test). Implementation ACs are intentionally red at this tests-only head; the separate implementation run turns them green.",
+  "acceptance_criteria": [
+    {
+      "id": "AC-1",
+      "description": "swift-openapi-generator + swift-openapi-runtime added to the iOS package; OpenAPI document vendored from viamin/color_matching#110",
+      "status": "failed",
+      "verification": {
+        "kind": "unit_or_service_test",
+        "references": [
+          { "locator": "iOS/Tests/ColorMatchingLPSAppTests/OpenAPIContractTests.swift:72", "result": "failed", "note": "testVendoredOpenAPIDocumentExistsAndIsOpenAPI30 - vendored spec path iOS/Sources/ColorMatchingOpenAPI/OpenAPI/openapi.json confirmed absent at head; red by filesystem inspection, not test-name inference" },
+          { "locator": "iOS/Tests/ColorMatchingLPSAppTests/OpenAPIContractTests.swift:84", "result": "failed", "note": "testPackageManifestWiresGeneratedOpenAPIClient - iOS/Package.swift at head contains none of: swift-openapi-generator, swift-openapi-runtime, OpenAPIGenerator, OpenAPIRuntime, ColorMatchingOpenAPI; red by manifest inspection" }
+        ]
+      }
+    },
+    {
+      "id": "AC-2",
+      "description": "Generated client covers test-sheet manifest, recent sheets, capture session creation, measurement upload, judgment upload, ranked results",
+      "status": "failed",
+      "verification": {
+        "kind": "unit_or_service_test",
+        "references": [
+          { "locator": "iOS/Tests/ColorMatchingLPSAppTests/OpenAPIContractTests.swift:98", "result": "failed", "note": "surface coverage: all six paths/methods/success statuses (200/200/200/201/200/200) with operationIds and JSON responses; red because no vendored spec exists" },
+          { "locator": "iOS/Tests/ColorMatchingLPSAppTests/OpenAPIContractTests.swift:116", "result": "failed", "note": "http/bearer security required on every surface" },
+          { "locator": "iOS/Tests/ColorMatchingLPSAppTests/OpenAPIContractTests.swift:140", "result": "failed", "note": "manifest schema must declare all fields the app decodes (upstream spec under-declares; requires documented vendoring patch)" },
+          { "locator": "iOS/Tests/ColorMatchingLPSAppTests/OpenAPIContractTests.swift:154", "result": "failed", "note": "recent sheets items with nullable title" },
+          { "locator": "iOS/Tests/ColorMatchingLPSAppTests/OpenAPIContractTests.swift:167", "result": "failed", "note": "capture request accepts the app's metadata/quality payload" },
+          { "locator": "iOS/Tests/ColorMatchingLPSAppTests/OpenAPIContractTests.swift:177", "result": "failed", "note": "measurement upload schema matches app payload incl. stats and top-level scoring_algorithm_version (wire parity)" },
+          { "locator": "iOS/Tests/ColorMatchingLPSAppTests/OpenAPIContractTests.swift:193", "result": "failed", "note": "judgment upload schema matches app payload" },
+          { "locator": "iOS/Tests/ColorMatchingLPSAppTests/OpenAPIContractTests.swift:200", "result": "failed", "note": "ranked results schema declares ranked list items (rank, pair_id, source_colors, score)" }
+        ]
+      }
+    },
+    {
+      "id": "AC-3",
+      "description": "Hand-written API models replaced with generated types; purely client-side models kept as-is",
+      "status": "skipped",
+      "verification": {
+        "kind": "unit_or_service_test",
+        "references": [
+          { "locator": "iOS/Tests/ColorMatchingLPSAppTests/APIClientSurfaceTests.swift:16", "result": "not_run_locally_no_swift_toolchain", "note": "wire-parity keeper: manifest decode incl. patches/pairs/marker rects into client-side SheetManifest model; desk-checked green against current APIClient; must remain green after swap" },
+          { "locator": "iOS/Tests/ColorMatchingLPSAppTests/APIClientSurfaceTests.swift:65", "result": "not_run_locally_no_swift_toolchain", "note": "recent sheets with null title decode" },
+          { "locator": "iOS/Tests/ColorMatchingLPSAppTests/APIClientSurfaceTests.swift:86", "result": "not_run_locally_no_swift_toolchain", "note": "401 surfaces as an error; error type intentionally not pinned so generated-client error types are permitted" },
+          { "locator": "iOS/Tests/ColorMatchingLPSAppTests/APIClientTests.swift:12", "result": "not_run_locally_no_swift_toolchain", "note": "pre-existing keepers for capture creation, measurement upload, judgment upload wire format" }
+        ],
+        "reason": "Tests-only phase: replacement happens in the implementation run; these keepers enforce that the swap preserves method/path/auth header/decoded client-side models, and DTO removal is verified by diff review of that run"
+      }
+    },
+    {
+      "id": "AC-4",
+      "description": "Swift tests exercising the generated client against local stubbed responses, no live server in CI",
+      "status": "failed",
+      "verification": {
+        "kind": "unit_or_service_test",
+        "references": [
+          { "locator": "iOS/Tests/ColorMatchingLPSAppTests/APIClientSurfaceTests.swift:172", "result": "failed", "note": "StubURLProtocol-based tests exist at head and use no network, but they cannot exercise the generated client until AC-1/AC-2 land (same red); once APIClient is rewired, these plus APIClientTests are the stubbed-response suite for the generated client" }
+        ]
+      }
+    },
+    {
+      "id": "AC-5",
+      "description": "PR description records prose-contract vs published-spec deltas and endpoint gaps",
+      "status": "skipped",
+      "verification": {
+        "kind": "human_or_external_evidence",
+        "references": [
+          { "locator": "docs/ios-openapi-client-plan.md", "result": "available_at_head", "note": "delta table pre-materialized from upstream router.ex/api_spec.ex/api_schemas.ex/test_sheet_json.ex inspection (manifest + ranked-results under-declaration, measurement-upload payload gaps, upload response bodies, integer-as-string capture_id, '<pair>#<side>' patch ids, extra endpoints in spec); the implementation PR description must carry it forward" }
+        ],
+        "reason": "PR body is authored when the PR is published after paid-tests-approved; deltas are staged in the committed doc for that purpose"
+      }
+    }
+  ]
+}
