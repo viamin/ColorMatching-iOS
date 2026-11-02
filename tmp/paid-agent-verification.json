@@ -1,0 +1,79 @@
+{
+  "status": "failed",
+  "summary": "Tests-only red phase: local-stub coverage was extended and generator/spec guard tests were added, but the generated-client artifacts do not exist yet. Swift is unavailable in this container, so the suite was not executed.",
+  "acceptance_criteria": [
+    {
+      "id": "AC-1",
+      "status": "failed",
+      "verification": {
+        "kind": "unit_or_service_test",
+        "references": [
+          {
+            "locator": "iOS/Tests/ColorMatchingLPSAppTests/OpenAPIClientGenerationTests.swift:5",
+            "result": "red: Package.swift does not yet declare swift-openapi-generator/runtime"
+          },
+          {
+            "locator": "iOS/Tests/ColorMatchingLPSAppTests/OpenAPIClientGenerationTests.swift:14",
+            "result": "red: vendored OpenAPI document is absent"
+          }
+        ]
+      }
+    },
+    {
+      "id": "AC-2",
+      "status": "failed",
+      "verification": {
+        "kind": "unit_or_service_test",
+        "references": [
+          {
+            "locator": "iOS/Tests/ColorMatchingLPSAppTests/OpenAPIClientGenerationTests.swift:14",
+            "result": "red: required operation paths cannot be verified until the published document is vendored"
+          }
+        ]
+      }
+    },
+    {
+      "id": "AC-3",
+      "status": "not_run",
+      "verification": {
+        "kind": "human_or_external_evidence",
+        "references": [
+          {
+            "locator": "docs/issue-5-openapi-client-pr.md:9",
+            "result": "implementation review and compiler evidence required after generated client exists"
+          }
+        ]
+      }
+    },
+    {
+      "id": "AC-4",
+      "status": "not_run",
+      "verification": {
+        "kind": "permanent_system_test",
+        "references": [
+          {
+            "locator": "iOS/Tests/ColorMatchingLPSAppTests/APIClientTests.swift:14",
+            "result": "local MockURLProtocol coverage added; not executed because swift is unavailable"
+          },
+          {
+            "locator": "docs/issue-5-openapi-client-pr.md:27",
+            "result": "ranked-results generated-client stub test remains implementation work"
+          }
+        ]
+      }
+    },
+    {
+      "id": "AC-5",
+      "status": "passed",
+      "verification": {
+        "kind": "human_or_external_evidence",
+        "references": [
+          {
+            "locator": "docs/issue-5-openapi-client-pr.md:19",
+            "result": "contract/spec deltas and ranked-results gap recorded from upstream commit 47057afd58f7d46b4d4b740ca7d2d08947774471"
+          }
+        ]
+      }
+    }
+  ]
+}
