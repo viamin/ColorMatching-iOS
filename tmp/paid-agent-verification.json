@@ -1,0 +1,91 @@
+{
+  "status": "failed",
+  "summary": "Tests-only red-phase run for issue #5 (generated OpenAPI Swift client). Two new test files plus a LID doc were committed; all new tests fail by design at this head because the implementation (swift-openapi-generator wiring, vendored spec, generated module) is deliberately out of scope for this phase. Contract deltas between docs/color-matching-api-contract.md and the published spec (viamin/color_matching#110/#113) are recorded in docs/openapi-generated-client.md, including two endpoint gaps: the manifest schema does not type patches/pairs (blocking full generated-type adoption for manifests) and ranked results are typed only as schema_version + sheet_id. Swift toolchain is unavailable in this container, so tests could not be executed locally; they will run in the macOS CI (swift test job).",
+  "acceptance_criteria": [
+    {
+      "id": "AC-1",
+      "description": "swift-openapi-generator + swift-openapi-runtime added to the iOS package; OpenAPI document fetched/vendored from viamin/color_matching#110",
+      "status": "failed",
+      "verification": {
+        "kind": "unit_or_service_test",
+        "references": [
+          {
+            "locator": "iOS/Tests/ColorMatchingLPSAppTests/OpenAPISpecVendorTests.swift:118",
+            "result": "red_at_head",
+            "detail": "testVendoredSpecDocumentExistsAtCanonicalPath fails: vendored spec not yet fetched to Sources/ColorMatchingOpenAPI/openapi.json"
+          },
+          {
+            "locator": "iOS/Tests/ColorMatchingLPSAppTests/GeneratedOpenAPIClientTests.swift:340",
+            "result": "red_at_head",
+            "detail": "#else fallback testGeneratedOpenAPIClientModuleIsWiredIntoPackage fails until the generated module and dependencies are wired"
+          }
+        ]
+      }
+    },
+    {
+      "id": "AC-2",
+      "description": "Client generated for all surfaces the app uses: manifest, recent sheets, capture creation, measurement upload, judgment upload, ranked results",
+      "status": "failed",
+      "verification": {
+        "kind": "unit_or_service_test",
+        "references": [
+          {
+            "locator": "iOS/Tests/ColorMatchingLPSAppTests/OpenAPISpecVendorTests.swift:87",
+            "result": "red_at_head",
+            "detail": "testVendoredSpecCoversEveryEndpointUsedByTheApp pins all six paths, methods, operationIds, and path parameters"
+          },
+          {
+            "locator": "iOS/Tests/ColorMatchingLPSAppTests/GeneratedOpenAPIClientTests.swift:8",
+            "result": "compiled_out_until_wiring",
+            "detail": "one stubbed round-trip test per surface behind #if canImport(ColorMatchingOpenAPI)"
+          }
+        ]
+      }
+    },
+    {
+      "id": "AC-3",
+      "description": "Replace hand-written API models with generated types; keep purely client-side models",
+      "status": "not_run",
+      "verification": {
+        "kind": "unit_or_service_test",
+        "references": [
+          {
+            "locator": "iOS/Tests/ColorMatchingLPSAppTests/GeneratedOpenAPIClientTests.swift:340",
+            "result": "red_at_head",
+            "detail": "compile-level criterion: the guarded tests compile only against generated types; model deletion happens in the implementation run (docs/openapi-generated-client.md lists what stays client-side)"
+          }
+        ]
+      }
+    },
+    {
+      "id": "AC-4",
+      "description": "Swift tests exercising the generated client against local stubbed responses, no live server in CI",
+      "status": "not_run",
+      "verification": {
+        "kind": "unit_or_service_test",
+        "references": [
+          {
+            "locator": "iOS/Tests/ColorMatchingLPSAppTests/GeneratedOpenAPIClientTests.swift:294",
+            "result": "written_not_executable_until_wiring",
+            "detail": "eight tests against an in-process ClientTransport stub and ClientMiddleware bearer auth (zero network I/O); compiled out until the generated module exists"
+          }
+        ]
+      }
+    },
+    {
+      "id": "AC-5",
+      "description": "PR description records contract deltas between the prose contract and the published spec, and endpoint gaps discovered",
+      "status": "passed",
+      "verification": {
+        "kind": "human_or_external_evidence",
+        "references": [
+          {
+            "locator": "docs/openapi-generated-client.md",
+            "result": "committed_at_head",
+            "detail": "delta table (10 items) verified against viamin/color_matching@main source (api_spec.ex, api_schemas.ex, router.ex, controllers), incl. gaps: manifest schema omits patches/pairs/page/registration_markers/printer_profile; ranked results typed only as schema_version+sheet_id; measurement upload lost scoring_algorithm_version and stats"
+          }
+        ]
+      }
+    }
+  ]
+}
