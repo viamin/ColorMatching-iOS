@@ -1,0 +1,84 @@
+{
+  "status": "not_run",
+  "summary": "Test-writing run added permanent local-stub coverage for manifest and recent-sheet reads. Swift is unavailable in this container, so swift test --disable-sandbox could not run; generated-client implementation is intentionally deferred to the approved implementation phase.",
+  "acceptance_criteria": [
+    {
+      "id": "AC-1",
+      "status": "not_run",
+      "verification": {
+        "kind": "unit_or_service_test",
+        "references": [
+          {
+            "locator": "docs/issue-5-openapi-client-verification-plan.md",
+            "result": "Implementation-phase dependency and generator configuration are not present in this test-writing revision."
+          }
+        ]
+      }
+    },
+    {
+      "id": "AC-2",
+      "status": "not_run",
+      "verification": {
+        "kind": "unit_or_service_test",
+        "references": [
+          {
+            "locator": "iOS/Tests/ColorMatchingLPSAppTests/APIClientTests.swift:49",
+            "result": "Local-stub behavioral coverage was added for manifest and recent sheets; generated-operation coverage and ranked results await implementation and its published response schema."
+          }
+        ]
+      }
+    },
+    {
+      "id": "AC-3",
+      "status": "not_run",
+      "verification": {
+        "kind": "human_or_external_evidence",
+        "references": [
+          {
+            "locator": "docs/issue-5-openapi-client-verification-plan.md",
+            "result": "The implementation run must inspect the replacement of hand-written transport models."
+          }
+        ]
+      }
+    },
+    {
+      "id": "AC-4",
+      "status": "not_run",
+      "verification": {
+        "kind": "unit_or_service_test",
+        "references": [
+          {
+            "locator": "iOS/Tests/ColorMatchingLPSAppTests/APIClientTests.swift:49",
+            "result": "Permanent MockURLProtocol tests exercise local stubbed responses; execution is not run because swift is unavailable."
+          }
+        ]
+      }
+    },
+    {
+      "id": "AC-5",
+      "status": "not_run",
+      "verification": {
+        "kind": "human_or_external_evidence",
+        "references": [
+          {
+            "locator": "docs/issue-5-openapi-client-verification-plan.md",
+            "result": "Known prose gaps are recorded; direct comparison requires the vendored upstream specification in the implementation PR."
+          }
+        ]
+      }
+    },
+    {
+      "id": "AC-6",
+      "status": "not_run",
+      "verification": {
+        "kind": "unit_or_service_test",
+        "references": [
+          {
+            "locator": "iOS/Package.swift",
+            "result": "swift test --disable-sandbox was not runnable because swift is not installed in this container."
+          }
+        ]
+      }
+    }
+  ]
+}
