@@ -1,0 +1,49 @@
+{
+  "status": "not_run",
+  "summary": "Red-phase OpenAPI tests and criterion plan added. Swift is not installed in this container, so the Swift suite was not executed; the generated-client configuration test is intentionally expected to fail until implementation vendors the specification and adds dependencies.",
+  "acceptance_criteria": [
+    {
+      "id": "AC-1",
+      "status": "not_run",
+      "verification": {
+        "kind": "unit_or_service_test",
+        "references": [
+          {
+            "locator": "iOS/Tests/ColorMatchingLPSAppTests/OpenAPIClientConfigurationTests.swift:5",
+            "result": "not_run: swift executable unavailable; test is intentionally red until dependencies and pinned specification are added"
+          }
+        ]
+      }
+    },
+    {
+      "id": "AC-2",
+      "status": "not_run",
+      "verification": {
+        "kind": "unit_or_service_test",
+        "references": [
+          {
+            "locator": "iOS/Tests/ColorMatchingLPSAppTests/APIClientTests.swift:49",
+            "result": "not_run: local URLProtocol manifest and recent-sheet stubs added"
+          },
+          {
+            "locator": "iOS/Tests/ColorMatchingLPSAppTests/APIClientTests.swift:9",
+            "result": "not_run: existing local URLProtocol capture, measurement, and judgment stubs retained"
+          }
+        ]
+      }
+    },
+    {
+      "id": "AC-3",
+      "status": "not_run",
+      "verification": {
+        "kind": "human_or_external_evidence",
+        "references": [
+          {
+            "locator": "docs/issue-5-openapi-client-test-plan.md:19",
+            "result": "not_run: implementation PR description has not been created in this tests-only run"
+          }
+        ]
+      }
+    }
+  ]
+}
