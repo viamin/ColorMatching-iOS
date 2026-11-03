@@ -1,0 +1,71 @@
+{
+  "status": "failed",
+  "summary": "Red-phase tests and migration evidence were added. Swift is unavailable in this container, and the upstream OpenAPI document/PR #110 is not publicly accessible from this environment.",
+  "acceptance_criteria": [
+    {
+      "id": "AC-1",
+      "status": "failed",
+      "verification": {
+        "kind": "unit_or_service_test",
+        "references": [
+          {
+            "locator": "iOS/Tests/ColorMatchingLPSAppTests/GeneratedClientConfigurationTests.swift:5",
+            "result": "red: Package.swift does not yet declare swift-openapi-generator, swift-openapi-runtime, or OpenAPIGenerator"
+          }
+        ]
+      }
+    },
+    {
+      "id": "AC-2",
+      "status": "failed",
+      "verification": {
+        "kind": "unit_or_service_test",
+        "references": [
+          {
+            "locator": "iOS/Tests/ColorMatchingLPSAppTests/GeneratedClientConfigurationTests.swift:14",
+            "result": "red: iOS/OpenAPI/color_matching.yaml is not yet vendored; test names all six required paths"
+          }
+        ]
+      }
+    },
+    {
+      "id": "AC-3",
+      "status": "not_run",
+      "verification": {
+        "kind": "unit_or_service_test",
+        "references": [
+          {
+            "locator": "docs/solutions/openapi-client-migration-test-plan.md:13",
+            "result": "implementation is deferred to the post-approval implementation run"
+          }
+        ]
+      }
+    },
+    {
+      "id": "AC-4",
+      "status": "not_run",
+      "verification": {
+        "kind": "permanent_system_test",
+        "references": [
+          {
+            "locator": "iOS/Tests/ColorMatchingLPSAppTests/APIClientTests.swift:46",
+            "result": "local URLProtocol stubs added for manifest and recent sheets; swift test --disable-sandbox could not start because swift is absent"
+          }
+        ]
+      }
+    },
+    {
+      "id": "AC-5",
+      "status": "skipped",
+      "verification": {
+        "kind": "human_or_external_evidence",
+        "references": [
+          {
+            "locator": "docs/solutions/openapi-client-migration-test-plan.md:17",
+            "result": "blocked pending the published viamin/color_matching#110 OpenAPI document"
+          }
+        ]
+      }
+    }
+  ]
+}
