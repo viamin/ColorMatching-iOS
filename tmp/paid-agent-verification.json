@@ -1,0 +1,71 @@
+{
+  "status": "failed",
+  "summary": "Tests-first run: focused local-stub tests and generated-runtime boundary assertions are present, but Swift is unavailable in this container and generated-client inputs are intentionally red until implementation.",
+  "acceptance_criteria": [
+    {
+      "id": "AC-1",
+      "status": "failed",
+      "verification": {
+        "kind": "unit_or_service_test",
+        "references": [
+          {
+            "locator": "iOS/Tests/ColorMatchingLPSAppTests/APIClientTests.swift:testOpenAPIClientInputsDeclareEveryConsumedOperation",
+            "result": "red: Package.swift lacks swift-openapi-generator and swift-openapi-runtime; iOS/OpenAPI/openapi.json is absent"
+          }
+        ]
+      }
+    },
+    {
+      "id": "AC-2",
+      "status": "failed",
+      "verification": {
+        "kind": "unit_or_service_test",
+        "references": [
+          {
+            "locator": "iOS/Tests/ColorMatchingLPSAppTests/APIClientTests.swift:testOpenAPIClientInputsDeclareEveryConsumedOperation",
+            "result": "red: the absent vendored specification cannot declare the six required operations"
+          }
+        ]
+      }
+    },
+    {
+      "id": "AC-3",
+      "status": "not_run",
+      "verification": {
+        "kind": "unit_or_service_test",
+        "references": [
+          {
+            "locator": "iOS/Tests/ColorMatchingLPSAppTests/APIClientTests.swift:testAPIClientUsesTheOpenAPIRuntimeInsteadOfOwningHTTPSerialization",
+            "result": "red: APIClient neither imports OpenAPIRuntime nor delegates request construction; final removal of handwritten API models still requires implementation-head review"
+          }
+        ]
+      }
+    },
+    {
+      "id": "AC-4",
+      "status": "not_run",
+      "verification": {
+        "kind": "unit_or_service_test",
+        "references": [
+          {
+            "locator": "iOS/Tests/ColorMatchingLPSAppTests/APIClientTests.swift",
+            "result": "local MockURLProtocol tests added; unable to execute because swift is not installed"
+          }
+        ]
+      }
+    },
+    {
+      "id": "AC-5",
+      "status": "not_run",
+      "verification": {
+        "kind": "human_or_external_evidence",
+        "references": [
+          {
+            "locator": "docs/issue-5-generated-openapi-client-verification-plan.md",
+            "result": "requires comparison against the exact vendored upstream OpenAPI revision and PR description"
+          }
+        ]
+      }
+    }
+  ]
+}
