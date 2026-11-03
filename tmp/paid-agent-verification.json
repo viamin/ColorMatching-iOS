@@ -1,0 +1,58 @@
+{
+  "status": "passed",
+  "summary": "Tests-only phase completed: focused local-stub coverage and generation-input contract checks are committed. Swift execution is not available in this container.",
+  "acceptance_criteria": [
+    {
+      "id": "AC-1",
+      "status": "not_run",
+      "verification": {
+        "kind": "unit_or_service_test",
+        "references": [
+          {
+            "locator": "iOS/Tests/ColorMatchingLPSAppTests/OpenAPIGenerationContractTests.swift:5",
+            "result": "not_run: Swift toolchain is unavailable; test is intentionally red until generator/runtime dependencies and vendored spec are added"
+          }
+        ]
+      }
+    },
+    {
+      "id": "AC-2",
+      "status": "not_run",
+      "verification": {
+        "kind": "unit_or_service_test",
+        "references": [
+          {
+            "locator": "docs/issue-5-openapi-client-test-plan.md:15",
+            "result": "not_run: replacing hand-written models is reserved for the subsequent implementation phase"
+          }
+        ]
+      }
+    },
+    {
+      "id": "AC-3",
+      "status": "not_run",
+      "verification": {
+        "kind": "unit_or_service_test",
+        "references": [
+          {
+            "locator": "iOS/Tests/ColorMatchingLPSAppTests/APIClientTests.swift:49",
+            "result": "not_run: local URLProtocol stubs cover manifest, recent sheets, capture creation, measurement upload, and judgment upload; Swift is unavailable"
+          }
+        ]
+      }
+    },
+    {
+      "id": "AC-4",
+      "status": "passed",
+      "verification": {
+        "kind": "human_or_external_evidence",
+        "references": [
+          {
+            "locator": "docs/issue-5-openapi-client-test-plan.md:23",
+            "result": "published-spec comparison and required PR-description deltas recorded from viamin/color_matching PR #113"
+          }
+        ]
+      }
+    }
+  ]
+}
