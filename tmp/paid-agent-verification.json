@@ -1,0 +1,71 @@
+{
+  "status": "not_run",
+  "summary": "Test-phase coverage and the OpenAPI implementation plan were added, but Swift is not installed in the container and the upstream dynamic OpenAPI endpoint is unavailable without a deployed Phoenix server.",
+  "acceptance_criteria": [
+    {
+      "id": "AC-1",
+      "status": "not_run",
+      "verification": {
+        "kind": "human_or_external_evidence",
+        "references": [
+          {
+            "locator": "docs/issue-5-openapi-client-test-plan.md",
+            "result": "Upstream issue #110 is closed, but no static spec exists in its main branch and the attempted raw spec fetch returned HTTP 404."
+          }
+        ]
+      }
+    },
+    {
+      "id": "AC-2",
+      "status": "not_run",
+      "verification": {
+        "kind": "unit_or_service_test",
+        "references": [
+          {
+            "locator": "iOS/Tests/ColorMatchingLPSAppTests/APIClientTests.swift",
+            "result": "Local-stub tests cover manifest, recent sheets, capture creation, measurement upload, and judgment upload; generated operation names and ranked-results schema await the published document."
+          }
+        ]
+      }
+    },
+    {
+      "id": "AC-3",
+      "status": "not_run",
+      "verification": {
+        "kind": "human_or_external_evidence",
+        "references": [
+          {
+            "locator": "docs/issue-5-openapi-client-test-plan.md",
+            "result": "Replacement boundary is documented for the implementation run."
+          }
+        ]
+      }
+    },
+    {
+      "id": "AC-4",
+      "status": "not_run",
+      "verification": {
+        "kind": "unit_or_service_test",
+        "references": [
+          {
+            "locator": "iOS/Tests/ColorMatchingLPSAppTests/APIClientTests.swift",
+            "result": "Tests use MockURLProtocol local stubs; execution was not possible because swift is absent."
+          }
+        ]
+      }
+    },
+    {
+      "id": "AC-5",
+      "status": "not_run",
+      "verification": {
+        "kind": "human_or_external_evidence",
+        "references": [
+          {
+            "locator": "docs/issue-5-openapi-client-test-plan.md",
+            "result": "PR-body delta checklist is recorded; the actual delta is blocked until a published spec can be fetched or vendored."
+          }
+        ]
+      }
+    }
+  ]
+}
