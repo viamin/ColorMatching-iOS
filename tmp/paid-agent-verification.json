@@ -1,0 +1,195 @@
+{
+  "status": "passed",
+  "summary": "Test-writing phase for viamin/ColorMatching-iOS#5. Added the OpenAPI-client test suite (GeneratedAPIClientTests.swift, OpenAPISpecDriftTests.swift), aligned the existing APIClientTests.swift stubs with the published OpenAPI document, and wrote the normative design/contract-delta record at docs/openapi-generated-client.md. The suite is red by design until the generated client lands (no generated types or fetchRankedResults exist yet). No Swift toolchain is available in this container (swift is not installed and the package targets iOS/macOS), so the tests could not be executed here; they are committed for the implementation run.",
+  "acceptance_criteria": [
+    {
+      "id": "AC-1",
+      "title": "Add swift-openapi-generator + swift-openapi-runtime to the iOS package; fetch or vendor the OpenAPI document from viamin/color_matching#110",
+      "status": "not_run",
+      "reason": "Implementation deliverable. This run may only change test paths and LID docs, so Package.swift and the vendored document are untouched. The required layout, generator configuration and vendored paths are specified normatively in docs/openapi-generated-client.md.",
+      "verification": {
+        "kind": "unit_or_service_test",
+        "references": [
+          {
+            "locator": "iOS/Tests/ColorMatchingLPSAppTests/OpenAPISpecDriftTests.swift:12",
+            "result": "not_run"
+          },
+          {
+            "locator": "docs/openapi-generated-client.md:41",
+            "result": "passed"
+          }
+        ]
+      }
+    },
+    {
+      "id": "AC-2",
+      "title": "Generate the client for the surfaces the app uses today: test-sheet manifest + recent sheets, capture session creation, measurement upload, judgment upload, ranked results",
+      "status": "not_run",
+      "reason": "Implementation deliverable. The six operations and their pinned operationIds are specified in docs/openapi-generated-client.md; the generated sources do not exist yet.",
+      "verification": {
+        "kind": "unit_or_service_test",
+        "references": [
+          {
+            "locator": "iOS/Tests/ColorMatchingLPSAppTests/OpenAPISpecDriftTests.swift:115",
+            "result": "not_run"
+          },
+          {
+            "locator": "docs/openapi-generated-client.md:117",
+            "result": "passed"
+          }
+        ]
+      }
+    },
+    {
+      "id": "AC-3",
+      "title": "Replace the app's hand-written API models with generated types; keep any purely client-side models as-is",
+      "status": "not_run",
+      "reason": "Implementation deliverable. docs/openapi-generated-client.md states which wire types become generated (re-exported under the app's existing names) and which client-side models stay hand-written.",
+      "verification": {
+        "kind": "unit_or_service_test",
+        "references": [
+          {
+            "locator": "iOS/Tests/ColorMatchingLPSAppTests/GeneratedAPIClientTests.swift:22",
+            "result": "not_run"
+          },
+          {
+            "locator": "docs/openapi-generated-client.md:128",
+            "result": "passed"
+          }
+        ]
+      }
+    },
+    {
+      "id": "AC-4",
+      "title": "Swift tests exercising the generated client against local stubbed responses (no live server in CI)",
+      "status": "not_run",
+      "reason": "The tests are written and committed but cannot be executed in this container: swift is not installed and the package's app target is iOS/macOS-only. They are red by design (the generated client, the RankedResults type and fetchRankedResults do not exist yet), which is the expected red phase for the implementation run.",
+      "verification": {
+        "kind": "unit_or_service_test",
+        "references": [
+          {
+            "locator": "iOS/Tests/ColorMatchingLPSAppTests/GeneratedAPIClientTests.swift:22",
+            "result": "not_run"
+          },
+          {
+            "locator": "iOS/Tests/ColorMatchingLPSAppTests/GeneratedAPIClientTests.swift:52",
+            "result": "not_run"
+          },
+          {
+            "locator": "iOS/Tests/ColorMatchingLPSAppTests/GeneratedAPIClientTests.swift:74",
+            "result": "not_run"
+          },
+          {
+            "locator": "iOS/Tests/ColorMatchingLPSAppTests/GeneratedAPIClientTests.swift:125",
+            "result": "not_run"
+          },
+          {
+            "locator": "iOS/Tests/ColorMatchingLPSAppTests/GeneratedAPIClientTests.swift:197",
+            "result": "not_run"
+          },
+          {
+            "locator": "iOS/Tests/ColorMatchingLPSAppTests/GeneratedAPIClientTests.swift:228",
+            "result": "not_run"
+          },
+          {
+            "locator": "iOS/Tests/ColorMatchingLPSAppTests/GeneratedAPIClientTests.swift:255",
+            "result": "not_run"
+          },
+          {
+            "locator": "iOS/Tests/ColorMatchingLPSAppTests/GeneratedAPIClientTests.swift:273",
+            "result": "not_run"
+          },
+          {
+            "locator": "iOS/Tests/ColorMatchingLPSAppTests/OpenAPISpecDriftTests.swift:12",
+            "result": "not_run"
+          },
+          {
+            "locator": "iOS/Tests/ColorMatchingLPSAppTests/OpenAPISpecDriftTests.swift:29",
+            "result": "not_run"
+          },
+          {
+            "locator": "iOS/Tests/ColorMatchingLPSAppTests/OpenAPISpecDriftTests.swift:50",
+            "result": "not_run"
+          },
+          {
+            "locator": "iOS/Tests/ColorMatchingLPSAppTests/OpenAPISpecDriftTests.swift:63",
+            "result": "not_run"
+          },
+          {
+            "locator": "iOS/Tests/ColorMatchingLPSAppTests/OpenAPISpecDriftTests.swift:85",
+            "result": "not_run"
+          },
+          {
+            "locator": "iOS/Tests/ColorMatchingLPSAppTests/OpenAPISpecDriftTests.swift:98",
+            "result": "not_run"
+          },
+          {
+            "locator": "iOS/Tests/ColorMatchingLPSAppTests/OpenAPISpecDriftTests.swift:115",
+            "result": "not_run"
+          }
+        ]
+      }
+    },
+    {
+      "id": "AC-5",
+      "title": "PR description records what changed between the prose contract and the published spec, and any endpoint gaps discovered",
+      "status": "passed",
+      "reason": "Recorded as the contract-delta table (D1-D19) and the endpoint-gap section, with a ready-to-paste PR description draft.",
+      "verification": {
+        "kind": "human_or_external_evidence",
+        "references": [
+          {
+            "locator": "docs/openapi-generated-client.md:208",
+            "result": "passed"
+          },
+          {
+            "locator": "docs/openapi-generated-client.md:236",
+            "result": "passed"
+          },
+          {
+            "locator": "docs/openapi-generated-client.md:339",
+            "result": "passed"
+          }
+        ]
+      }
+    },
+    {
+      "id": "AC-6",
+      "title": "Exit criterion: swift test --disable-sandbox green with generated types wired in",
+      "status": "not_run",
+      "reason": "Cannot be satisfied in the test-writing phase: the generated client does not exist yet and no Swift toolchain is installed in this container (swift: command not found; the package's ColorMatchingLPSApp target requires iOS/macOS). The test files were syntax-checked with ast-grep's Swift parser and reviewed by hand.",
+      "verification": {
+        "kind": "unit_or_service_test",
+        "references": [
+          {
+            "locator": "iOS/Tests/ColorMatchingLPSAppTests/GeneratedAPIClientTests.swift:14",
+            "result": "not_run"
+          },
+          {
+            "locator": "iOS/Tests/ColorMatchingLPSAppTests/OpenAPISpecDriftTests.swift:11",
+            "result": "not_run"
+          }
+        ]
+      }
+    },
+    {
+      "id": "AC-7",
+      "title": "Exit criterion: PR description captures contract deltas between docs/color-matching-api-contract.md and the real API",
+      "status": "passed",
+      "reason": "Deltas were derived from the upstream source (viamin/color_matching PR #113, merge 094bd6d3443ddacbda7e63354299867eb5bdfa9f) rather than from the prose document, and are written down with the upstream references.",
+      "verification": {
+        "kind": "human_or_external_evidence",
+        "references": [
+          {
+            "locator": "docs/openapi-generated-client.md:95",
+            "result": "passed"
+          },
+          {
+            "locator": "docs/openapi-generated-client.md:263",
+            "result": "passed"
+          }
+        ]
+      }
+    }
+  ]
+}
