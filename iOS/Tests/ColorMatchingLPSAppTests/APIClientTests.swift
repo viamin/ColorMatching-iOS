@@ -46,6 +46,56 @@ final class APIClientTests: XCTestCase {
         XCTAssertEqual(quality["rejections"] as? [String], [])
     }
 
+    func testFetchesManifestAndRecentSheetsFromLocalStubbedResponses() async throws {
+        MockURLProtocol.handler = { request in
+            let response = HTTPURLResponse(url: try XCTUnwrap(request.url), statusCode: 200, httpVersion: nil, headerFields: nil)!
+
+            switch request.url?.path {
+            case "/api/v1/test_sheets/sheet_1/manifest":
+                return (response, Self.manifestResponse)
+            case "/api/v1/test_sheets/recent":
+                return (response, Data(#"{"sheets":[{"sheet_id":"sheet_1","manifest_url":"https://example.test/api/v1/test_sheets/sheet_1/manifest","title":"October sheet"}]}"#.utf8))
+            default:
+                throw URLError(.badURL)
+            }
+        }
+
+        let baseURL = URL(string: "https://example.test")!
+        let manifest = try await client().fetchManifest(baseURL: baseURL, sheetCode: "sheet_1")
+        let recentSheets = try await client().fetchRecentSheets(baseURL: baseURL)
+
+        XCTAssertEqual(manifest.sheetID, "sheet_1")
+        XCTAssertEqual(manifest.pairs.map(\.id), ["pair_1"])
+        XCTAssertEqual(recentSheets.map(\.sheetID), ["sheet_1"])
+        XCTAssertEqual(recentSheets.first?.title, "October sheet")
+    }
+
+    func testPackageConfiguresGeneratedClientFromVendoredOpenAPISpec() throws {
+        let package = try String(contentsOf: repositoryFile("iOS/Package.swift"), encoding: .utf8)
+        let generatedClient = try String(contentsOf: repositoryFile("iOS/Sources/ColorMatchingLPSAppCore/APIClient.swift"), encoding: .utf8)
+        let spec = repositoryFile("iOS/openapi/color-matching-api-v1.json")
+
+        XCTAssertTrue(FileManager.default.fileExists(atPath: spec.path), "Vendor the published /api/v1 OpenAPI document so generation is reproducible.")
+        let specContents = try? String(contentsOf: spec, encoding: .utf8)
+        [
+            "/api/v1/test_sheets/{sheet_id}/manifest",
+            "/api/v1/test_sheets/recent",
+            "/api/v1/test_sheets/{sheet_id}/captures",
+            "/api/v1/captures/{capture_id}/measurements",
+            "/api/v1/captures/{capture_id}/judgments",
+            "/api/v1/test_sheets/{sheet_id}/ranked_results"
+        ].forEach { path in
+            XCTAssertTrue(specContents?.contains(path) == true, "The vendored spec must cover \(path).")
+        }
+        XCTAssertTrue(package.contains("swift-openapi-generator"))
+        XCTAssertTrue(package.contains("swift-openapi-runtime"))
+        XCTAssertTrue(package.contains("OpenAPIGenerator"))
+        XCTAssertTrue(package.contains("OpenAPIRuntime"))
+        XCTAssertTrue(generatedClient.contains("Client"), "Route app API calls through the generated OpenAPI client.")
+        XCTAssertFalse(generatedClient.contains("struct CaptureMetadata"), "Remove hand-written transport models after generation.")
+        XCTAssertFalse(generatedClient.contains("struct RecentSheet"), "Use generated response schemas for recent sheets.")
+    }
+
     func testUploadMeasurementsEncodesScoresWithAlgorithmVersion() async throws {
         var capturedBody: Data?
         MockURLProtocol.handler = { request in
@@ -116,6 +166,30 @@ final class APIClientTests: XCTestCase {
             }
         }
         return data
+    }
+
+    private static let manifestResponse = Data(#"""
+    {
+      "schema_version":"lps-sheet-manifest/v1",
+      "sheet_version":"lps-letter-grid-v1",
+      "sheet_id":"sheet_1",
+      "manifest_url":"https://example.test/api/v1/test_sheets/sheet_1/manifest",
+      "page":{"units":"mm","width":215.9,"height":279.4},
+      "registration_markers":[],
+      "patches":[
+        {"id":"patch_1","role":"pair_color","pair_id":"pair_1","pair_side":"first","reference_role":null,"source_color":"#FF0000","safe_inset_mm":1.5,"rect":{"x":16,"y":38,"width":16,"height":10}},
+        {"id":"patch_2","role":"pair_color","pair_id":"pair_1","pair_side":"second","reference_role":null,"source_color":"#00FF00","safe_inset_mm":1.5,"rect":{"x":36,"y":38,"width":16,"height":10}}
+      ],
+      "pairs":[{"id":"pair_1","first_patch_id":"patch_1","second_patch_id":"patch_2","source_colors":["#FF0000","#00FF00"],"grid_row":0,"grid_col":0}]
+    }
+    """#.utf8)
+
+    private func repositoryFile(_ relativePath: String) -> URL {
+        URL(fileURLWithPath: #filePath)
+            .deletingLastPathComponent()
+            .deletingLastPathComponent()
+            .deletingLastPathComponent()
+            .appendingPathComponent(relativePath)
     }
 }
 
