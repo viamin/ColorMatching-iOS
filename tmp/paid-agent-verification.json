@@ -1,0 +1,75 @@
+{
+  "status": "not_run",
+  "summary": "Red-phase tests and criterion plan added. The container does not provide a swift executable, so Swift compilation and test execution could not run.",
+  "acceptance_criteria": [
+    {
+      "id": "AC-1",
+      "status": "failed",
+      "verification": {
+        "kind": "unit_or_service_test",
+        "references": [
+          {
+            "locator": "iOS/Tests/ColorMatchingLPSAppTests/OpenAPIAdoptionTests.swift:5",
+            "result": "Red: Package.swift currently lacks swift-openapi-generator and swift-openapi-runtime, and iOS/OpenAPI/color-matching.json is absent."
+          }
+        ]
+      }
+    },
+    {
+      "id": "AC-2",
+      "status": "failed",
+      "verification": {
+        "kind": "unit_or_service_test",
+        "references": [
+          {
+            "locator": "iOS/Tests/ColorMatchingLPSAppTests/OpenAPIAdoptionTests.swift:15",
+            "result": "Red: no vendored OpenAPI input exists; the expected six app-used paths cannot yet be checked."
+          },
+          {
+            "locator": "iOS/Tests/ColorMatchingLPSAppTests/OpenAPIAdoptionTests.swift:29",
+            "result": "Red: APIClient.swift still defines CaptureMetadata, CaptureSessionResponse, RecentSheet, and PairJudgment."
+          }
+        ]
+      }
+    },
+    {
+      "id": "AC-3",
+      "status": "not_run",
+      "verification": {
+        "kind": "permanent_system_test",
+        "references": [
+          {
+            "locator": "iOS/Tests/ColorMatchingLPSAppTests/APIClientTests.swift:49",
+            "result": "Local URLProtocol stub coverage was added, but swift test --disable-sandbox could not start because swift is not installed in this container."
+          }
+        ]
+      }
+    },
+    {
+      "id": "AC-4",
+      "status": "not_run",
+      "verification": {
+        "kind": "human_or_external_evidence",
+        "references": [
+          {
+            "locator": "docs/issue-5-test-plan.md:18",
+            "result": "Requires the exact published OpenAPI response and a PR-body comparison; neither belongs in this tests-only commit."
+          }
+        ]
+      }
+    },
+    {
+      "id": "AC-5",
+      "status": "not_run",
+      "verification": {
+        "kind": "unit_or_service_test",
+        "references": [
+          {
+            "locator": "iOS/Tests/ColorMatchingLPSAppTests/OpenAPIAdoptionTests.swift:5",
+            "result": "swift test --disable-sandbox was blocked before execution: swift executable is absent."
+          }
+        ]
+      }
+    }
+  ]
+}
