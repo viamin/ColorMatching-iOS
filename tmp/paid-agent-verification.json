@@ -1,0 +1,71 @@
+{
+  "status": "failed",
+  "summary": "Test-writing phase: local-stub coverage and migration evidence added; implementation remains intentionally red and Swift is unavailable in this container.",
+  "acceptance_criteria": [
+    {
+      "id": "AC-1",
+      "status": "failed",
+      "verification": {
+        "kind": "unit_or_service_test",
+        "references": [
+          {
+            "locator": "iOS/Tests/ColorMatchingLPSAppTests/APIClientTests.swift:testPackageDeclaresGeneratedOpenAPIClientDependencies",
+            "result": "red: Package.swift does not yet declare swift-openapi-generator or swift-openapi-runtime"
+          }
+        ]
+      }
+    },
+    {
+      "id": "AC-2",
+      "status": "failed",
+      "verification": {
+        "kind": "permanent_system_test",
+        "references": [
+          {
+            "locator": "iOS/Tests/ColorMatchingLPSAppTests/APIClientTests.swift",
+            "result": "local stubs cover manifest, recent sheets, capture, measurements, and judgments; generated types and ranked-results call are not implemented"
+          }
+        ]
+      }
+    },
+    {
+      "id": "AC-3",
+      "status": "not_run",
+      "verification": {
+        "kind": "unit_or_service_test",
+        "references": [
+          {
+            "locator": "docs/openapi-client-migration-test-plan.md",
+            "result": "requires the implementation run to compile the generated boundary"
+          }
+        ]
+      }
+    },
+    {
+      "id": "AC-4",
+      "status": "not_run",
+      "verification": {
+        "kind": "permanent_system_test",
+        "references": [
+          {
+            "locator": "iOS/Tests/ColorMatchingLPSAppTests/APIClientTests.swift",
+            "result": "tests use MockURLProtocol with no live server; execution unavailable because swift is not installed"
+          }
+        ]
+      }
+    },
+    {
+      "id": "AC-5",
+      "status": "passed",
+      "verification": {
+        "kind": "human_or_external_evidence",
+        "references": [
+          {
+            "locator": "docs/openapi-client-migration-test-plan.md",
+            "result": "comparison against viamin/color_matching#110 router, schemas, and response renderers is recorded for the PR description"
+          }
+        ]
+      }
+    }
+  ]
+}
