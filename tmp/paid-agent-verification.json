@@ -1,0 +1,88 @@
+{
+  "status": "not_run",
+  "summary": "Red-phase OpenAPI migration tests and a criterion-level migration plan were added. The Swift toolchain is unavailable in this container, so swift test --disable-sandbox could not run.",
+  "acceptance_criteria": [
+    {
+      "id": "AC-1",
+      "status": "failed",
+      "verification": {
+        "kind": "unit_or_service_test",
+        "references": [
+          {
+            "locator": "iOS/Tests/ColorMatchingLPSAppTests/APIClientTests.swift:testPackageDeclaresOpenAPIClientGenerationAndVendoredSpec",
+            "result": "Static inspection confirms Package.swift has no swift-openapi-generator/runtime dependencies and the expected vendored specification is absent."
+          }
+        ]
+      }
+    },
+    {
+      "id": "AC-2",
+      "status": "not_run",
+      "verification": {
+        "kind": "unit_or_service_test",
+        "references": [
+          {
+            "locator": "iOS/Tests/ColorMatchingLPSAppTests/APIClientTests.swift:testFetchManifestDecodesGeneratedContractResponse",
+            "result": "Fixture added, but it currently calls the handwritten client and could not be executed because swift is unavailable."
+          },
+          {
+            "locator": "iOS/Tests/ColorMatchingLPSAppTests/APIClientTests.swift:testFetchRecentSheetsDecodesNullableTitle",
+            "result": "Fixture added, but it currently calls the handwritten client and could not be executed because swift is unavailable."
+          }
+        ]
+      }
+    },
+    {
+      "id": "AC-3",
+      "status": "not_run",
+      "verification": {
+        "kind": "human_or_external_evidence",
+        "references": [
+          {
+            "locator": "docs/openapi-client-migration-test-plan.md",
+            "result": "Requires generated source and review of the app's remaining client-only models."
+          }
+        ]
+      }
+    },
+    {
+      "id": "AC-4",
+      "status": "not_run",
+      "verification": {
+        "kind": "unit_or_service_test",
+        "references": [
+          {
+            "locator": "iOS/Tests/ColorMatchingLPSAppTests/APIClientTests.swift",
+            "result": "Local URLProtocol stubs cover manifest, recent sheets, capture creation, measurements, and judgments; generation and ranked-results coverage remain red."
+          }
+        ]
+      }
+    },
+    {
+      "id": "AC-5",
+      "status": "skipped",
+      "verification": {
+        "kind": "human_or_external_evidence",
+        "references": [
+          {
+            "locator": "docs/openapi-client-migration-test-plan.md",
+            "result": "The provider issue is closed, but the served document was not reachable from this environment; compare the actual vendored document before writing the PR description."
+          }
+        ]
+      }
+    },
+    {
+      "id": "AC-6",
+      "status": "not_run",
+      "verification": {
+        "kind": "unit_or_service_test",
+        "references": [
+          {
+            "locator": "swift test --disable-sandbox",
+            "result": "Not run: the RTK wrapper reported that swift is not installed."
+          }
+        ]
+      }
+    }
+  ]
+}
