@@ -1,0 +1,71 @@
+{
+  "status": "failed",
+  "summary": "Tests-only red phase: local URLProtocol coverage was added, while generator/spec assertions remain intentionally red until viamin/color_matching#110 is available and the implementation run wires generated types.",
+  "acceptance_criteria": [
+    {
+      "id": "AC-1",
+      "status": "failed",
+      "verification": {
+        "kind": "unit_or_service_test",
+        "references": [
+          {
+            "locator": "iOS/Tests/ColorMatchingLPSAppTests/OpenAPIGenerationContractTests.swift:5",
+            "result": "red: Package.swift has no generator/runtime wiring and the vendored specification is absent"
+          }
+        ]
+      }
+    },
+    {
+      "id": "AC-2",
+      "status": "failed",
+      "verification": {
+        "kind": "unit_or_service_test",
+        "references": [
+          {
+            "locator": "iOS/Tests/ColorMatchingLPSAppTests/OpenAPIGenerationContractTests.swift:14",
+            "result": "red: endpoint inventory cannot be verified until the upstream OpenAPI document is vendored"
+          }
+        ]
+      }
+    },
+    {
+      "id": "AC-3",
+      "status": "not_run",
+      "verification": {
+        "kind": "unit_or_service_test",
+        "references": [
+          {
+            "locator": "docs/issue-5-openapi-client-pr-plan.md:8",
+            "result": "implementation-run compile-time generated-type test required"
+          }
+        ]
+      }
+    },
+    {
+      "id": "AC-4",
+      "status": "not_run",
+      "verification": {
+        "kind": "unit_or_service_test",
+        "references": [
+          {
+            "locator": "iOS/Tests/ColorMatchingLPSAppTests/APIClientTests.swift:49",
+            "result": "local URLProtocol stubs added; not run because Swift is not installed in this container"
+          }
+        ]
+      }
+    },
+    {
+      "id": "AC-5",
+      "status": "skipped",
+      "verification": {
+        "kind": "human_or_external_evidence",
+        "references": [
+          {
+            "locator": "docs/issue-5-openapi-client-pr-plan.md:17",
+            "result": "blocked pending publication and inspection of viamin/color_matching#110"
+          }
+        ]
+      }
+    }
+  ]
+}
