@@ -46,6 +46,42 @@ final class APIClientTests: XCTestCase {
         XCTAssertEqual(quality["rejections"] as? [String], [])
     }
 
+    func testFetchesManifestAndRecentSheetsFromLocalStubs() async throws {
+        var requestedPaths: [String] = []
+        MockURLProtocol.handler = { request in
+            requestedPaths.append(request.url!.path)
+
+            switch request.url!.path {
+            case "/api/v1/test_sheets/sheet_1/manifest":
+                return (
+                    HTTPURLResponse(url: request.url!, statusCode: 200, httpVersion: nil, headerFields: nil)!,
+                    Data(Self.manifestResponse.utf8)
+                )
+            case "/api/v1/test_sheets/recent":
+                return (
+                    HTTPURLResponse(url: request.url!, statusCode: 200, httpVersion: nil, headerFields: nil)!,
+                    Data(#"{"sheets":[{"sheet_id":"sheet_1","manifest_url":"https://example.test/api/v1/test_sheets/sheet_1/manifest","title":null}]}"#.utf8)
+                )
+            default:
+                throw URLError(.badURL)
+            }
+        }
+
+        let manifest = try await client().fetchManifest(
+            baseURL: URL(string: "https://example.test")!,
+            sheetCode: "sheet_1"
+        )
+        let recentSheets = try await client().fetchRecentSheets(baseURL: URL(string: "https://example.test")!)
+
+        XCTAssertEqual(manifest.sheetID, "sheet_1")
+        XCTAssertEqual(recentSheets.map(\.sheetID), ["sheet_1"])
+        XCTAssertNil(recentSheets.first?.title)
+        XCTAssertEqual(requestedPaths, [
+            "/api/v1/test_sheets/sheet_1/manifest",
+            "/api/v1/test_sheets/recent"
+        ])
+    }
+
     func testUploadMeasurementsEncodesScoresWithAlgorithmVersion() async throws {
         var capturedBody: Data?
         MockURLProtocol.handler = { request in
@@ -92,6 +128,20 @@ final class APIClientTests: XCTestCase {
         XCTAssertEqual((json["judgments"] as? [[String: Any]])?.first?["judgment"] as? String, "near_match")
     }
 
+    func testPackageDeclaresTheGeneratedOpenAPIClient() throws {
+        let packageURL = URL(fileURLWithPath: #filePath)
+            .deletingLastPathComponent()
+            .deletingLastPathComponent()
+            .deletingLastPathComponent()
+            .appendingPathComponent("Package.swift")
+        let package = try String(contentsOf: packageURL)
+
+        XCTAssertTrue(package.contains("swift-openapi-generator"))
+        XCTAssertTrue(package.contains("swift-openapi-runtime"))
+        XCTAssertTrue(package.contains("OpenAPIGenerator"))
+        XCTAssertTrue(package.contains("openapi.json"))
+    }
+
     private func client() -> APIClient {
         let configuration = URLSessionConfiguration.ephemeral
         configuration.protocolClasses = [MockURLProtocol.self]
@@ -117,6 +167,22 @@ final class APIClientTests: XCTestCase {
         }
         return data
     }
+
+    private static let manifestResponse = #"""
+    {
+      "schema_version": "lps-sheet-manifest/v1",
+      "sheet_version": "lps-letter-grid-v1",
+      "sheet_id": "sheet_1",
+      "manifest_url": "https://example.test/api/v1/test_sheets/sheet_1/manifest",
+      "created_at": "2026-07-25T12:00:00Z",
+      "page": {"units": "mm", "width": 215.9, "height": 279.4},
+      "registration_markers": [],
+      "printer_profile": {"id": "printer_1", "name": "Research printer", "paper": "paper", "ink": "ink", "settings": {}},
+      "capture_profile": {"expected_illuminant": "low_pressure_sodium", "preferred_camera": "wide", "scoring_algorithm_version": "lps-distance-v1"},
+      "patches": [],
+      "pairs": []
+    }
+    """#
 }
 
 private final class MockURLProtocol: URLProtocol {
