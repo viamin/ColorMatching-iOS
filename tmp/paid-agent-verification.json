@@ -1,0 +1,88 @@
+{
+  "status": "failed",
+  "summary": "Tests and contract-delta documentation were added in the required tests-only phase. Swift is not installed in this container, so the suite could not run; the generated-client dependency assertion is intentionally red until implementation.",
+  "acceptance_criteria": [
+    {
+      "id": "AC-1",
+      "status": "not_run",
+      "verification": {
+        "kind": "unit_or_service_test",
+        "references": [
+          {
+            "locator": "iOS/Tests/ColorMatchingLPSAppTests/APIClientTests.swift:testPackageDeclaresGeneratedOpenAPIClientDependencies",
+            "result": "not_run: swift executable is unavailable; expected to fail before Package.swift declares generator and runtime dependencies"
+          }
+        ]
+      }
+    },
+    {
+      "id": "AC-2",
+      "status": "not_run",
+      "verification": {
+        "kind": "permanent_system_test",
+        "references": [
+          {
+            "locator": "iOS/Tests/ColorMatchingLPSAppTests/APIClientTests.swift:testFetchManifestDecodesLocalOpenAPIStub",
+            "result": "not_run: local-stub test added; generated operation wiring remains implementation work"
+          },
+          {
+            "locator": "docs/issue-5-openapi-client-verification-plan.md",
+            "result": "ranked-results operation coverage is explicitly identified as pending a compilable generated-client seam"
+          }
+        ]
+      }
+    },
+    {
+      "id": "AC-3",
+      "status": "not_run",
+      "verification": {
+        "kind": "human_or_external_evidence",
+        "references": [
+          {
+            "locator": "docs/issue-5-openapi-client-verification-plan.md",
+            "result": "requires review of generated artifacts and removal of hand-written transport models"
+          }
+        ]
+      }
+    },
+    {
+      "id": "AC-4",
+      "status": "not_run",
+      "verification": {
+        "kind": "permanent_system_test",
+        "references": [
+          {
+            "locator": "iOS/Tests/ColorMatchingLPSAppTests/APIClientTests.swift",
+            "result": "MockURLProtocol local-stub coverage exists but could not run because swift is unavailable"
+          }
+        ]
+      }
+    },
+    {
+      "id": "AC-5",
+      "status": "passed",
+      "verification": {
+        "kind": "human_or_external_evidence",
+        "references": [
+          {
+            "locator": "docs/issue-5-openapi-client-verification-plan.md",
+            "result": "records provider PR #113 / issue #110 contract deltas and confirms no current-workflow endpoint gap"
+          }
+        ]
+      }
+    },
+    {
+      "id": "AC-6",
+      "status": "not_run",
+      "verification": {
+        "kind": "unit_or_service_test",
+        "references": [
+          {
+            "locator": "iOS/Package.swift",
+            "result": "swift test --disable-sandbox could not start: swift executable unavailable"
+          }
+        ]
+      }
+    }
+  ]
+}
