@@ -1,0 +1,75 @@
+{
+  "status": "not_run",
+  "summary": "Tests-only red phase for issue #5. The generator adoption guard is intentionally red; Swift is unavailable in the container, so the test target could not be compiled.",
+  "acceptance_criteria": [
+    {
+      "id": "AC-1",
+      "status": "failed",
+      "verification": {
+        "kind": "unit_or_service_test",
+        "references": [
+          {
+            "locator": "iOS/Tests/ColorMatchingLPSAppTests/OpenAPIClientAdoptionTests.swift:5",
+            "result": "intentionally red: Package.swift lacks swift-openapi-generator, swift-openapi-runtime, plugin wiring, and vendored specification"
+          }
+        ]
+      }
+    },
+    {
+      "id": "AC-2",
+      "status": "not_run",
+      "verification": {
+        "kind": "unit_or_service_test",
+        "references": [
+          {
+            "locator": "iOS/Tests/ColorMatchingLPSAppTests/APIClientTests.swift:46",
+            "result": "local URLProtocol manifest/recent-sheet coverage added; Swift compiler unavailable (swift: No such file or directory)"
+          }
+        ]
+      }
+    },
+    {
+      "id": "AC-3",
+      "status": "not_run",
+      "verification": {
+        "kind": "unit_or_service_test",
+        "references": [
+          {
+            "locator": "docs/issue-5-openapi-client-plan.md:9",
+            "result": "compile-time mapper coverage is deferred to the implementation phase"
+          }
+        ]
+      }
+    },
+    {
+      "id": "AC-4",
+      "status": "not_run",
+      "verification": {
+        "kind": "unit_or_service_test",
+        "references": [
+          {
+            "locator": "iOS/Tests/ColorMatchingLPSAppTests/APIClientTests.swift:46",
+            "result": "uses a local URLProtocol stub; not compiled because Swift is unavailable"
+          }
+        ]
+      }
+    },
+    {
+      "id": "AC-5",
+      "status": "passed",
+      "verification": {
+        "kind": "human_or_external_evidence",
+        "references": [
+          {
+            "locator": "docs/issue-5-openapi-client-plan.md:15",
+            "result": "records deltas and upstream endpoint-schema gaps against viamin/color_matching#110"
+          },
+          {
+            "locator": "https://github.com/viamin/color_matching/issues/110",
+            "result": "upstream issue is closed; its implementation serves /api/v1/openapi.json"
+          }
+        ]
+      }
+    }
+  ]
+}
