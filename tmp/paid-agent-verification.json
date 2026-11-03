@@ -1,0 +1,87 @@
+{
+  "status": "not_run",
+  "summary": "Tests-first run: local URLProtocol tests and red OpenAPI-adoption checks were added, but the container has no Swift toolchain and implementation is prohibited in this phase.",
+  "acceptance_criteria": [
+    {
+      "id": "AC-1",
+      "status": "not_run",
+      "verification": {
+        "kind": "unit_or_service_test",
+        "references": [
+          {
+            "locator": "iOS/Tests/ColorMatchingLPSAppTests/OpenAPIAdoptionTests.swift:5",
+            "result": "not run: swift executable is unavailable; source inspection confirms the required dependencies are not declared"
+          },
+          {
+            "locator": "iOS/Tests/ColorMatchingLPSAppTests/OpenAPIAdoptionTests.swift:12",
+            "result": "not run: expected vendored OpenAPI source is absent"
+          }
+        ]
+      }
+    },
+    {
+      "id": "AC-2",
+      "status": "not_run",
+      "verification": {
+        "kind": "permanent_system_test",
+        "references": [
+          {
+            "locator": "iOS/Tests/ColorMatchingLPSAppTests/APIClientTests.swift:49",
+            "result": "not run: local stubbed manifest test added"
+          },
+          {
+            "locator": "iOS/Tests/ColorMatchingLPSAppTests/APIClientTests.swift:69",
+            "result": "not run: local stubbed recent-sheets test added"
+          }
+        ]
+      }
+    },
+    {
+      "id": "AC-3",
+      "status": "not_run",
+      "verification": {
+        "kind": "permanent_system_test",
+        "references": [
+          {
+            "locator": "iOS/Tests/ColorMatchingLPSAppTests/APIClientTests.swift:12",
+            "result": "not run: local stubbed capture-creation test present"
+          },
+          {
+            "locator": "iOS/Tests/ColorMatchingLPSAppTests/APIClientTests.swift:85",
+            "result": "not run: local stubbed measurement-upload test present"
+          },
+          {
+            "locator": "iOS/Tests/ColorMatchingLPSAppTests/APIClientTests.swift:113",
+            "result": "not run: local stubbed judgment-upload test present"
+          }
+        ]
+      }
+    },
+    {
+      "id": "AC-4",
+      "status": "not_run",
+      "verification": {
+        "kind": "permanent_system_test",
+        "references": [
+          {
+            "locator": "docs/issue-5-openapi-client-test-plan.md:20",
+            "result": "not run: ranked-results operation does not exist in the current app client"
+          }
+        ]
+      }
+    },
+    {
+      "id": "AC-5",
+      "status": "passed",
+      "verification": {
+        "kind": "human_or_external_evidence",
+        "references": [
+          {
+            "locator": "docs/issue-5-openapi-client-test-plan.md:23",
+            "result": "records the upstream #113/#110 discrepancy and inspectable prose-to-published-contract deltas"
+          }
+        ]
+      }
+    }
+  ]
+}
