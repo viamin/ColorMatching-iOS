@@ -1,0 +1,58 @@
+{
+  "status": "not_run",
+  "summary": "Tests were added for locally stubbed manifest and recent-sheet flows, but Swift is not installed in this container; generated-client implementation and upstream OpenAPI-spec verification are deferred to the implementation run.",
+  "acceptance_criteria": [
+    {
+      "id": "AC-1",
+      "status": "not_run",
+      "verification": {
+        "kind": "unit_or_service_test",
+        "references": [
+          {
+            "locator": "iOS/Tests/ColorMatchingLPSAppTests/APIClientTests.swift:49",
+            "result": "not_run: Swift toolchain unavailable"
+          }
+        ]
+      }
+    },
+    {
+      "id": "AC-2",
+      "status": "not_run",
+      "verification": {
+        "kind": "unit_or_service_test",
+        "references": [
+          {
+            "locator": "iOS/Tests/ColorMatchingLPSAppTests/APIClientTests.swift:12",
+            "result": "not_run: Swift toolchain unavailable"
+          }
+        ]
+      }
+    },
+    {
+      "id": "AC-3",
+      "status": "not_run",
+      "verification": {
+        "kind": "unit_or_service_test",
+        "references": [
+          {
+            "locator": "docs/issue-5-openapi-client-test-plan.md:14",
+            "result": "blocked: ranked-results response schema and generated operation await viamin/color_matching#110"
+          }
+        ]
+      }
+    },
+    {
+      "id": "AC-4",
+      "status": "not_run",
+      "verification": {
+        "kind": "human_or_external_evidence",
+        "references": [
+          {
+            "locator": "docs/issue-5-openapi-client-test-plan.md:15",
+            "result": "blocked: upstream OpenAPI document is not available in this checkout"
+          }
+        ]
+      }
+    }
+  ]
+}
