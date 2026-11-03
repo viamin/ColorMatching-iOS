@@ -1,0 +1,39 @@
+{
+  "status": "failed",
+  "summary": "Tests-only red phase: the OpenAPI migration contract test records the missing generated-client inputs and bindings.",
+  "acceptance_criteria": [
+    {
+      "id": "AC-1",
+      "status": "failed",
+      "verification": {
+        "kind": "unit_or_service_test",
+        "references": [{
+          "locator": "iOS/Tests/ColorMatchingLPSAppTests/OpenAPIClientMigrationContractTests.swift:5",
+          "result": "expected red failure: package has no generator/runtime/plugin and no vendored spec"
+        }]
+      }
+    },
+    {
+      "id": "AC-2",
+      "status": "failed",
+      "verification": {
+        "kind": "unit_or_service_test",
+        "references": [{
+          "locator": "iOS/Tests/ColorMatchingLPSAppTests/APIClientTests.swift:6",
+          "result": "local MockURLProtocol coverage exists for three current paths; generated bindings and ranked-results coverage are absent"
+        }]
+      }
+    },
+    {
+      "id": "AC-3",
+      "status": "not_run",
+      "verification": {
+        "kind": "human_or_external_evidence",
+        "references": [{
+          "locator": "docs/openapi-client-migration.md:13",
+          "result": "published spec must be fetched from the deployed upstream endpoint before contract deltas can be inspected"
+        }]
+      }
+    }
+  ]
+}
