@@ -1,0 +1,88 @@
+{
+  "status": "failed",
+  "summary": "Red-phase tests and criterion mapping added; generated-client implementation is intentionally absent and Swift tooling is unavailable in this container.",
+  "acceptance_criteria": [
+    {
+      "id": "AC-1",
+      "status": "failed",
+      "verification": {
+        "kind": "unit_or_service_test",
+        "references": [
+          {
+            "locator": "iOS/Tests/ColorMatchingLPSAppTests/APIClientTests.swift:119",
+            "result": "red: Package.swift does not declare swift-openapi-generator or swift-openapi-runtime"
+          }
+        ]
+      }
+    },
+    {
+      "id": "AC-2",
+      "status": "failed",
+      "verification": {
+        "kind": "unit_or_service_test",
+        "references": [
+          {
+            "locator": "iOS/Tests/ColorMatchingLPSAppTests/APIClientTests.swift:95",
+            "result": "local stub covers manifest and recent sheets; existing tests cover capture and uploads; ranked-results operation is absent"
+          },
+          {
+            "locator": "docs/issue-5-openapi-client-verification-plan.md",
+            "result": "documents the ranked-results endpoint gap"
+          }
+        ]
+      }
+    },
+    {
+      "id": "AC-3",
+      "status": "failed",
+      "verification": {
+        "kind": "human_or_external_evidence",
+        "references": [
+          {
+            "locator": "iOS/Sources/ColorMatchingLPSAppCore/APIClient.swift:87",
+            "result": "hand-written Codable API models remain pending implementation"
+          }
+        ]
+      }
+    },
+    {
+      "id": "AC-4",
+      "status": "not_run",
+      "verification": {
+        "kind": "unit_or_service_test",
+        "references": [
+          {
+            "locator": "iOS/Tests/ColorMatchingLPSAppTests/APIClientTests.swift:95",
+            "result": "not run: swift executable is unavailable; test uses URLProtocol stubs and no live server"
+          }
+        ]
+      }
+    },
+    {
+      "id": "AC-5",
+      "status": "not_run",
+      "verification": {
+        "kind": "human_or_external_evidence",
+        "references": [
+          {
+            "locator": "docs/issue-5-openapi-client-verification-plan.md",
+            "result": "not run: OpenAPI document from viamin/color_matching#110 is unavailable locally"
+          }
+        ]
+      }
+    },
+    {
+      "id": "AC-6",
+      "status": "not_run",
+      "verification": {
+        "kind": "unit_or_service_test",
+        "references": [
+          {
+            "locator": "iOS/Package.swift",
+            "result": "not run: swift executable is unavailable in this container"
+          }
+        ]
+      }
+    }
+  ]
+}
