@@ -1,0 +1,71 @@
+{
+  "status": "not_run",
+  "summary": "Red-phase OpenAPI adoption tests and migration evidence were added. Swift is unavailable in this container, so the Swift suite could not be executed; the generated-client implementation is deliberately deferred to the approved implementation run.",
+  "acceptance_criteria": [
+    {
+      "id": "AC-1",
+      "status": "not_run",
+      "verification": {
+        "kind": "unit_or_service_test",
+        "references": [
+          {
+            "locator": "iOS/Tests/ColorMatchingLPSAppTests/OpenAPIAdoptionTests.swift:5",
+            "result": "red test added; not executed because swift is unavailable"
+          }
+        ]
+      }
+    },
+    {
+      "id": "AC-2",
+      "status": "not_run",
+      "verification": {
+        "kind": "permanent_system_test",
+        "references": [
+          {
+            "locator": "iOS/Tests/ColorMatchingLPSAppTests/APIClientTests.swift:48",
+            "result": "local-stub manifest/recent coverage added; generated-client and ranked-results coverage remain red"
+          }
+        ]
+      }
+    },
+    {
+      "id": "AC-3",
+      "status": "not_run",
+      "verification": {
+        "kind": "unit_or_service_test",
+        "references": [
+          {
+            "locator": "docs/openapi-client-migration-plan.md:10",
+            "result": "implementation-phase compilation criterion recorded"
+          }
+        ]
+      }
+    },
+    {
+      "id": "AC-4",
+      "status": "not_run",
+      "verification": {
+        "kind": "permanent_system_test",
+        "references": [
+          {
+            "locator": "iOS/Tests/ColorMatchingLPSAppTests/APIClientTests.swift:48",
+            "result": "local URLProtocol stubs are inspectable; Swift suite not executable in this container"
+          }
+        ]
+      }
+    },
+    {
+      "id": "AC-5",
+      "status": "not_run",
+      "verification": {
+        "kind": "human_or_external_evidence",
+        "references": [
+          {
+            "locator": "docs/openapi-client-migration-plan.md:22",
+            "result": "contract deltas documented; final PR description still requires reviewer-visible evidence"
+          }
+        ]
+      }
+    }
+  ]
+}
