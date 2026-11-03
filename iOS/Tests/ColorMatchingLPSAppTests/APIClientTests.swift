@@ -15,7 +15,7 @@ final class APIClientTests: XCTestCase {
         MockURLProtocol.handler = { request in
             capturedRequest = request
             capturedBody = request.httpBodyStream.flatMap(Self.readBody) ?? request.httpBody
-            return (HTTPURLResponse(url: request.url!, statusCode: 201, httpVersion: nil, headerFields: nil)!, Data(#"{"capture_id":"cap_1"}"#.utf8))
+            return Self.stubResponse(for: request, statusCode: 201, json: #"{"capture_id":"cap_1"}"#)
         }
 
         let response = try await client().createCapture(
@@ -50,7 +50,11 @@ final class APIClientTests: XCTestCase {
         var capturedBody: Data?
         MockURLProtocol.handler = { request in
             capturedBody = request.httpBodyStream.flatMap(Self.readBody) ?? request.httpBody
-            return (HTTPURLResponse(url: request.url!, statusCode: 204, httpVersion: nil, headerFields: nil)!, Data())
+            return Self.stubResponse(
+                for: request,
+                statusCode: 200,
+                json: #"{"capture_id":"cap_1","measurement_count":1,"pair_score_count":1}"#
+            )
         }
 
         let rgb = RGB(r: 0.2, g: 0.3, b: 0.4)
@@ -63,12 +67,16 @@ final class APIClientTests: XCTestCase {
         )
 
         let json = try XCTUnwrap(Self.jsonObject(from: capturedBody) as? [String: Any])
-        XCTAssertEqual(json["scoring_algorithm_version"] as? String, "lps-distance-v1")
         let measurement = try XCTUnwrap((json["measurements"] as? [[String: Any]])?.first)
         XCTAssertEqual(measurement["patch_id"] as? String, "patch_1")
         let statsPayload = try XCTUnwrap(measurement["stats"] as? [String: Any])
         XCTAssertEqual(Set(statsPayload.keys), ["sample_count", "clipping_fraction", "mean", "standard_deviation"])
-        XCTAssertEqual((json["pair_scores"] as? [[String: Any]])?.first?["pair_id"] as? String, "pair_1")
+        let pairScore = try XCTUnwrap((json["pair_scores"] as? [[String: Any]])?.first)
+        XCTAssertEqual(pairScore["pair_id"] as? String, "pair_1")
+        // The published OpenAPI document carries the algorithm version per pair
+        // score. The top-level `scoring_algorithm_version` of the prose
+        // contract is not part of the document and the server ignores it.
+        XCTAssertEqual(pairScore["algorithm_version"] as? String, "lps-distance-v1")
     }
 
     func testUploadJudgmentsEncodesPathAndPayload() async throws {
@@ -77,7 +85,11 @@ final class APIClientTests: XCTestCase {
         MockURLProtocol.handler = { request in
             capturedRequest = request
             capturedBody = request.httpBodyStream.flatMap(Self.readBody) ?? request.httpBody
-            return (HTTPURLResponse(url: request.url!, statusCode: 204, httpVersion: nil, headerFields: nil)!, Data())
+            return Self.stubResponse(
+                for: request,
+                statusCode: 200,
+                json: #"{"capture_id":"cap_1","judgment_count":1}"#
+            )
         }
 
         try await client().uploadJudgments(
@@ -100,6 +112,18 @@ final class APIClientTests: XCTestCase {
 
     private static func jsonObject(from data: Data?) throws -> Any {
         try JSONSerialization.jsonObject(with: XCTUnwrap(data))
+    }
+
+    /// The published OpenAPI document declares JSON bodies for every endpoint
+    /// the app calls, so the stub has to advertise the content type.
+    private static func stubResponse(for request: URLRequest, statusCode: Int, json: String) -> (HTTPURLResponse, Data) {
+        let response = HTTPURLResponse(
+            url: request.url!,
+            statusCode: statusCode,
+            httpVersion: nil,
+            headerFields: ["Content-Type": "application/json"]
+        )!
+        return (response, Data(json.utf8))
     }
 
     private static func readBody(_ stream: InputStream) -> Data {
