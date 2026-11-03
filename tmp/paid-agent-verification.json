@@ -1,0 +1,75 @@
+{
+  "status": "failed",
+  "summary": "Tests-only phase: local-stub coverage was added for the API surfaces that are callable today, while generated-client prerequisites remain intentionally red. The Swift toolchain is unavailable in this container, so swift test could not run.",
+  "acceptance_criteria": [
+    {
+      "id": "AC-1",
+      "status": "failed",
+      "verification": {
+        "kind": "unit_or_service_test",
+        "references": [
+          {
+            "locator": "iOS/Tests/ColorMatchingLPSAppTests/APIClientTests.swift:testPackageManifestDeclaresGeneratedClientAndVendoredOpenAPISpec",
+            "result": "not_run: intentional red assertion until generator/runtime dependencies and vendored spec are added"
+          }
+        ]
+      }
+    },
+    {
+      "id": "AC-2",
+      "status": "not_run",
+      "verification": {
+        "kind": "unit_or_service_test",
+        "references": [
+          {
+            "locator": "docs/issue-5-openapi-client-test-plan.md:criterion map",
+            "result": "ranked-results has no callable app client method; generated operation coverage awaits implementation"
+          }
+        ]
+      }
+    },
+    {
+      "id": "AC-3",
+      "status": "not_run",
+      "verification": {
+        "kind": "unit_or_service_test",
+        "references": [
+          {
+            "locator": "iOS/Tests/ColorMatchingLPSAppTests/APIClientTests.swift:testPackageManifestDeclaresGeneratedClientAndVendoredOpenAPISpec",
+            "result": "not run: generated types are not present in this tests-only phase"
+          }
+        ]
+      }
+    },
+    {
+      "id": "AC-4",
+      "status": "not_run",
+      "verification": {
+        "kind": "unit_or_service_test",
+        "references": [
+          {
+            "locator": "iOS/Tests/ColorMatchingLPSAppTests/APIClientTests.swift:testFetchManifestUsesPublishedRouteAndDecodesSheetGeometry",
+            "result": "not run: Swift executable unavailable; test uses local MockURLProtocol and no live server"
+          },
+          {
+            "locator": "iOS/Tests/ColorMatchingLPSAppTests/APIClientTests.swift:testFetchRecentSheetsUsesPublishedRouteAndDecodesNullableTitle",
+            "result": "not run: Swift executable unavailable; test uses local MockURLProtocol and no live server"
+          }
+        ]
+      }
+    },
+    {
+      "id": "AC-5",
+      "status": "passed",
+      "verification": {
+        "kind": "human_or_external_evidence",
+        "references": [
+          {
+            "locator": "docs/issue-5-openapi-client-test-plan.md:Published-spec deltas and gaps",
+            "result": "compares the published upstream OpenAPI source modules with docs/color-matching-api-contract.md"
+          }
+        ]
+      }
+    }
+  ]
+}
