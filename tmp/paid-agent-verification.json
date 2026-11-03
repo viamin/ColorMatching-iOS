@@ -1,0 +1,75 @@
+{
+  "status": "not_run",
+  "summary": "Tests-only phase: local-stub coverage and a red generated-client configuration guard were added. Swift is unavailable in the container, so dependency resolution and the Swift suite were not run.",
+  "acceptance_criteria": [
+    {
+      "id": "AC-1",
+      "status": "not_run",
+      "verification": {
+        "kind": "unit_or_service_test",
+        "references": [
+          {
+            "locator": "iOS/Tests/ColorMatchingLPSAppTests/APIClientTests.swift:181",
+            "result": "not_run: swift executable is unavailable; the test is intentionally red until Package.swift configures swift-openapi-generator, swift-openapi-runtime, and iOS/OpenAPI/color-matching.json"
+          }
+        ]
+      }
+    },
+    {
+      "id": "AC-2",
+      "status": "not_run",
+      "verification": {
+        "kind": "unit_or_service_test",
+        "references": [
+          {
+            "locator": "iOS/Tests/ColorMatchingLPSAppTests/APIClientTests.swift:49",
+            "result": "not_run: local-stub manifest test added; generated-client migration remains for the implementation phase"
+          },
+          {
+            "locator": "iOS/Tests/ColorMatchingLPSAppTests/APIClientTests.swift:70",
+            "result": "not_run: local-stub recent-sheets test added; ranked-results schema gap is documented in docs/solutions/api-contracts/openapi-generated-client-contract-deltas.md"
+          }
+        ]
+      }
+    },
+    {
+      "id": "AC-3",
+      "status": "not_run",
+      "verification": {
+        "kind": "human_or_external_evidence",
+        "references": [
+          {
+            "locator": "docs/solutions/api-contracts/openapi-generated-client-contract-deltas.md",
+            "result": "The hand-written-model replacement is deferred to the implementation phase; the document records the boundary between generated API types and client-side MeasurementCore models."
+          }
+        ]
+      }
+    },
+    {
+      "id": "AC-4",
+      "status": "not_run",
+      "verification": {
+        "kind": "unit_or_service_test",
+        "references": [
+          {
+            "locator": "iOS/Tests/ColorMatchingLPSAppTests/APIClientTests.swift:12",
+            "result": "not_run: existing capture/measurement/judgment local-stub tests remain as migration regression coverage; swift is unavailable."
+          }
+        ]
+      }
+    },
+    {
+      "id": "AC-5",
+      "status": "not_run",
+      "verification": {
+        "kind": "human_or_external_evidence",
+        "references": [
+          {
+            "locator": "docs/solutions/api-contracts/openapi-generated-client-contract-deltas.md",
+            "result": "Contract deltas were compared with viamin/color_matching#113 source; the implementation PR must carry this evidence in its description."
+          }
+        ]
+      }
+    }
+  ]
+}
