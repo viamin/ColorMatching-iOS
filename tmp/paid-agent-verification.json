@@ -1,0 +1,58 @@
+{
+  "status": "failed",
+  "summary": "Tests-only red phase: focused OpenAPI migration acceptance tests and PR evidence were added, but the generated client, vendored document, and Swift toolchain are not yet available.",
+  "acceptance_criteria": [
+    {
+      "id": "AC-1",
+      "status": "not_run",
+      "verification": {
+        "kind": "unit_or_service_test",
+        "references": [
+          {
+            "locator": "iOS/Tests/ColorMatchingLPSAppTests/OpenAPIContractTests.swift:17",
+            "result": "not_run: swift is not installed in this container; test is intentionally red until Package.swift declares swift-openapi-generator and swift-openapi-runtime"
+          }
+        ]
+      }
+    },
+    {
+      "id": "AC-2",
+      "status": "not_run",
+      "verification": {
+        "kind": "unit_or_service_test",
+        "references": [
+          {
+            "locator": "iOS/Tests/ColorMatchingLPSAppTests/OpenAPIContractTests.swift:5",
+            "result": "not_run: swift is not installed in this container; test is intentionally red until OpenAPI/color_matching.openapi.json is vendored"
+          }
+        ]
+      }
+    },
+    {
+      "id": "AC-3",
+      "status": "not_run",
+      "verification": {
+        "kind": "unit_or_service_test",
+        "references": [
+          {
+            "locator": "iOS/Tests/ColorMatchingLPSAppTests/APIClientTests.swift:12",
+            "result": "not_run: existing URLProtocol stubs cover capture/measurement/judgment requests; implementation must migrate and extend them for generated manifest, recent-sheet, and ranked-results operations"
+          }
+        ]
+      }
+    },
+    {
+      "id": "AC-4",
+      "status": "passed",
+      "verification": {
+        "kind": "human_or_external_evidence",
+        "references": [
+          {
+            "locator": "docs/openapi-client-migration.md:27",
+            "result": "records source-backed prose-contract deltas and provider endpoint/schema gaps for the eventual PR description"
+          }
+        ]
+      }
+    }
+  ]
+}
