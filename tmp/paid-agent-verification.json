@@ -1,0 +1,71 @@
+{
+  "status": "not_run",
+  "summary": "Tests-only PR: local-stub regression coverage was added for manifest and recent-sheet reads. The container has no Swift toolchain, and generated-client implementation is intentionally deferred to the next phase.",
+  "acceptance_criteria": [
+    {
+      "id": "AC-1",
+      "status": "not_run",
+      "verification": {
+        "kind": "human_or_external_evidence",
+        "references": [
+          {
+            "locator": "https://github.com/viamin/color_matching/issues/110",
+            "result": "Upstream issue is closed; its current main commit 47057afd58f7d46b4d4b740ca7d2d08947774471 serves /api/v1/openapi.json. iOS dependency and vendoring work has not started in this tests-only phase."
+          }
+        ]
+      }
+    },
+    {
+      "id": "AC-2",
+      "status": "not_run",
+      "verification": {
+        "kind": "unit_or_service_test",
+        "references": [
+          {
+            "locator": "docs/issue-5-openapi-client-test-plan.md",
+            "result": "Defines the six generated-operation stub tests; ranked-results and generated operation wiring await implementation."
+          }
+        ]
+      }
+    },
+    {
+      "id": "AC-3",
+      "status": "not_run",
+      "verification": {
+        "kind": "human_or_external_evidence",
+        "references": [
+          {
+            "locator": "iOS/Sources/ColorMatchingLPSAppCore/APIClient.swift",
+            "result": "Hand-written API models remain present by design in this tests-only phase."
+          }
+        ]
+      }
+    },
+    {
+      "id": "AC-4",
+      "status": "not_run",
+      "verification": {
+        "kind": "unit_or_service_test",
+        "references": [
+          {
+            "locator": "iOS/Tests/ColorMatchingLPSAppTests/APIClientTests.swift",
+            "result": "Local URLProtocol stubs cover manifest, recent sheets, capture creation, measurement upload, and judgment upload; tests could not run because swift is unavailable in this container."
+          }
+        ]
+      }
+    },
+    {
+      "id": "AC-5",
+      "status": "passed",
+      "verification": {
+        "kind": "human_or_external_evidence",
+        "references": [
+          {
+            "locator": "docs/issue-5-openapi-client-test-plan.md",
+            "result": "Records prose-contract deltas, unsupported schema precision, and the ranked-results endpoint gap against upstream commit 47057afd58f7d46b4d4b740ca7d2d08947774471."
+          }
+        ]
+      }
+    }
+  ]
+}
