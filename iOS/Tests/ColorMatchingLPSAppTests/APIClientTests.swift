@@ -92,10 +92,86 @@ final class APIClientTests: XCTestCase {
         XCTAssertEqual((json["judgments"] as? [[String: Any]])?.first?["judgment"] as? String, "near_match")
     }
 
+    func testFetchRecentSheetsDecodesLocallyStubbedResponse() async throws {
+        MockURLProtocol.handler = { request in
+            XCTAssertEqual(request.httpMethod, "GET")
+            XCTAssertEqual(request.url?.path, "/api/v1/test_sheets/recent")
+            return (
+                HTTPURLResponse(url: request.url!, statusCode: 200, httpVersion: nil, headerFields: nil)!,
+                Data(#"{"sheets":[{"sheet_id":"sheet_1","manifest_url":"https://example.test/api/v1/test_sheets/sheet_1/manifest","title":null}]}"#.utf8)
+            )
+        }
+
+        let sheets = try await client().fetchRecentSheets(baseURL: URL(string: "https://example.test")!)
+
+        XCTAssertEqual(sheets.map(\.sheetID), ["sheet_1"])
+        XCTAssertNil(sheets.first?.title)
+    }
+
+    func testFetchManifestDecodesLocallyStubbedResponse() async throws {
+        MockURLProtocol.handler = { request in
+            XCTAssertEqual(request.httpMethod, "GET")
+            XCTAssertEqual(request.url?.path, "/api/v1/test_sheets/sheet_1/manifest")
+            return (
+                HTTPURLResponse(url: request.url!, statusCode: 200, httpVersion: nil, headerFields: nil)!,
+                Data(Self.manifestResponse.utf8)
+            )
+        }
+
+        let manifest = try await client().fetchManifest(
+            baseURL: URL(string: "https://example.test")!,
+            sheetCode: "sheet_1"
+        )
+
+        XCTAssertEqual(manifest.sheetID, "sheet_1")
+        XCTAssertEqual(manifest.patches.map(\.id), ["patch_1"])
+    }
+
+    func testVendoredOpenAPISpecDeclaresEveryAppUsedEndpoint() throws {
+        let specURL = packageRoot
+            .appendingPathComponent("OpenAPI")
+            .appendingPathComponent("color-matching.json")
+
+        guard FileManager.default.fileExists(atPath: specURL.path) else {
+            XCTFail("Vendor the published OpenAPI document at \(specURL.path)")
+            return
+        }
+
+        let document = try XCTUnwrap(
+            try JSONSerialization.jsonObject(with: Data(contentsOf: specURL)) as? [String: Any]
+        )
+        let paths = try XCTUnwrap(document["paths"] as? [String: Any])
+        let expectedPaths: Set<String> = [
+            "/api/v1/test_sheets/recent",
+            "/api/v1/test_sheets/{sheet_id}/manifest",
+            "/api/v1/test_sheets/{sheet_id}/captures",
+            "/api/v1/captures/{capture_id}/measurements",
+            "/api/v1/captures/{capture_id}/judgments",
+            "/api/v1/test_sheets/{sheet_id}/ranked_results"
+        ]
+
+        XCTAssertEqual(Set(paths.keys).intersection(expectedPaths), expectedPaths)
+    }
+
+    func testPackageDeclaresOpenAPIGeneratorAndRuntimeDependencies() throws {
+        let packageURL = packageRoot.appendingPathComponent("Package.swift")
+        let package = try String(contentsOf: packageURL, encoding: .utf8)
+
+        XCTAssertTrue(package.contains("swift-openapi-generator"))
+        XCTAssertTrue(package.contains("swift-openapi-runtime"))
+    }
+
     private func client() -> APIClient {
         let configuration = URLSessionConfiguration.ephemeral
         configuration.protocolClasses = [MockURLProtocol.self]
         return APIClient(token: "token", session: URLSession(configuration: configuration))
+    }
+
+    private var packageRoot: URL {
+        URL(fileURLWithPath: #filePath)
+            .deletingLastPathComponent()
+            .deletingLastPathComponent()
+            .deletingLastPathComponent()
     }
 
     private static func jsonObject(from data: Data?) throws -> Any {
@@ -117,6 +193,39 @@ final class APIClientTests: XCTestCase {
         }
         return data
     }
+
+    private static let manifestResponse = #"""
+    {
+      "schema_version": "lps-sheet-manifest/v1",
+      "sheet_version": "lps-letter-grid-v1",
+      "sheet_id": "sheet_1",
+      "manifest_url": "https://example.test/api/v1/test_sheets/sheet_1/manifest",
+      "page": {"units": "mm", "width": 215.9, "height": 279.4},
+      "registration_markers": [],
+      "patches": [
+        {
+          "id": "patch_1",
+          "role": "pair_color",
+          "pair_id": "pair_1",
+          "pair_side": "first",
+          "reference_role": null,
+          "source_color": "#FF0000",
+          "safe_inset_mm": 1.5,
+          "rect": {"x": 16, "y": 38, "width": 16, "height": 10}
+        }
+      ],
+      "pairs": [
+        {
+          "id": "pair_1",
+          "first_patch_id": "patch_1",
+          "second_patch_id": "patch_2",
+          "source_colors": ["#FF0000", "#00FF00"],
+          "grid_row": 0,
+          "grid_col": 1
+        }
+      ]
+    }
+    """#
 }
 
 private final class MockURLProtocol: URLProtocol {
