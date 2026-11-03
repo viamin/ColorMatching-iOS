@@ -1,0 +1,58 @@
+{
+  "status": "not_run",
+  "summary": "Red-phase tests and verification plan added. The container has no Swift toolchain, so swift test --disable-sandbox could not start; generated-client implementation is intentionally pending the subsequent implementation run.",
+  "acceptance_criteria": [
+    {
+      "id": "AC-1",
+      "status": "failed",
+      "verification": {
+        "kind": "unit_or_service_test",
+        "references": [
+          {
+            "locator": "iOS/Tests/ColorMatchingLPSAppTests/OpenAPIClientConfigurationTests.swift:5",
+            "result": "red: requires vendored spec, Swift OpenAPI generator/runtime dependencies, build plugin, and all six consumed paths"
+          }
+        ]
+      }
+    },
+    {
+      "id": "AC-2",
+      "status": "not_run",
+      "verification": {
+        "kind": "permanent_system_test",
+        "references": [
+          {
+            "locator": "iOS/Tests/ColorMatchingLPSAppTests/APIClientTests.swift:12",
+            "result": "local URLProtocol stubs cover manifest, recent sheets, capture creation, measurements, and judgments; not run because swift is unavailable"
+          }
+        ]
+      }
+    },
+    {
+      "id": "AC-3",
+      "status": "not_run",
+      "verification": {
+        "kind": "permanent_system_test",
+        "references": [
+          {
+            "locator": "docs/openapi-client-migration-test-plan.md:10",
+            "result": "ranked-results stub is pending the provider's published response schema"
+          }
+        ]
+      }
+    },
+    {
+      "id": "AC-4",
+      "status": "skipped",
+      "verification": {
+        "kind": "human_or_external_evidence",
+        "references": [
+          {
+            "locator": "docs/openapi-client-migration-test-plan.md:16",
+            "result": "requires comparison with the served upstream OpenAPI document and PR description; document unavailable in this environment"
+          }
+        ]
+      }
+    }
+  ]
+}
