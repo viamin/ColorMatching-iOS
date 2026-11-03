@@ -1,0 +1,62 @@
+{
+  "status": "not_run",
+  "summary": "Red-phase OpenAPI-client tests and acceptance plan added; Swift is unavailable in the container, so the suite could not run.",
+  "acceptance_criteria": [
+    {
+      "id": "AC-1",
+      "status": "not_run",
+      "verification": {
+        "kind": "unit_or_service_test",
+        "references": [
+          {
+            "locator": "iOS/Tests/ColorMatchingLPSAppTests/GeneratedOpenAPIClientRequirementsTests.swift:5",
+            "result": "red test added; not run because /usr/bin/swift is unavailable"
+          }
+        ]
+      }
+    },
+    {
+      "id": "AC-2",
+      "status": "not_run",
+      "verification": {
+        "kind": "unit_or_service_test",
+        "references": [
+          {
+            "locator": "iOS/Tests/ColorMatchingLPSAppTests/APIClientTests.swift:12",
+            "result": "local URL-protocol manifest and recent-sheet stub tests added; not run because /usr/bin/swift is unavailable"
+          },
+          {
+            "locator": "iOS/Tests/ColorMatchingLPSAppTests/GeneratedOpenAPIClientRequirementsTests.swift:25",
+            "result": "red ranked-results operation requirement added; not run because /usr/bin/swift is unavailable"
+          }
+        ]
+      }
+    },
+    {
+      "id": "AC-3",
+      "status": "not_run",
+      "verification": {
+        "kind": "unit_or_service_test",
+        "references": [
+          {
+            "locator": "iOS/Tests/ColorMatchingLPSAppTests/GeneratedOpenAPIClientRequirementsTests.swift:14",
+            "result": "red hand-written DTO/transport removal requirement added; not run because /usr/bin/swift is unavailable"
+          }
+        ]
+      }
+    },
+    {
+      "id": "AC-4",
+      "status": "not_run",
+      "verification": {
+        "kind": "human_or_external_evidence",
+        "references": [
+          {
+            "locator": "docs/issue-5-openapi-client-test-plan.md:17",
+            "result": "upstream API document must be vendored before a prose/spec delta can be inspected"
+          }
+        ]
+      }
+    }
+  ]
+}
