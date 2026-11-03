@@ -1,0 +1,71 @@
+{
+  "status": "not_run",
+  "summary": "Tests-only PR: expanded URLProtocol coverage using published provider response shapes. swift is unavailable in this container, so the Swift suite could not run.",
+  "acceptance_criteria": [
+    {
+      "id": "AC-1",
+      "status": "not_run",
+      "verification": {
+        "kind": "unit_or_service_test",
+        "references": [
+          {
+            "locator": "iOS/Package.swift",
+            "result": "Generated OpenAPI dependencies and a pinned document are not present in this tests-only change."
+          }
+        ]
+      }
+    },
+    {
+      "id": "AC-2",
+      "status": "not_run",
+      "verification": {
+        "kind": "unit_or_service_test",
+        "references": [
+          {
+            "locator": "iOS/Tests/ColorMatchingLPSAppTests/APIClientTests.swift:46",
+            "result": "Stubbed manifest, recent-sheet, capture, measurement, and judgment paths are covered; the generated client and ranked-results operation are not implemented."
+          }
+        ]
+      }
+    },
+    {
+      "id": "AC-3",
+      "status": "not_run",
+      "verification": {
+        "kind": "human_or_external_evidence",
+        "references": [
+          {
+            "locator": "iOS/Sources/ColorMatchingLPSAppCore/APIClient.swift",
+            "result": "Hand-written API models remain during the test-writing phase."
+          }
+        ]
+      }
+    },
+    {
+      "id": "AC-4",
+      "status": "not_run",
+      "verification": {
+        "kind": "unit_or_service_test",
+        "references": [
+          {
+            "locator": "iOS/Tests/ColorMatchingLPSAppTests/APIClientTests.swift:6",
+            "result": "Tests use MockURLProtocol and do not need a live server; execution was blocked because swift is not installed."
+          }
+        ]
+      }
+    },
+    {
+      "id": "AC-5",
+      "status": "passed",
+      "verification": {
+        "kind": "human_or_external_evidence",
+        "references": [
+          {
+            "locator": "docs/openapi-client-migration-plan.md",
+            "result": "Records provider commit evidence, contract deltas, and the manifest/ranked-results schema gaps."
+          }
+        ]
+      }
+    }
+  ]
+}
