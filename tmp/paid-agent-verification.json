@@ -1,0 +1,84 @@
+{
+  "status": "failed",
+  "summary": "Red-phase OpenAPI generation tests and contract-delta plan added; Swift is unavailable in this container.",
+  "acceptance_criteria": [
+    {
+      "id": "AC-1",
+      "status": "failed",
+      "verification": {
+        "kind": "unit_or_service_test",
+        "references": [
+          {
+            "locator": "iOS/Tests/ColorMatchingLPSAppTests/OpenAPIClientGenerationTests.swift:5",
+            "result": "red: Package.swift has neither required OpenAPI package and no vendored specification exists"
+          }
+        ]
+      }
+    },
+    {
+      "id": "AC-2",
+      "status": "failed",
+      "verification": {
+        "kind": "unit_or_service_test",
+        "references": [
+          {
+            "locator": "iOS/Tests/ColorMatchingLPSAppTests/OpenAPIClientGenerationTests.swift:13",
+            "result": "red: six required generated operations have no vendored source specification"
+          }
+        ]
+      }
+    },
+    {
+      "id": "AC-3",
+      "status": "failed",
+      "verification": {
+        "kind": "unit_or_service_test",
+        "references": [
+          {
+            "locator": "iOS/Tests/ColorMatchingLPSAppTests/OpenAPIClientGenerationTests.swift:26",
+            "result": "red: hand-written Codable wire models remain in APIClient.swift"
+          }
+        ]
+      }
+    },
+    {
+      "id": "AC-4",
+      "status": "not_run",
+      "verification": {
+        "kind": "permanent_system_test",
+        "references": [
+          {
+            "locator": "docs/issue-5-openapi-client-verification-plan.md:12",
+            "result": "stubbed generated-client test is planned but cannot be written against types before generation"
+          }
+        ]
+      }
+    },
+    {
+      "id": "AC-5",
+      "status": "not_run",
+      "verification": {
+        "kind": "human_or_external_evidence",
+        "references": [
+          {
+            "locator": "docs/issue-5-openapi-client-verification-plan.md:22",
+            "result": "provider-spec delta list prepared; implementation PR description has not yet been created"
+          }
+        ]
+      }
+    },
+    {
+      "id": "AC-6",
+      "status": "not_run",
+      "verification": {
+        "kind": "unit_or_service_test",
+        "references": [
+          {
+            "locator": "iOS/Package.swift:1",
+            "result": "not run: swift executable is unavailable in this container"
+          }
+        ]
+      }
+    }
+  ]
+}
