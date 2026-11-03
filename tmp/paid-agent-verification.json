@@ -1,0 +1,75 @@
+{
+  "status": "not_run",
+  "summary": "Tests and contract-delta evidence were added in the mandated tests-only phase. swift is unavailable in this container, so the Swift suite could not be executed.",
+  "acceptance_criteria": [
+    {
+      "id": "AC-1",
+      "status": "not_run",
+      "verification": {
+        "kind": "human_or_external_evidence",
+        "references": [
+          {
+            "locator": "docs/issues/5-generated-openapi-client.md",
+            "result": "Implementation intentionally deferred by the tests-only boundary; source endpoint and generation plan recorded."
+          }
+        ]
+      }
+    },
+    {
+      "id": "AC-2",
+      "status": "not_run",
+      "verification": {
+        "kind": "unit_or_service_test",
+        "references": [
+          {
+            "locator": "iOS/Tests/ColorMatchingLPSAppTests/APIClientTests.swift:49",
+            "result": "Published manifest and recent-sheet stub fixtures added; suite not run because swift is absent."
+          },
+          {
+            "locator": "docs/issues/5-generated-openapi-client.md",
+            "result": "Ranked-results schema gap documented from the published server spec."
+          }
+        ]
+      }
+    },
+    {
+      "id": "AC-3",
+      "status": "not_run",
+      "verification": {
+        "kind": "human_or_external_evidence",
+        "references": [
+          {
+            "locator": "docs/issues/5-generated-openapi-client.md",
+            "result": "Replacement requires the separate implementation run after tests approval."
+          }
+        ]
+      }
+    },
+    {
+      "id": "AC-4",
+      "status": "not_run",
+      "verification": {
+        "kind": "unit_or_service_test",
+        "references": [
+          {
+            "locator": "iOS/Tests/ColorMatchingLPSAppTests/APIClientTests.swift:138",
+            "result": "Red test requires the generated client to reject legacy 204 measurement responses; suite not run because swift is absent."
+          }
+        ]
+      }
+    },
+    {
+      "id": "AC-5",
+      "status": "passed",
+      "verification": {
+        "kind": "human_or_external_evidence",
+        "references": [
+          {
+            "locator": "docs/issues/5-generated-openapi-client.md",
+            "result": "Contract deltas and published-schema endpoint gaps are recorded with links to color_matching #110 and #113."
+          }
+        ]
+      }
+    }
+  ]
+}
