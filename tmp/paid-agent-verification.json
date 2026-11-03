@@ -1,0 +1,79 @@
+{
+  "status": "failed",
+  "summary": "Tests-only red phase: local-stub coverage was added for the implemented manifest and recent-sheet surfaces, while ranked results remains intentionally failing until the generated client is wired in. The Swift toolchain is unavailable in this environment.",
+  "acceptance_criteria": [
+    {
+      "id": "AC-1",
+      "status": "not_run",
+      "verification": {
+        "kind": "human_or_external_evidence",
+        "references": [
+          {
+            "locator": "docs/issue-5-generated-openapi-client-pr-evidence.md",
+            "result": "No vendored OpenAPI document exists; GitHub API lookup of dependency PR #110 returned 404."
+          }
+        ]
+      }
+    },
+    {
+      "id": "AC-2",
+      "status": "failed",
+      "verification": {
+        "kind": "unit_or_service_test",
+        "references": [
+          {
+            "locator": "iOS/Tests/ColorMatchingLPSAppTests/APIClientTests.swift:testOpenAPIRuntimeIsLinkedForGeneratedClient",
+            "result": "Red: swift-openapi-runtime is not linked, so generated-client tests cannot compile yet."
+          },
+          {
+            "locator": "iOS/Tests/ColorMatchingLPSAppTests/APIClientTests.swift:testFetchManifestDecodesLocalStubResponse",
+            "result": "Not run: Swift toolchain unavailable."
+          },
+          {
+            "locator": "iOS/Tests/ColorMatchingLPSAppTests/APIClientTests.swift:testFetchRecentSheetsDecodesLocalStubResponse",
+            "result": "Not run: Swift toolchain unavailable."
+          }
+        ]
+      }
+    },
+    {
+      "id": "AC-3",
+      "status": "not_run",
+      "verification": {
+        "kind": "human_or_external_evidence",
+        "references": [
+          {
+            "locator": "docs/issue-5-generated-openapi-client-pr-evidence.md",
+            "result": "Requires implementation-phase generated-source and adapter review."
+          }
+        ]
+      }
+    },
+    {
+      "id": "AC-4",
+      "status": "not_run",
+      "verification": {
+        "kind": "unit_or_service_test",
+        "references": [
+          {
+            "locator": "iOS/Tests/ColorMatchingLPSAppTests/APIClientTests.swift",
+            "result": "Uses local MockURLProtocol stubs; execution blocked because swift is absent."
+          }
+        ]
+      }
+    },
+    {
+      "id": "AC-5",
+      "status": "not_run",
+      "verification": {
+        "kind": "human_or_external_evidence",
+        "references": [
+          {
+            "locator": "docs/issue-5-generated-openapi-client-pr-evidence.md",
+            "result": "Draft PR description identifies the current endpoint gap; contract delta comparison awaits a published spec."
+          }
+        ]
+      }
+    }
+  ]
+}
