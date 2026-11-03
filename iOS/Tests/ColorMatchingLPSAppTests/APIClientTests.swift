@@ -92,6 +92,41 @@ final class APIClientTests: XCTestCase {
         XCTAssertEqual((json["judgments"] as? [[String: Any]])?.first?["judgment"] as? String, "near_match")
     }
 
+    func testFetchesManifestAndRecentSheetsFromStubbedResponses() async throws {
+        MockURLProtocol.handler = { request in
+            switch request.url?.path {
+            case "/api/v1/test_sheets/sheet_1/manifest":
+                return (Self.response(for: request), Data(Self.manifestJSON.utf8))
+            case "/api/v1/test_sheets/recent":
+                return (Self.response(for: request), Data(#"{"sheets":[{"sheet_id":"sheet_1","manifest_url":"https://example.test/api/v1/test_sheets/sheet_1/manifest","title":"LPS sheet"}]}"#.utf8))
+            default:
+                throw URLError(.badURL)
+            }
+        }
+
+        let baseURL = URL(string: "https://example.test")!
+        let manifest = try await client().fetchManifest(baseURL: baseURL, sheetCode: "sheet_1")
+        let sheets = try await client().fetchRecentSheets(baseURL: baseURL)
+
+        XCTAssertEqual(manifest.sheetID, "sheet_1")
+        XCTAssertEqual(manifest.pairs.first?.id, "pair_1")
+        XCTAssertEqual(sheets.count, 1)
+        XCTAssertEqual(sheets.first?.sheetID, "sheet_1")
+        XCTAssertEqual(sheets.first?.title, "LPS sheet")
+    }
+
+    func testPackageDeclaresOpenAPIGeneratorAndRuntimeDependencies() throws {
+        let packageURL = URL(fileURLWithPath: #filePath)
+            .deletingLastPathComponent()
+            .deletingLastPathComponent()
+            .deletingLastPathComponent()
+            .appendingPathComponent("Package.swift")
+        let package = try String(contentsOf: packageURL)
+
+        XCTAssertTrue(package.contains("swift-openapi-generator"))
+        XCTAssertTrue(package.contains("swift-openapi-runtime"))
+    }
+
     private func client() -> APIClient {
         let configuration = URLSessionConfiguration.ephemeral
         configuration.protocolClasses = [MockURLProtocol.self]
@@ -101,6 +136,30 @@ final class APIClientTests: XCTestCase {
     private static func jsonObject(from data: Data?) throws -> Any {
         try JSONSerialization.jsonObject(with: XCTUnwrap(data))
     }
+
+    private static func response(for request: URLRequest) -> HTTPURLResponse {
+        HTTPURLResponse(url: request.url!, statusCode: 200, httpVersion: nil, headerFields: nil)!
+    }
+
+    private static let manifestJSON = #"""
+    {
+      "schema_version": "lps-sheet-manifest/v1",
+      "sheet_version": "lps-letter-grid-v1",
+      "sheet_id": "sheet_1",
+      "manifest_url": "https://example.test/api/v1/test_sheets/sheet_1/manifest",
+      "page": {"units": "mm", "width": 215.9, "height": 279.4},
+      "registration_markers": [],
+      "patches": [],
+      "pairs": [{
+        "id": "pair_1",
+        "grid_row": 0,
+        "grid_col": 1,
+        "first_patch_id": "patch_1",
+        "second_patch_id": "patch_2",
+        "source_colors": ["#FF0000", "#00FF00"]
+      }]
+    }
+    """#
 
     private static func readBody(_ stream: InputStream) -> Data {
         stream.open()
