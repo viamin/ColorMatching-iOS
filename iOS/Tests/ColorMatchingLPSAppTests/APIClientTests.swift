@@ -46,11 +46,36 @@ final class APIClientTests: XCTestCase {
         XCTAssertEqual(quality["rejections"] as? [String], [])
     }
 
+    func testFetchesManifestAndRecentSheetsFromOpenAPIResponses() async throws {
+        MockURLProtocol.handler = { request in
+            let response = HTTPURLResponse(url: request.url!, statusCode: 200, httpVersion: nil, headerFields: nil)!
+
+            switch request.url!.path {
+            case "/api/v1/test_sheets/sheet_1/manifest":
+                return (response, Data(Self.manifestResponse.utf8))
+            case "/api/v1/test_sheets/recent":
+                return (response, Data(#"{"sheets":[{"sheet_id":"sheet_1","manifest_url":"https://example.test/api/v1/test_sheets/sheet_1/manifest","title":null}]}"#.utf8))
+            default:
+                throw URLError(.badURL)
+            }
+        }
+
+        let client = client()
+        let baseURL = URL(string: "https://example.test")!
+        let manifest = try await client.fetchManifest(baseURL: baseURL, sheetCode: "sheet_1")
+        let recentSheets = try await client.fetchRecentSheets(baseURL: baseURL)
+
+        XCTAssertEqual(manifest.sheetID, "sheet_1")
+        XCTAssertEqual(manifest.patches.map(\.id), ["patch_1", "patch_2"])
+        XCTAssertEqual(recentSheets.map(\.sheetID), ["sheet_1"])
+        XCTAssertNil(recentSheets.first?.title)
+    }
+
     func testUploadMeasurementsEncodesScoresWithAlgorithmVersion() async throws {
         var capturedBody: Data?
         MockURLProtocol.handler = { request in
             capturedBody = request.httpBodyStream.flatMap(Self.readBody) ?? request.httpBody
-            return (HTTPURLResponse(url: request.url!, statusCode: 204, httpVersion: nil, headerFields: nil)!, Data())
+            return (HTTPURLResponse(url: request.url!, statusCode: 200, httpVersion: nil, headerFields: nil)!, Data(#"{"capture_id":"cap_1","measurement_count":1,"pair_score_count":1}"#.utf8))
         }
 
         let rgb = RGB(r: 0.2, g: 0.3, b: 0.4)
@@ -77,7 +102,7 @@ final class APIClientTests: XCTestCase {
         MockURLProtocol.handler = { request in
             capturedRequest = request
             capturedBody = request.httpBodyStream.flatMap(Self.readBody) ?? request.httpBody
-            return (HTTPURLResponse(url: request.url!, statusCode: 204, httpVersion: nil, headerFields: nil)!, Data())
+            return (HTTPURLResponse(url: request.url!, statusCode: 200, httpVersion: nil, headerFields: nil)!, Data(#"{"capture_id":"cap_1","judgment_count":1}"#.utf8))
         }
 
         try await client().uploadJudgments(
@@ -101,6 +126,22 @@ final class APIClientTests: XCTestCase {
     private static func jsonObject(from data: Data?) throws -> Any {
         try JSONSerialization.jsonObject(with: XCTUnwrap(data))
     }
+
+    private static let manifestResponse = #"""
+    {
+      "schema_version":"lps-sheet-manifest/v1",
+      "sheet_version":"lps-letter-grid-v1",
+      "sheet_id":"sheet_1",
+      "manifest_url":"https://example.test/api/v1/test_sheets/sheet_1/manifest",
+      "page":{"units":"mm","width":215.9,"height":279.4},
+      "registration_markers":[{"role":"top_left","shape":"solid_square","rect":{"x":12,"y":12,"width":8,"height":8}}],
+      "patches":[
+        {"id":"patch_1","role":"pair_color","pair_id":"pair_1","pair_side":"first","reference_role":null,"source_color":"#FF0000","safe_inset_mm":1.5,"rect":{"x":16,"y":38,"width":16,"height":10}},
+        {"id":"patch_2","role":"pair_color","pair_id":"pair_1","pair_side":"second","reference_role":null,"source_color":"#00FF00","safe_inset_mm":1.5,"rect":{"x":34,"y":38,"width":16,"height":10}}
+      ],
+      "pairs":[{"id":"pair_1","first_patch_id":"patch_1","second_patch_id":"patch_2","source_colors":["#FF0000","#00FF00"],"grid_row":0,"grid_col":1}]
+    }
+    """#
 
     private static func readBody(_ stream: InputStream) -> Data {
         stream.open()
