@@ -1,0 +1,66 @@
+{
+  "status": "not_run",
+  "summary": "Red-phase OpenAPI migration tests and criterion map were added. swift is not installed in this container, so the Swift suite could not be executed.",
+  "acceptance_criteria": [
+    {
+      "id": "AC-1",
+      "status": "not_run",
+      "verification": {
+        "kind": "unit_or_service_test",
+        "references": [
+          {
+            "locator": "iOS/Tests/ColorMatchingLPSAppTests/GeneratedOpenAPIClientConfigurationTests.swift:5",
+            "result": "not_run: Swift executable is unavailable; test is intentionally red until generator/runtime and vendored spec are added"
+          }
+        ]
+      }
+    },
+    {
+      "id": "AC-2",
+      "status": "not_run",
+      "verification": {
+        "kind": "unit_or_service_test",
+        "references": [
+          {
+            "locator": "iOS/Tests/ColorMatchingLPSAppTests/APIClientTests.swift:49",
+            "result": "not_run: local URLProtocol stub test added for manifest behavior"
+          },
+          {
+            "locator": "iOS/Tests/ColorMatchingLPSAppTests/APIClientTests.swift:72",
+            "result": "not_run: local URLProtocol stub test added for recent-sheet behavior"
+          }
+        ]
+      }
+    },
+    {
+      "id": "AC-3",
+      "status": "not_run",
+      "verification": {
+        "kind": "unit_or_service_test",
+        "references": [
+          {
+            "locator": "iOS/Tests/ColorMatchingLPSAppTests/APIClientTests.swift:12",
+            "result": "not_run: existing local-stub capture test retained as generated-wrapper regression coverage"
+          },
+          {
+            "locator": "iOS/Tests/ColorMatchingLPSAppTests/APIClientTests.swift:110",
+            "result": "not_run: existing local-stub measurement and judgment tests retained as generated-wrapper regression coverage"
+          }
+        ]
+      }
+    },
+    {
+      "id": "AC-4",
+      "status": "skipped",
+      "verification": {
+        "kind": "human_or_external_evidence",
+        "references": [
+          {
+            "locator": "docs/openapi-client-migration-plan.md:21",
+            "result": "blocked pending the published viamin/color_matching#110 specification and its pinned revision"
+          }
+        ]
+      }
+    }
+  ]
+}
