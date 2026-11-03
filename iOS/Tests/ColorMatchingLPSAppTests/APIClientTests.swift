@@ -92,6 +92,21 @@ final class APIClientTests: XCTestCase {
         XCTAssertEqual((json["judgments"] as? [[String: Any]])?.first?["judgment"] as? String, "near_match")
     }
 
+    func testOpenAPIGeneratorConfigurationReplacesHandWrittenTransportModels() throws {
+        let package = try String(contentsOf: projectFile("Package.swift"))
+        let apiClient = try String(contentsOf: projectFile("Sources/ColorMatchingLPSAppCore/APIClient.swift"))
+
+        XCTAssertTrue(package.contains("swift-openapi-generator"))
+        XCTAssertTrue(package.contains("swift-openapi-runtime"))
+        XCTAssertFalse(apiClient.contains("public struct CaptureMetadata"))
+        XCTAssertFalse(apiClient.contains("public struct CaptureSessionResponse"))
+        XCTAssertFalse(apiClient.contains("public struct RecentSheet"))
+        XCTAssertFalse(apiClient.contains("public struct PairJudgment"))
+        XCTAssertFalse(apiClient.contains("private struct CreateCaptureRequest"))
+        XCTAssertFalse(apiClient.contains("private struct MeasurementUploadRequest"))
+        XCTAssertFalse(apiClient.contains("private struct JudgmentUploadRequest"))
+    }
+
     private func client() -> APIClient {
         let configuration = URLSessionConfiguration.ephemeral
         configuration.protocolClasses = [MockURLProtocol.self]
@@ -116,6 +131,14 @@ final class APIClientTests: XCTestCase {
             }
         }
         return data
+    }
+
+    private func projectFile(_ path: String) -> URL {
+        URL(fileURLWithPath: #filePath)
+            .deletingLastPathComponent()
+            .deletingLastPathComponent()
+            .deletingLastPathComponent()
+            .appending(path: path)
     }
 }
 
