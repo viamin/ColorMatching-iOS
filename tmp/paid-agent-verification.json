@@ -1,0 +1,75 @@
+{
+  "status": "failed",
+  "summary": "Tests-only phase: local URLProtocol stubs were added for manifest and recent-sheet responses, while ranked results remains an intentional red test until a generated client exists. swift test could not run because Swift is not installed in this container.",
+  "acceptance_criteria": [
+    {
+      "id": "AC-1",
+      "status": "not_run",
+      "verification": {
+        "kind": "human_or_external_evidence",
+        "references": [
+          {
+            "locator": "docs/openapi-client-migration.md:7",
+            "result": "Implementation phase must inspect the package dependency and pinned OpenAPI document."
+          }
+        ]
+      }
+    },
+    {
+      "id": "AC-2",
+      "status": "failed",
+      "verification": {
+        "kind": "unit_or_service_test",
+        "references": [
+          {
+            "locator": "iOS/Tests/ColorMatchingLPSAppTests/APIClientTests.swift:130",
+            "result": "Intentional red test: generated ranked-results client surface is absent."
+          }
+        ]
+      }
+    },
+    {
+      "id": "AC-3",
+      "status": "not_run",
+      "verification": {
+        "kind": "human_or_external_evidence",
+        "references": [
+          {
+            "locator": "docs/openapi-client-migration.md:8",
+            "result": "Requires implementation-phase source inspection and compilation."
+          }
+        ]
+      }
+    },
+    {
+      "id": "AC-4",
+      "status": "not_run",
+      "verification": {
+        "kind": "unit_or_service_test",
+        "references": [
+          {
+            "locator": "iOS/Tests/ColorMatchingLPSAppTests/APIClientTests.swift:49",
+            "result": "Local URLProtocol stub coverage added; not run because the Swift toolchain is unavailable."
+          },
+          {
+            "locator": "iOS/Tests/ColorMatchingLPSAppTests/APIClientTests.swift:67",
+            "result": "Local URLProtocol recent-sheets stub coverage added; not run because the Swift toolchain is unavailable."
+          }
+        ]
+      }
+    },
+    {
+      "id": "AC-5",
+      "status": "not_run",
+      "verification": {
+        "kind": "human_or_external_evidence",
+        "references": [
+          {
+            "locator": "docs/openapi-client-migration.md:18",
+            "result": "Contract deltas are recorded for the future PR description; no PR is opened in this tests-only run."
+          }
+        ]
+      }
+    }
+  ]
+}
