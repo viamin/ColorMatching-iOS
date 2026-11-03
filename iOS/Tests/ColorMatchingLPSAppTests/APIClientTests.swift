@@ -92,6 +92,73 @@ final class APIClientTests: XCTestCase {
         XCTAssertEqual((json["judgments"] as? [[String: Any]])?.first?["judgment"] as? String, "near_match")
     }
 
+    func testFetchManifestAcceptsThePublishedMinimumResponse() async throws {
+        MockURLProtocol.handler = { request in
+            XCTAssertEqual(request.url?.path, "/api/v1/test_sheets/sheet_1/manifest")
+            return (
+                HTTPURLResponse(url: request.url!, statusCode: 200, httpVersion: nil, headerFields: nil)!,
+                Data(#"{"schema_version":"lps-sheet-manifest/v1","sheet_id":"sheet_1","capture_profile":{"scoring_algorithm_version":"lps-distance-v1"}}"#.utf8)
+            )
+        }
+
+        let manifest = try await client().fetchManifest(
+            baseURL: URL(string: "https://example.test")!,
+            sheetCode: "sheet_1"
+        )
+
+        XCTAssertEqual(manifest.schemaVersion, "lps-sheet-manifest/v1")
+        XCTAssertEqual(manifest.sheetID, "sheet_1")
+    }
+
+    func testFetchRecentSheetsDecodesAStubbedResponse() async throws {
+        MockURLProtocol.handler = { request in
+            XCTAssertEqual(request.url?.path, "/api/v1/test_sheets/recent")
+            return (
+                HTTPURLResponse(url: request.url!, statusCode: 200, httpVersion: nil, headerFields: nil)!,
+                Data(#"{"sheets":[{"sheet_id":"sheet_1","manifest_url":"https://example.test/api/v1/test_sheets/sheet_1/manifest","title":null}]}"#.utf8)
+            )
+        }
+
+        let sheets = try await client().fetchRecentSheets(baseURL: URL(string: "https://example.test")!)
+
+        XCTAssertEqual(sheets.map(\.sheetID), ["sheet_1"])
+        XCTAssertNil(sheets.first?.title)
+    }
+
+    func testVendoredOpenAPISpecDeclaresEveryCompanionOperation() throws {
+        let specURL = URL(fileURLWithPath: #filePath)
+            .deletingLastPathComponent()
+            .deletingLastPathComponent()
+            .deletingLastPathComponent()
+            .appending(path: "OpenAPI/color-matching-openapi.json")
+
+        XCTAssertTrue(
+            FileManager.default.fileExists(atPath: specURL.path),
+            "Vendor the OpenAPI document used to generate the companion client."
+        )
+        guard FileManager.default.fileExists(atPath: specURL.path) else { return }
+
+        let spec = try XCTUnwrap(
+            try JSONSerialization.jsonObject(with: Data(contentsOf: specURL)) as? [String: Any]
+        )
+        let paths = try XCTUnwrap(spec["paths"] as? [String: Any])
+
+        for (path, method) in [
+            ("/api/v1/test_sheets/{sheet_id}/manifest", "get"),
+            ("/api/v1/test_sheets/recent", "get"),
+            ("/api/v1/test_sheets/{sheet_id}/captures", "post"),
+            ("/api/v1/captures/{capture_id}/measurements", "post"),
+            ("/api/v1/captures/{capture_id}/judgments", "post"),
+            ("/api/v1/test_sheets/{sheet_id}/ranked_results", "get")
+        ] {
+            let operation = try XCTUnwrap(
+                (paths[path] as? [String: Any])?[method] as? [String: Any],
+                "Expected \(method.uppercased()) \(path) in the vendored OpenAPI document."
+            )
+            XCTAssertNotNil(operation["operationId"])
+        }
+    }
+
     private func client() -> APIClient {
         let configuration = URLSessionConfiguration.ephemeral
         configuration.protocolClasses = [MockURLProtocol.self]
