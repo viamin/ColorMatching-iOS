@@ -1,0 +1,92 @@
+{
+  "status": "failed",
+  "summary": "Red-phase tests and migration evidence prepared; Swift is unavailable in this container, and the production OpenAPI integration is intentionally not implemented in this run.",
+  "acceptance_criteria": [
+    {
+      "id": "AC-1",
+      "status": "failed",
+      "verification": {
+        "kind": "unit_or_service_test",
+        "references": [
+          {
+            "locator": "iOS/Tests/ColorMatchingLPSAppTests/APIClientTests.swift:130",
+            "result": "Red assertion requires the vendored OpenAPI document to declare all six app-used paths."
+          },
+          {
+            "locator": "iOS/Tests/ColorMatchingLPSAppTests/APIClientTests.swift:156",
+            "result": "Red assertions require swift-openapi-generator and swift-openapi-runtime package dependencies."
+          }
+        ]
+      }
+    },
+    {
+      "id": "AC-2",
+      "status": "failed",
+      "verification": {
+        "kind": "unit_or_service_test",
+        "references": [
+          {
+            "locator": "iOS/Tests/ColorMatchingLPSAppTests/APIClientTests.swift:130",
+            "result": "The red spec-path assertion covers manifest, recent sheets, capture creation, both uploads, and ranked results; generated-client wiring remains unimplemented."
+          }
+        ]
+      }
+    },
+    {
+      "id": "AC-3",
+      "status": "not_run",
+      "verification": {
+        "kind": "human_or_external_evidence",
+        "references": [
+          {
+            "locator": "docs/openapi-client-migration.md:12",
+            "result": "Requires implementation and compile-time inspection of generated request and response types."
+          }
+        ]
+      }
+    },
+    {
+      "id": "AC-4",
+      "status": "not_run",
+      "verification": {
+        "kind": "unit_or_service_test",
+        "references": [
+          {
+            "locator": "iOS/Tests/ColorMatchingLPSAppTests/APIClientTests.swift:95",
+            "result": "Local URLProtocol test added, but swift test could not run because the swift executable is absent."
+          },
+          {
+            "locator": "iOS/Tests/ColorMatchingLPSAppTests/APIClientTests.swift:111",
+            "result": "Local URLProtocol manifest test added, but swift test could not run because the swift executable is absent."
+          }
+        ]
+      }
+    },
+    {
+      "id": "AC-5",
+      "status": "passed",
+      "verification": {
+        "kind": "human_or_external_evidence",
+        "references": [
+          {
+            "locator": "docs/openapi-client-migration.md:18",
+            "result": "Inspectable contract-delta and endpoint-gap findings based on color_matching#110's published OpenApiSpex source."
+          }
+        ]
+      }
+    },
+    {
+      "id": "AC-6",
+      "status": "not_run",
+      "verification": {
+        "kind": "unit_or_service_test",
+        "references": [
+          {
+            "locator": "iOS/Package.swift:1",
+            "result": "swift test --disable-sandbox was attempted but could not start: swift executable not found."
+          }
+        ]
+      }
+    }
+  ]
+}
