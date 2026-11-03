@@ -1,0 +1,83 @@
+{
+  "status": "not_run",
+  "summary": "Added permanent local-stub coverage for manifest and recent-sheet reads. The Swift toolchain is unavailable in this container, and generated-client implementation is deliberately deferred to the next phase.",
+  "acceptance_criteria": [
+    {
+      "id": "AC-1",
+      "status": "failed",
+      "verification": {
+        "kind": "human_or_external_evidence",
+        "references": [
+          {
+            "locator": "iOS/Package.swift:5",
+            "result": "inspected: package has no swift-openapi-generator or swift-openapi-runtime dependency and no OpenAPI input is present"
+          },
+          {
+            "locator": "docs/issue-5-openapi-client-verification.md:7",
+            "result": "records dependency/spec publication blocker"
+          }
+        ]
+      }
+    },
+    {
+      "id": "AC-2",
+      "status": "not_run",
+      "verification": {
+        "kind": "unit_or_service_test",
+        "references": [
+          {
+            "locator": "iOS/Tests/ColorMatchingLPSAppTests/APIClientTests.swift:49",
+            "result": "permanent manifest stub test added; not run because swift is unavailable"
+          },
+          {
+            "locator": "iOS/Tests/ColorMatchingLPSAppTests/APIClientTests.swift:69",
+            "result": "permanent recent-sheet stub test added; not run because swift is unavailable"
+          },
+          {
+            "locator": "docs/issue-5-openapi-client-verification.md:14",
+            "result": "ranked-results operation and response schema are an unresolved endpoint gap"
+          }
+        ]
+      }
+    },
+    {
+      "id": "AC-3",
+      "status": "failed",
+      "verification": {
+        "kind": "human_or_external_evidence",
+        "references": [
+          {
+            "locator": "iOS/Sources/ColorMatchingLPSAppCore/APIClient.swift:87",
+            "result": "inspected: hand-written Codable API models remain in the implementation, as expected for this tests-only run"
+          }
+        ]
+      }
+    },
+    {
+      "id": "AC-4",
+      "status": "not_run",
+      "verification": {
+        "kind": "unit_or_service_test",
+        "references": [
+          {
+            "locator": "iOS/Tests/ColorMatchingLPSAppTests/APIClientTests.swift:6",
+            "result": "tests use MockURLProtocol and require no live server; swift test --disable-sandbox could not start because swift is unavailable"
+          }
+        ]
+      }
+    },
+    {
+      "id": "AC-5",
+      "status": "skipped",
+      "verification": {
+        "kind": "human_or_external_evidence",
+        "references": [
+          {
+            "locator": "docs/issue-5-openapi-client-verification.md:12",
+            "result": "contract-delta comparison awaits viamin/color_matching#110's published OpenAPI document"
+          }
+        ]
+      }
+    }
+  ]
+}
