@@ -92,6 +92,36 @@ final class APIClientTests: XCTestCase {
         XCTAssertEqual((json["judgments"] as? [[String: Any]])?.first?["judgment"] as? String, "near_match")
     }
 
+    func testFetchesManifestAndRecentSheetsFromLocalStubbedResponses() async throws {
+        var capturedRequests: [URLRequest] = []
+        MockURLProtocol.handler = { request in
+            capturedRequests.append(request)
+
+            switch request.url?.path {
+            case "/api/v1/test_sheets/sheet_1/manifest":
+                return (Self.response(statusCode: 200), Data(Self.manifestJSON.utf8))
+            case "/api/v1/test_sheets/recent":
+                let json = #"{"sheets":[{"sheet_id":"sheet_1","manifest_url":"https://example.test/api/v1/test_sheets/sheet_1/manifest","title":"October sheet"}]}"#
+                return (Self.response(statusCode: 200), Data(json.utf8))
+            default:
+                throw URLError(.badURL)
+            }
+        }
+
+        let baseURL = URL(string: "https://example.test")!
+        let manifest = try await client().fetchManifest(baseURL: baseURL, sheetCode: "sheet_1")
+        let recentSheets = try await client().fetchRecentSheets(baseURL: baseURL)
+
+        XCTAssertEqual(manifest.sheetID, "sheet_1")
+        XCTAssertEqual(try XCTUnwrap(manifest.patches.first).id, "patch_1")
+        XCTAssertEqual(try XCTUnwrap(recentSheets.first).title, "October sheet")
+        XCTAssertEqual(
+            capturedRequests.map { $0.url?.path },
+            ["/api/v1/test_sheets/sheet_1/manifest", "/api/v1/test_sheets/recent"]
+        )
+        XCTAssertTrue(capturedRequests.allSatisfy { $0.value(forHTTPHeaderField: "Authorization") == "Bearer token" })
+    }
+
     private func client() -> APIClient {
         let configuration = URLSessionConfiguration.ephemeral
         configuration.protocolClasses = [MockURLProtocol.self]
@@ -117,6 +147,48 @@ final class APIClientTests: XCTestCase {
         }
         return data
     }
+
+    private static func response(statusCode: Int) -> HTTPURLResponse {
+        HTTPURLResponse(
+            url: URL(string: "https://example.test")!,
+            statusCode: statusCode,
+            httpVersion: nil,
+            headerFields: nil
+        )!
+    }
+
+    private static let manifestJSON = #"""
+    {
+      "schema_version": "lps-sheet-manifest/v1",
+      "sheet_version": "lps-letter-grid-v1",
+      "sheet_id": "sheet_1",
+      "manifest_url": "https://example.test/api/v1/test_sheets/sheet_1/manifest",
+      "page": {"units": "mm", "width": 215.9, "height": 279.4},
+      "registration_markers": [],
+      "patches": [
+        {
+          "id": "patch_1",
+          "role": "pair_color",
+          "pair_id": "pair_1",
+          "pair_side": "first",
+          "reference_role": null,
+          "source_color": "#FF0000",
+          "safe_inset_mm": 1.5,
+          "rect": {"x": 16, "y": 38, "width": 16, "height": 10}
+        }
+      ],
+      "pairs": [
+        {
+          "id": "pair_1",
+          "first_patch_id": "patch_1",
+          "second_patch_id": "patch_2",
+          "source_colors": ["#FF0000", "#00FF00"],
+          "grid_row": 0,
+          "grid_col": 1
+        }
+      ]
+    }
+    """
 }
 
 private final class MockURLProtocol: URLProtocol {
