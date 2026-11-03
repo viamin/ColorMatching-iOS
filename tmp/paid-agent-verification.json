@@ -1,0 +1,71 @@
+{
+  "status": "not_run",
+  "summary": "Tests-only phase added OpenAPI-aligned local stub fixtures and an intentional generated-target red test. The container has no Swift toolchain, so XCTest execution is deferred to CI/the implementation phase.",
+  "acceptance_criteria": [
+    {
+      "id": "AC-1",
+      "status": "not_run",
+      "verification": {
+        "kind": "human_or_external_evidence",
+        "references": [
+          {
+            "locator": "docs/issue-5-openapi-client-test-plan.md:10",
+            "result": "Implementation-phase package, vendored-spec, and generated-output inspection planned."
+          }
+        ]
+      }
+    },
+    {
+      "id": "AC-2",
+      "status": "not_run",
+      "verification": {
+        "kind": "permanent_system_test",
+        "references": [
+          {
+            "locator": "iOS/Tests/ColorMatchingLPSAppTests/APIClientTests.swift:49",
+            "result": "Local URLProtocol stubs cover manifest and recent sheets; generated target gate is intentionally red at :144."
+          }
+        ]
+      }
+    },
+    {
+      "id": "AC-3",
+      "status": "not_run",
+      "verification": {
+        "kind": "human_or_external_evidence",
+        "references": [
+          {
+            "locator": "docs/issue-5-openapi-client-test-plan.md:11",
+            "result": "Implementation is prohibited in this tests-only phase."
+          }
+        ]
+      }
+    },
+    {
+      "id": "AC-4",
+      "status": "not_run",
+      "verification": {
+        "kind": "unit_or_service_test",
+        "references": [
+          {
+            "locator": "iOS/Tests/ColorMatchingLPSAppTests/APIClientTests.swift:8",
+            "result": "All API tests use MockURLProtocol; Swift is unavailable in this container."
+          }
+        ]
+      }
+    },
+    {
+      "id": "AC-5",
+      "status": "not_run",
+      "verification": {
+        "kind": "human_or_external_evidence",
+        "references": [
+          {
+            "locator": "docs/issue-5-openapi-client-test-plan.md:21",
+            "result": "PR delta baseline records published-spec deltas and outstanding endpoint gap."
+          }
+        ]
+      }
+    }
+  ]
+}
