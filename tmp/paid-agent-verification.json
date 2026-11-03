@@ -1,0 +1,92 @@
+{
+  "status": "failed",
+  "summary": "Tests and PR-ready contract-delta notes were added in the required tests-only phase. Verification could not run because the container has no Swift executable; package/spec tests are intentionally red until the implementation phase adds the generated-client dependencies and vendored spec.",
+  "acceptance_criteria": [
+    {
+      "id": "AC-1",
+      "status": "failed",
+      "verification": {
+        "kind": "unit_or_service_test",
+        "references": [
+          {
+            "locator": "iOS/Tests/ColorMatchingLPSAppTests/OpenAPIClientPackageTests.swift:5",
+            "result": "Expected red: requires swift-openapi-generator, swift-openapi-runtime, and generated-client products in Package.swift."
+          },
+          {
+            "locator": "iOS/Tests/ColorMatchingLPSAppTests/OpenAPIClientPackageTests.swift:14",
+            "result": "Expected red: requires a vendored OpenAPI/openapi.json with all six app operation paths."
+          }
+        ]
+      }
+    },
+    {
+      "id": "AC-2",
+      "status": "failed",
+      "verification": {
+        "kind": "unit_or_service_test",
+        "references": [
+          {
+            "locator": "iOS/Tests/ColorMatchingLPSAppTests/APIClientTests.swift:44",
+            "result": "Local-stub manifest read coverage added; implementation must route it through generated types."
+          },
+          {
+            "locator": "docs/openapi-client-pr-notes.md:9",
+            "result": "Ranked-results generated-client coverage remains blocked by incomplete upstream schema."
+          }
+        ]
+      }
+    },
+    {
+      "id": "AC-3",
+      "status": "not_run",
+      "verification": {
+        "kind": "unit_or_service_test",
+        "references": [
+          {
+            "locator": "docs/openapi-client-pr-notes.md:30",
+            "result": "Implementation-phase compile verification is required after handwritten transport DTOs are replaced."
+          }
+        ]
+      }
+    },
+    {
+      "id": "AC-4",
+      "status": "not_run",
+      "verification": {
+        "kind": "unit_or_service_test",
+        "references": [
+          {
+            "locator": "iOS/Tests/ColorMatchingLPSAppTests/APIClientTests.swift:5",
+            "result": "Tests use MockURLProtocol local stubs, but swift test could not start: Swift is absent from this container."
+          }
+        ]
+      }
+    },
+    {
+      "id": "AC-5",
+      "status": "failed",
+      "verification": {
+        "kind": "human_or_external_evidence",
+        "references": [
+          {
+            "locator": "docs/openapi-client-pr-notes.md:18",
+            "result": "Contract deltas are recorded for transfer to the implementation PR description; no PR was opened in this tests-only run."
+          }
+        ]
+      }
+    },
+    {
+      "id": "AC-6",
+      "status": "not_run",
+      "verification": {
+        "kind": "unit_or_service_test",
+        "references": [
+          {
+            "locator": "iOS/Package.swift:1",
+            "result": "swift test --disable-sandbox could not execute because swift is not installed in the container."
+          }
+        ]
+      }
+    }
+  ]
+}
