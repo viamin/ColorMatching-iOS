@@ -1,0 +1,79 @@
+{
+  "status": "not_run",
+  "summary": "Permanent local-stub XCTest coverage has been added for the existing app-facing manifest, recent-sheet, capture, measurement, and judgment paths. XCTest could not run because this container has no Swift executable. Generated-client and ranked-results criteria remain explicitly not run pending the implementation phase and upstream schema expansion.",
+  "acceptance_criteria": [
+    {
+      "id": "AC-1",
+      "status": "not_run",
+      "verification": {
+        "kind": "human_or_external_evidence",
+        "references": [
+          {
+            "locator": "docs/openapi-client-migration.md:23",
+            "result": "The upstream OpenAPI response is runtime-served and has not yet been pinned or vendored."
+          }
+        ]
+      }
+    },
+    {
+      "id": "AC-2",
+      "status": "not_run",
+      "verification": {
+        "kind": "human_or_external_evidence",
+        "references": [
+          {
+            "locator": "docs/openapi-client-migration.md:31",
+            "result": "Published manifest and ranked-results schemas omit fields needed for generated replacement types."
+          }
+        ]
+      }
+    },
+    {
+      "id": "AC-3",
+      "status": "not_run",
+      "verification": {
+        "kind": "unit_or_service_test",
+        "references": [
+          {
+            "locator": "iOS/Tests/ColorMatchingLPSAppTests/APIClientTests.swift:55",
+            "result": "not run: no Swift executable is installed in this container"
+          },
+          {
+            "locator": "iOS/Tests/ColorMatchingLPSAppTests/APIClientTests.swift:76",
+            "result": "not run: no Swift executable is installed in this container"
+          },
+          {
+            "locator": "iOS/Tests/ColorMatchingLPSAppTests/APIClientTests.swift:7",
+            "result": "not run: no Swift executable is installed in this container"
+          }
+        ]
+      }
+    },
+    {
+      "id": "AC-4",
+      "status": "not_run",
+      "verification": {
+        "kind": "unit_or_service_test",
+        "references": [
+          {
+            "locator": "docs/openapi-client-migration.md:11",
+            "result": "No ranked-results operation currently exists in the app-facing client."
+          }
+        ]
+      }
+    },
+    {
+      "id": "AC-5",
+      "status": "passed",
+      "verification": {
+        "kind": "human_or_external_evidence",
+        "references": [
+          {
+            "locator": "docs/openapi-client-migration.md:27",
+            "result": "Prose-contract deltas and endpoint gaps are recorded against upstream issue #110 and schema sources."
+          }
+        ]
+      }
+    }
+  ]
+}
