@@ -1,5 +1,13 @@
 # `color_matching` API Contract For iOS Companion
 
+> **Status: superseded in part.** `viamin/color_matching` now publishes this API
+> as an OpenAPI 3 document (`GET /api/v1/openapi.json`). This page is kept as
+> the original intent; where the published document and this page disagree, the
+> differences are recorded in
+> [`docs/openapi-contract-deltas.md`](openapi-contract-deltas.md), and the
+> generated client that replaced the hand-written models is described in
+> [`docs/openapi-generated-client.md`](openapi-generated-client.md).
+
 This contract describes the API that `viamin/color_matching` should expose for the iOS companion app. The implementation belongs in the Phoenix app, not in this repository.
 
 ## Authentication
