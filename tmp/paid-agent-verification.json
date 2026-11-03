@@ -1,0 +1,71 @@
+{
+  "status": "failed",
+  "summary": "Red-phase test and contract-review handoff for issue #5. Swift is unavailable in this container, and the OpenAPI client has not yet been implemented.",
+  "acceptance_criteria": [
+    {
+      "id": "AC-1",
+      "status": "failed",
+      "verification": {
+        "kind": "unit_or_service_test",
+        "references": [
+          {
+            "locator": "iOS/Tests/ColorMatchingLPSAppTests/OpenAPIClientConfigurationTests.swift:5",
+            "result": "red: Package.swift does not yet declare the OpenAPI generator/runtime/URLSession transport/plugin"
+          }
+        ]
+      }
+    },
+    {
+      "id": "AC-2",
+      "status": "not_run",
+      "verification": {
+        "kind": "unit_or_service_test",
+        "references": [
+          {
+            "locator": "docs/issue-5-openapi-client-test-plan.md",
+            "result": "Generated-client operation coverage is pending implementation; ranked-results has no current client operation."
+          }
+        ]
+      }
+    },
+    {
+      "id": "AC-3",
+      "status": "not_run",
+      "verification": {
+        "kind": "human_or_external_evidence",
+        "references": [
+          {
+            "locator": "docs/issue-5-openapi-client-test-plan.md",
+            "result": "Requires generated types to compile in app core and source review after implementation."
+          }
+        ]
+      }
+    },
+    {
+      "id": "AC-4",
+      "status": "not_run",
+      "verification": {
+        "kind": "unit_or_service_test",
+        "references": [
+          {
+            "locator": "iOS/Tests/ColorMatchingLPSAppTests/APIClientTests.swift:48",
+            "result": "Local URLProtocol stubs were added, but swift is unavailable in this container and these stubs still exercise the handwritten client."
+          }
+        ]
+      }
+    },
+    {
+      "id": "AC-5",
+      "status": "not_run",
+      "verification": {
+        "kind": "human_or_external_evidence",
+        "references": [
+          {
+            "locator": "docs/issue-5-openapi-client-test-plan.md",
+            "result": "Contract deltas and endpoint gap are documented for inclusion in the future implementation PR description."
+          }
+        ]
+      }
+    }
+  ]
+}
