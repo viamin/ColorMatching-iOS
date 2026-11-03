@@ -1,0 +1,92 @@
+{
+  "status": "failed",
+  "summary": "Red-phase tests define the local-stub behavior for manifest, recent sheets, capture, measurements, judgments, and ranked results. The generated client module and implementation are intentionally absent in this tests-only run; Swift is unavailable in the container, so tests could not execute.",
+  "acceptance_criteria": [
+    {
+      "id": "AC-1",
+      "status": "failed",
+      "verification": {
+        "kind": "unit_or_service_test",
+        "references": [
+          {
+            "locator": "iOS/Tests/ColorMatchingLPSAppTests/APIClientTests.swift:138",
+            "result": "red: ColorMatchingOpenAPI module is not yet available"
+          }
+        ]
+      }
+    },
+    {
+      "id": "AC-2",
+      "status": "failed",
+      "verification": {
+        "kind": "unit_or_service_test",
+        "references": [
+          {
+            "locator": "iOS/Tests/ColorMatchingLPSAppTests/APIClientTests.swift:148",
+            "result": "red gate: ranked-results adapter test activates once generated module exists"
+          }
+        ]
+      }
+    },
+    {
+      "id": "AC-3",
+      "status": "failed",
+      "verification": {
+        "kind": "unit_or_service_test",
+        "references": [
+          {
+            "locator": "iOS/Sources/ColorMatchingLPSAppCore/APIClient.swift:87",
+            "result": "handwritten transport models remain pending replacement"
+          }
+        ]
+      }
+    },
+    {
+      "id": "AC-4",
+      "status": "not_run",
+      "verification": {
+        "kind": "unit_or_service_test",
+        "references": [
+          {
+            "locator": "iOS/Tests/ColorMatchingLPSAppTests/APIClientTests.swift:53",
+            "result": "local URLProtocol stubs added; not run because swift is not installed"
+          },
+          {
+            "locator": "iOS/Tests/ColorMatchingLPSAppTests/APIClientTests.swift:75",
+            "result": "local recent-sheets stub added; not run because swift is not installed"
+          },
+          {
+            "locator": "iOS/Tests/ColorMatchingLPSAppTests/APIClientTests.swift:147",
+            "result": "ranked-results stub activates with generated client; not run"
+          }
+        ]
+      }
+    },
+    {
+      "id": "AC-5",
+      "status": "not_run",
+      "verification": {
+        "kind": "human_or_external_evidence",
+        "references": [
+          {
+            "locator": "https://github.com/viamin/color_matching/blob/main/lib/color_matching_web/api_schemas.ex",
+            "result": "upstream schema inspected; PR creation is outside this no-push tests-only run"
+          }
+        ]
+      }
+    },
+    {
+      "id": "AC-6",
+      "status": "not_run",
+      "verification": {
+        "kind": "unit_or_service_test",
+        "references": [
+          {
+            "locator": "iOS/Package.swift:1",
+            "result": "swift test --disable-sandbox could not start: swift command is unavailable in this container"
+          }
+        ]
+      }
+    }
+  ]
+}
