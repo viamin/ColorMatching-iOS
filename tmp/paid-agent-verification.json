@@ -1,0 +1,71 @@
+{
+  "status": "not_run",
+  "summary": "Red-phase tests and contract-delta evidence were added; Swift is unavailable in this container, so the test target could not run.",
+  "acceptance_criteria": [
+    {
+      "id": "AC-1",
+      "status": "not_run",
+      "verification": {
+        "kind": "human_or_external_evidence",
+        "references": [
+          {
+            "locator": "iOS/Package.swift",
+            "result": "Generator/runtime dependencies and a vendored specification are implementation-stage work."
+          }
+        ]
+      }
+    },
+    {
+      "id": "AC-2",
+      "status": "not_run",
+      "verification": {
+        "kind": "unit_or_service_test",
+        "references": [
+          {
+            "locator": "iOS/Tests/ColorMatchingLPSAppTests/APIClientTests.swift:11",
+            "result": "Local stubs characterize manifest, recent-sheet, capture, measurement, and judgment surfaces; ranked results is documented as a generated-schema gap."
+          }
+        ]
+      }
+    },
+    {
+      "id": "AC-3",
+      "status": "not_run",
+      "verification": {
+        "kind": "human_or_external_evidence",
+        "references": [
+          {
+            "locator": "docs/openapi-client-migration-test-plan.md:16",
+            "result": "Implementation-stage source review is required to verify server-owned models are generated."
+          }
+        ]
+      }
+    },
+    {
+      "id": "AC-4",
+      "status": "not_run",
+      "verification": {
+        "kind": "unit_or_service_test",
+        "references": [
+          {
+            "locator": "iOS/Tests/ColorMatchingLPSAppTests/APIClientTests.swift:11",
+            "result": "Permanent local-stub tests were added, but could not run because Swift is unavailable."
+          }
+        ]
+      }
+    },
+    {
+      "id": "AC-5",
+      "status": "passed",
+      "verification": {
+        "kind": "human_or_external_evidence",
+        "references": [
+          {
+            "locator": "docs/openapi-client-migration-test-plan.md:23",
+            "result": "The upstream-spec comparison and endpoint gaps are recorded for the PR description."
+          }
+        ]
+      }
+    }
+  ]
+}
