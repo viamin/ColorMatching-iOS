@@ -1,0 +1,62 @@
+{
+  "status": "not_run",
+  "summary": "Tests and verification plan were added in the required red phase. The requested Swift test command could not run because this container has no swift executable.",
+  "acceptance_criteria": [
+    {
+      "id": "AC-1",
+      "status": "not_run",
+      "verification": {
+        "kind": "unit_or_service_test",
+        "references": [
+          {
+            "locator": "iOS/Tests/ColorMatchingLPSAppTests/GeneratedClientAdoptionTests.swift:5",
+            "result": "Not run: swift executable is unavailable; test is intentionally red until the generator, runtime, and vendored spec are added."
+          }
+        ]
+      }
+    },
+    {
+      "id": "AC-2",
+      "status": "not_run",
+      "verification": {
+        "kind": "unit_or_service_test",
+        "references": [
+          {
+            "locator": "iOS/Tests/ColorMatchingLPSAppTests/GeneratedClientAdoptionTests.swift:30",
+            "result": "Not run: swift executable is unavailable; test is intentionally red until handwritten transport is removed."
+          }
+        ]
+      }
+    },
+    {
+      "id": "AC-3",
+      "status": "not_run",
+      "verification": {
+        "kind": "unit_or_service_test",
+        "references": [
+          {
+            "locator": "iOS/Tests/ColorMatchingLPSAppTests/APIClientTests.swift:12",
+            "result": "Not run: local URLProtocol stub coverage for manifest and recent sheets; existing tests cover capture and uploads."
+          },
+          {
+            "locator": "iOS/Tests/ColorMatchingLPSAppTests/GeneratedClientAdoptionTests.swift:15",
+            "result": "Not run: verifies the vendored spec includes the ranked-results endpoint until that generated operation is wired in."
+          }
+        ]
+      }
+    },
+    {
+      "id": "AC-4",
+      "status": "not_run",
+      "verification": {
+        "kind": "human_or_external_evidence",
+        "references": [
+          {
+            "locator": "docs/issue-5-generated-client-test-plan.md:15",
+            "result": "PR-description comparison remains for the implementation PR; upstream issue #110 and router were inspected."
+          }
+        ]
+      }
+    }
+  ]
+}
