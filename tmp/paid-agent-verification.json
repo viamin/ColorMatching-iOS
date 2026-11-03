@@ -1,0 +1,71 @@
+{
+  "status": "not_run",
+  "summary": "Tests-only phase: focused URLProtocol tests and an intentionally red package-integration test were added. swift is not installed in this container, so the Swift suite could not run.",
+  "acceptance_criteria": [
+    {
+      "id": "AC-1",
+      "status": "not_run",
+      "verification": {
+        "kind": "unit_or_service_test",
+        "references": [
+          {
+            "locator": "iOS/Tests/ColorMatchingLPSAppTests/APIClientTests.swift:testPackageDeclaresTheOpenAPIGeneratorAndRuntime",
+            "result": "not_run: intentionally red until swift-openapi-generator and swift-openapi-runtime are added; swift is unavailable in the container"
+          }
+        ]
+      }
+    },
+    {
+      "id": "AC-2",
+      "status": "not_run",
+      "verification": {
+        "kind": "unit_or_service_test",
+        "references": [
+          {
+            "locator": "iOS/Tests/ColorMatchingLPSAppTests/APIClientTests.swift",
+            "result": "not_run: manifest/recent-sheet and existing capture/upload stubs are present; ranked-results coverage requires the generated operation in the implementation phase"
+          }
+        ]
+      }
+    },
+    {
+      "id": "AC-3",
+      "status": "skipped",
+      "verification": {
+        "kind": "human_or_external_evidence",
+        "references": [
+          {
+            "locator": "docs/generated-openapi-client-test-plan.md:12",
+            "result": "requires implementation PR diff review; implementation changes are prohibited in this tests-only phase"
+          }
+        ]
+      }
+    },
+    {
+      "id": "AC-4",
+      "status": "not_run",
+      "verification": {
+        "kind": "unit_or_service_test",
+        "references": [
+          {
+            "locator": "iOS/Tests/ColorMatchingLPSAppTests/APIClientTests.swift",
+            "result": "not_run: tests use local URLProtocol stubs and no live server, but swift is unavailable in the container"
+          }
+        ]
+      }
+    },
+    {
+      "id": "AC-5",
+      "status": "skipped",
+      "verification": {
+        "kind": "human_or_external_evidence",
+        "references": [
+          {
+            "locator": "docs/generated-openapi-client-test-plan.md:20",
+            "result": "contract-delta text is prepared for the implementation PR description; no PR is opened in this run"
+          }
+        ]
+      }
+    }
+  ]
+}
