@@ -46,6 +46,41 @@ final class APIClientTests: XCTestCase {
         XCTAssertEqual(quality["rejections"] as? [String], [])
     }
 
+    func testFetchManifestDecodesPublishedStubResponse() async throws {
+        var capturedRequest: URLRequest?
+        MockURLProtocol.handler = { request in
+            capturedRequest = request
+            return (HTTPURLResponse(url: request.url!, statusCode: 200, httpVersion: nil, headerFields: nil)!, Data(Self.manifestResponse.utf8))
+        }
+
+        let manifest = try await client().fetchManifest(
+            baseURL: URL(string: "https://example.test")!,
+            sheetCode: "LPSM-DEV2"
+        )
+
+        XCTAssertEqual(capturedRequest?.httpMethod, "GET")
+        XCTAssertEqual(capturedRequest?.url?.path, "/api/v1/test_sheets/LPSM-DEV2/manifest")
+        XCTAssertEqual(capturedRequest?.value(forHTTPHeaderField: "Authorization"), "Bearer token")
+        XCTAssertEqual(manifest.sheetID, "LPSM-DEV2")
+        XCTAssertEqual(manifest.patches.map(\.id), ["pair-abc#first", "pair-abc#second"])
+    }
+
+    func testFetchRecentSheetsDecodesPublishedStubResponse() async throws {
+        var capturedRequest: URLRequest?
+        MockURLProtocol.handler = { request in
+            capturedRequest = request
+            return (HTTPURLResponse(url: request.url!, statusCode: 200, httpVersion: nil, headerFields: nil)!, Data(Self.recentSheetsResponse.utf8))
+        }
+
+        let sheets = try await client().fetchRecentSheets(baseURL: URL(string: "https://example.test")!)
+
+        XCTAssertEqual(capturedRequest?.httpMethod, "GET")
+        XCTAssertEqual(capturedRequest?.url?.path, "/api/v1/test_sheets/recent")
+        XCTAssertEqual(sheets.map(\.sheetID), ["LPSM-DEV2"])
+        XCTAssertEqual(sheets.first?.manifestURL.absoluteString, "https://example.test/api/v1/test_sheets/LPSM-DEV2/manifest")
+        XCTAssertNil(sheets.first?.title)
+    }
+
     func testUploadMeasurementsEncodesScoresWithAlgorithmVersion() async throws {
         var capturedBody: Data?
         MockURLProtocol.handler = { request in
@@ -92,6 +127,14 @@ final class APIClientTests: XCTestCase {
         XCTAssertEqual((json["judgments"] as? [[String: Any]])?.first?["judgment"] as? String, "near_match")
     }
 
+    func testGeneratedClientSupportsRankedResultsStubResponse() throws {
+        let response = try XCTUnwrap(Self.jsonObject(from: Data(Self.rankedResultsResponse.utf8)) as? [String: Any])
+
+        XCTAssertEqual(response["schema_version"] as? String, "lps-ranked-results/v1")
+        XCTAssertEqual((response["results"] as? [[String: Any]])?.first?["pair_id"] as? String, "pair-abc")
+        XCTFail("Implement typed ranked-results retrieval through the generated OpenAPI client.")
+    }
+
     private func client() -> APIClient {
         let configuration = URLSessionConfiguration.ephemeral
         configuration.protocolClasses = [MockURLProtocol.self]
@@ -117,6 +160,38 @@ final class APIClientTests: XCTestCase {
         }
         return data
     }
+
+    private static let manifestResponse = #"""
+    {
+      "schema_version": "lps-sheet-manifest/v1",
+      "sheet_version": "lps-letter-grid-v1",
+      "sheet_id": "LPSM-DEV2",
+      "manifest_url": "https://example.test/api/v1/test_sheets/LPSM-DEV2/manifest",
+      "page": {"units": "mm", "width": 215.9, "height": 279.4},
+      "registration_markers": [{"role": "top_left", "shape": "solid_square", "rect": {"x": 12, "y": 12, "width": 8, "height": 8}}],
+      "patches": [
+        {"id": "pair-abc#first", "role": "pair_color", "pair_id": "pair-abc", "pair_side": "first", "reference_role": null, "source_color": "#FF4444", "safe_inset_mm": 1.5, "rect": {"x": 16, "y": 38, "width": 16, "height": 10}},
+        {"id": "pair-abc#second", "role": "pair_color", "pair_id": "pair-abc", "pair_side": "second", "reference_role": null, "source_color": "#BB55BB", "safe_inset_mm": 1.5, "rect": {"x": 34, "y": 38, "width": 16, "height": 10}}
+      ],
+      "pairs": [{"id": "pair-abc", "first_patch_id": "pair-abc#first", "second_patch_id": "pair-abc#second", "source_colors": ["#FF4444", "#BB55BB"], "grid_row": 0, "grid_col": 1}]
+    }
+    """#
+
+    private static let recentSheetsResponse = #"""
+    {"sheets": [{"sheet_id": "LPSM-DEV2", "manifest_url": "https://example.test/api/v1/test_sheets/LPSM-DEV2/manifest", "title": null}]}
+    """#
+
+    private static let rankedResultsResponse = #"""
+    {
+      "schema_version": "lps-ranked-results/v1",
+      "sheet_id": "LPSM-DEV2",
+      "printer_profile": {"printer_make_model": "Generic Inkjet", "paper_type": "Plain", "ink_type": "Dye"},
+      "capture_count": 1,
+      "latest_capture_at": "2026-07-25T12:00:00Z",
+      "earliest_capture_at": "2026-07-25T12:00:00Z",
+      "scoring_algorithm_versions": ["lps-distance-v1"],
+      "results": [{"rank": 1, "pair_id": "pair-abc", "scoring_algorithm_version": "lps-distance-v1", "row": 0, "col": 1, "source_colors": {"color_a_hex": "#FF4444", "color_b_hex": "#BB55BB"}, "score": {"average": 0.9, "latest": 0.9, "minimum": 0.9, "maximum": 0.9, "capture_count": 1, "sample_count": 1, "algorithm_versions": ["lps-distance-v1"]}, "current_judgment": "near_match", "current_judgment_observed_at": "2026-07-25T12:00:00Z", "observation_count": 1, "latest_observation": {"judgment": "near_match", "observed_at": "2026-07-25T12:00:00Z"}, "capture_count": 1, "latest_capture_at": "2026-07-25T12:00:00Z", "earliest_capture_at": "2026-07-25T12:00:00Z"}]}
+    """#
 }
 
 private final class MockURLProtocol: URLProtocol {
