@@ -1,0 +1,84 @@
+{
+  "status": "failed",
+  "summary": "Tests-only phase added local-stub API coverage and a red dependency guard. Swift is unavailable in this container, so the suite could not run.",
+  "acceptance_criteria": [
+    {
+      "id": "AC-1",
+      "status": "failed",
+      "verification": {
+        "kind": "unit_or_service_test",
+        "references": [
+          {
+            "locator": "iOS/Tests/ColorMatchingLPSAppTests/OpenAPIClientAdoptionTests.swift:5",
+            "result": "red by design: Package.swift does not yet declare swift-openapi-generator or swift-openapi-runtime"
+          }
+        ]
+      }
+    },
+    {
+      "id": "AC-2",
+      "status": "not_run",
+      "verification": {
+        "kind": "unit_or_service_test",
+        "references": [
+          {
+            "locator": "docs/issue-5-openapi-client-pr.md:13",
+            "result": "ranked-results adapter and generated types are not implemented in this tests-only phase"
+          }
+        ]
+      }
+    },
+    {
+      "id": "AC-3",
+      "status": "not_run",
+      "verification": {
+        "kind": "human_or_external_evidence",
+        "references": [
+          {
+            "locator": "docs/issue-5-openapi-client-pr.md:15",
+            "result": "requires implementation diff inspection"
+          }
+        ]
+      }
+    },
+    {
+      "id": "AC-4",
+      "status": "not_run",
+      "verification": {
+        "kind": "unit_or_service_test",
+        "references": [
+          {
+            "locator": "iOS/Tests/ColorMatchingLPSAppTests/APIClientTests.swift:49",
+            "result": "local URLProtocol coverage added but not executable because Swift is unavailable"
+          }
+        ]
+      }
+    },
+    {
+      "id": "AC-5",
+      "status": "not_run",
+      "verification": {
+        "kind": "human_or_external_evidence",
+        "references": [
+          {
+            "locator": "docs/issue-5-openapi-client-pr.md:17",
+            "result": "swift test --disable-sandbox could not run because the Swift toolchain is absent"
+          }
+        ]
+      }
+    },
+    {
+      "id": "AC-6",
+      "status": "passed",
+      "verification": {
+        "kind": "human_or_external_evidence",
+        "references": [
+          {
+            "locator": "docs/issue-5-openapi-client-pr.md:21",
+            "result": "published-spec comparison and endpoint gap recorded"
+          }
+        ]
+      }
+    }
+  ]
+}
