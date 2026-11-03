@@ -1,0 +1,70 @@
+{
+  "status": "not_run",
+  "summary": "Swift is not installed in this container, so the focused local-stub tests could not be executed. The generated-client package configuration test is intentionally red until the implementation run adds the generator, runtime, and OpenAPI document.",
+  "acceptance_criteria": [
+    {
+      "id": "AC-1",
+      "status": "not_run",
+      "verification": {
+        "kind": "unit_or_service_test",
+        "references": [
+          {
+            "locator": "iOS/Tests/ColorMatchingLPSAppTests/APIClientTests.swift:testPackageDeclaresTheGeneratedOpenAPIClient",
+            "result": "not_run: Swift toolchain unavailable; expected red until implementation adds generated-client configuration"
+          }
+        ]
+      }
+    },
+    {
+      "id": "AC-2",
+      "status": "not_run",
+      "verification": {
+        "kind": "unit_or_service_test",
+        "references": [
+          {
+            "locator": "iOS/Tests/ColorMatchingLPSAppTests/APIClientTests.swift:testFetchesManifestAndRecentSheetsFromLocalStubs",
+            "result": "not_run: Swift toolchain unavailable"
+          },
+          {
+            "locator": "iOS/Tests/ColorMatchingLPSAppTests/APIClientTests.swift:testCreateCaptureEncodesMetadataAndQuality",
+            "result": "not_run: Swift toolchain unavailable"
+          },
+          {
+            "locator": "iOS/Tests/ColorMatchingLPSAppTests/APIClientTests.swift:testUploadMeasurementsEncodesScoresWithAlgorithmVersion",
+            "result": "not_run: Swift toolchain unavailable"
+          },
+          {
+            "locator": "iOS/Tests/ColorMatchingLPSAppTests/APIClientTests.swift:testUploadJudgmentsEncodesPathAndPayload",
+            "result": "not_run: Swift toolchain unavailable"
+          }
+        ]
+      }
+    },
+    {
+      "id": "AC-3",
+      "status": "not_run",
+      "verification": {
+        "kind": "human_or_external_evidence",
+        "references": [
+          {
+            "locator": "docs/issue-5-openapi-client-verification.md",
+            "result": "requires implementation PR diff review"
+          }
+        ]
+      }
+    },
+    {
+      "id": "AC-4",
+      "status": "not_run",
+      "verification": {
+        "kind": "human_or_external_evidence",
+        "references": [
+          {
+            "locator": "docs/issue-5-openapi-client-verification.md",
+            "result": "requires implementation PR description to record deltas"
+          }
+        ]
+      }
+    }
+  ]
+}
