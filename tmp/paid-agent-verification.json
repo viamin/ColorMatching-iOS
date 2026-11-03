@@ -1,0 +1,75 @@
+{
+  "status": "not_run",
+  "summary": "Tests and migration evidence were added, but Swift is not installed in this container; `swift package resolve` and `swift test --disable-sandbox` could not run. The measurement payload test is intentionally red until the implementation run replaces hand-written payload models with generated OpenAPI types.",
+  "acceptance_criteria": [
+    {
+      "id": "AC-1",
+      "status": "not_run",
+      "verification": {
+        "kind": "human_or_external_evidence",
+        "references": [
+          {
+            "locator": "docs/openapi-client-migration-test-plan.md:7",
+            "result": "Package resolution and a pinned generated client are deferred to the implementation run."
+          }
+        ]
+      }
+    },
+    {
+      "id": "AC-2",
+      "status": "failed",
+      "verification": {
+        "kind": "unit_or_service_test",
+        "references": [
+          {
+            "locator": "docs/openapi-client-migration-test-plan.md:19",
+            "result": "The upstream schema has all six paths, but the app has no ranked-results operation and its published ranked-results schema is incomplete."
+          }
+        ]
+      }
+    },
+    {
+      "id": "AC-3",
+      "status": "failed",
+      "verification": {
+        "kind": "human_or_external_evidence",
+        "references": [
+          {
+            "locator": "docs/openapi-client-migration-test-plan.md:11",
+            "result": "Replacing hand-written wire models is implementation work and has not occurred in this tests-only run."
+          }
+        ]
+      }
+    },
+    {
+      "id": "AC-4",
+      "status": "not_run",
+      "verification": {
+        "kind": "unit_or_service_test",
+        "references": [
+          {
+            "locator": "iOS/Tests/ColorMatchingLPSAppTests/APIClientTests.swift:49",
+            "result": "Local MockURLProtocol coverage was added for manifest and recent-sheet responses; execution was blocked because Swift is unavailable."
+          },
+          {
+            "locator": "iOS/Tests/ColorMatchingLPSAppTests/APIClientTests.swift:84",
+            "result": "This intentional red test requires the generated measurement request to omit undocumented fields."
+          }
+        ]
+      }
+    },
+    {
+      "id": "AC-5",
+      "status": "not_run",
+      "verification": {
+        "kind": "human_or_external_evidence",
+        "references": [
+          {
+            "locator": "docs/openapi-client-migration-test-plan.md:29",
+            "result": "Contract deltas and endpoint gaps are prepared for the implementation PR description, which has not been published in this run."
+          }
+        ]
+      }
+    }
+  ]
+}
