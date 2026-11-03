@@ -1,0 +1,58 @@
+{
+  "status": "not_run",
+  "summary": "Red-phase tests and migration evidence were added, but the isolated environment has no Swift executable, so swift test --disable-sandbox could not run.",
+  "acceptance_criteria": [
+    {
+      "id": "AC-1",
+      "status": "failed",
+      "verification": {
+        "kind": "unit_or_service_test",
+        "references": [
+          {
+            "locator": "iOS/Tests/ColorMatchingLPSAppTests/APIClientTests.swift:87",
+            "result": "Red by design: asserts the missing generator/runtime dependencies, generator target, and vendored OpenAPI document."
+          }
+        ]
+      }
+    },
+    {
+      "id": "AC-2",
+      "status": "not_run",
+      "verification": {
+        "kind": "unit_or_service_test",
+        "references": [
+          {
+            "locator": "iOS/Tests/ColorMatchingLPSAppTests/APIClientTests.swift:49",
+            "result": "Local URLProtocol stubs cover manifest, recent sheets, capture creation, measurement upload, and judgment upload; ranked-results remains an implementation gap described in docs/openapi-client-migration.md."
+          }
+        ]
+      }
+    },
+    {
+      "id": "AC-3",
+      "status": "not_run",
+      "verification": {
+        "kind": "human_or_external_evidence",
+        "references": [
+          {
+            "locator": "docs/openapi-client-migration.md:10",
+            "result": "Requires the generated target and app migration before compile-time inspection is possible."
+          }
+        ]
+      }
+    },
+    {
+      "id": "AC-4",
+      "status": "passed",
+      "verification": {
+        "kind": "human_or_external_evidence",
+        "references": [
+          {
+            "locator": "docs/openapi-client-migration.md:16",
+            "result": "Records source-verified prose-contract deltas and the ranked-results endpoint gap."
+          }
+        ]
+      }
+    }
+  ]
+}
