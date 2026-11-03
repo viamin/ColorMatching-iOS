@@ -3,6 +3,10 @@ import MeasurementCore
 import XCTest
 @testable import ColorMatchingLPSAppCore
 
+#if canImport(ColorMatchingAPI)
+import ColorMatchingAPI
+#endif
+
 final class APIClientTests: XCTestCase {
     override func tearDown() {
         MockURLProtocol.handler = nil
@@ -92,6 +96,13 @@ final class APIClientTests: XCTestCase {
         XCTAssertEqual((json["judgments"] as? [[String: Any]])?.first?["judgment"] as? String, "near_match")
     }
 
+    func testGeneratedOpenAPIClientIsAvailable() {
+        #if canImport(ColorMatchingAPI)
+        #else
+        XCTFail("The generated ColorMatchingAPI target must be available to prevent API contract drift.")
+        #endif
+    }
+
     private func client() -> APIClient {
         let configuration = URLSessionConfiguration.ephemeral
         configuration.protocolClasses = [MockURLProtocol.self]
@@ -118,6 +129,78 @@ final class APIClientTests: XCTestCase {
         return data
     }
 }
+
+#if canImport(ColorMatchingAPI)
+extension APIClientTests {
+    func testGeneratedClientHandlesEveryCompanionSurfaceAgainstStubbedResponses() async throws {
+        MockURLProtocol.handler = { request in
+            let response = HTTPURLResponse(url: try XCTUnwrap(request.url), statusCode: 200, httpVersion: nil, headerFields: nil)!
+
+            switch request.url?.path {
+            case "/api/v1/test_sheets/sheet_1/manifest":
+                return (response, Self.manifestFixture)
+            case "/api/v1/test_sheets/recent":
+                return (response, Data(#"{"sheets":[{"sheet_id":"sheet_1","manifest_url":"https://example.test/api/v1/test_sheets/sheet_1/manifest","title":"Sheet"}]}"#.utf8))
+            case "/api/v1/test_sheets/sheet_1/captures":
+                let created = HTTPURLResponse(url: try XCTUnwrap(request.url), statusCode: 201, httpVersion: nil, headerFields: nil)!
+                return (created, Data(#"{"capture_id":"cap_1"}"#.utf8))
+            case "/api/v1/captures/cap_1/measurements":
+                return (response, Data(#"{"capture_id":"cap_1","measurement_count":1,"pair_score_count":1}"#.utf8))
+            case "/api/v1/captures/cap_1/judgments":
+                return (response, Data(#"{"capture_id":"cap_1","judgment_count":1}"#.utf8))
+            case "/api/v1/test_sheets/sheet_1/ranked_results":
+                return (response, Data(#"{"schema_version":"lps-ranked-results/v1","sheet_id":"sheet_1"}"#.utf8))
+            default:
+                throw URLError(.badURL)
+            }
+        }
+
+        let client = client()
+        _ = try await client.fetchManifest(baseURL: URL(string: "https://example.test")!, sheetCode: "sheet_1")
+        _ = try await client.fetchRecentSheets(baseURL: URL(string: "https://example.test")!)
+        _ = try await client.createCapture(
+            sheetID: "sheet_1",
+            baseURL: URL(string: "https://example.test")!,
+            metadata: Self.captureMetadata,
+            quality: CaptureQuality(detectedMarkerCount: 4, blurScore: 0.75, rejections: [])
+        )
+
+        let rgb = RGB(r: 0.2, g: 0.3, b: 0.4)
+        let stats = ChannelStats(median: rgb, mean: rgb, standardDeviation: rgb, min: rgb, max: rgb, sampleCount: 9, clippingFraction: 0)
+        try await client.uploadMeasurements(
+            captureID: "cap_1",
+            baseURL: URL(string: "https://example.test")!,
+            measurements: [PatchMeasurement(patchID: "patch_1", linearRGBMedian: rgb, normalizedLinearRGBMedian: rgb, stats: stats)],
+            scores: [PairScore(pairID: "pair_1", distance: 0.1, similarity: 0.9, algorithmVersion: LPSScorer.algorithmVersion)]
+        )
+        try await client.uploadJudgments(
+            captureID: "cap_1",
+            baseURL: URL(string: "https://example.test")!,
+            judgments: [PairJudgment(pairID: "pair_1", judgment: "near_match")]
+        )
+        _ = try await client.fetchRankedResults(baseURL: URL(string: "https://example.test")!, sheetCode: "sheet_1")
+    }
+
+    private static var captureMetadata: CaptureMetadata {
+        CaptureMetadata(
+            deviceModel: "iPhone",
+            lens: "wide",
+            exposureDurationSeconds: 0.01,
+            iso: 100,
+            focusLensPosition: 0.4,
+            whiteBalanceGains: WhiteBalanceGains(red: 1.1, green: 1.0, blue: 1.2),
+            imageWidth: 100,
+            imageHeight: 200,
+            appVersion: "0.1.0",
+            timestamp: Date(timeIntervalSince1970: 0)
+        )
+    }
+
+    private static var manifestFixture: Data {
+        Data(#"{"schema_version":"lps-sheet-manifest/v1","sheet_version":"lps-letter-grid-v1","sheet_id":"sheet_1","manifest_url":"https://example.test/api/v1/test_sheets/sheet_1/manifest","page":{"units":"mm","width":215.9,"height":279.4},"registration_markers":[],"patches":[],"pairs":[]}"#.utf8)
+    }
+}
+#endif
 
 private final class MockURLProtocol: URLProtocol {
     static var handler: ((URLRequest) throws -> (HTTPURLResponse, Data))?
