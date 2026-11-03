@@ -112,6 +112,23 @@ final class APIClientTests: XCTestCase {
         }
     }
 
+    func testAPIClientUsesTheOpenAPIRuntimeInsteadOfOwningHTTPSerialization() throws {
+        let iOSDirectory = URL(fileURLWithPath: #filePath)
+            .deletingLastPathComponent()
+            .deletingLastPathComponent()
+            .deletingLastPathComponent()
+        let apiClient = try String(contentsOf: iOSDirectory.appending(path: "Sources/ColorMatchingLPSAppCore/APIClient.swift"))
+
+        XCTAssertTrue(
+            apiClient.contains("import OpenAPIRuntime"),
+            "APIClient should adapt generated OpenAPI types instead of owning HTTP serialization."
+        )
+        XCTAssertFalse(
+            apiClient.contains("private func authorizedRequest"),
+            "Authorization and request construction belong in the generated client transport configuration."
+        )
+    }
+
     func testUploadMeasurementsEncodesScoresWithAlgorithmVersion() async throws {
         var capturedBody: Data?
         MockURLProtocol.handler = { request in
