@@ -46,6 +46,58 @@ final class APIClientTests: XCTestCase {
         XCTAssertEqual(quality["rejections"] as? [String], [])
     }
 
+    func testFetchManifestDecodesGeneratedContractResponse() async throws {
+        MockURLProtocol.handler = { request in
+            XCTAssertEqual(request.url?.path, "/api/v1/test_sheets/sheet_1/manifest")
+            return (
+                HTTPURLResponse(url: request.url!, statusCode: 200, httpVersion: nil, headerFields: nil)!,
+                Data(Self.manifestResponse.utf8)
+            )
+        }
+
+        let manifest = try await client().fetchManifest(
+            baseURL: URL(string: "https://example.test")!,
+            sheetCode: "sheet_1"
+        )
+
+        XCTAssertEqual(manifest.sheetID, "sheet_1")
+        XCTAssertEqual(manifest.patches.map(\.id), ["black", "pair_1_a"])
+        XCTAssertEqual(manifest.pairs.single?.sourceColors, ["#111111", "#121212"])
+    }
+
+    func testFetchRecentSheetsDecodesNullableTitle() async throws {
+        MockURLProtocol.handler = { request in
+            XCTAssertEqual(request.url?.path, "/api/v1/test_sheets/recent")
+            return (
+                HTTPURLResponse(url: request.url!, statusCode: 200, httpVersion: nil, headerFields: nil)!,
+                Data(#"{"sheets":[{"sheet_id":"sheet_1","manifest_url":"https://example.test/api/v1/test_sheets/sheet_1/manifest","title":null}]}"#.utf8)
+            )
+        }
+
+        let sheets = try await client().fetchRecentSheets(baseURL: URL(string: "https://example.test")!)
+
+        XCTAssertEqual(sheets.map(\.sheetID), ["sheet_1"])
+        XCTAssertNil(sheets.single?.title)
+    }
+
+    func testPackageDeclaresOpenAPIClientGenerationAndVendoredSpec() throws {
+        let package = try String(contentsOf: Self.packageManifestURL, encoding: .utf8)
+        let specification = try? String(contentsOf: Self.openAPISpecificationURL, encoding: .utf8)
+
+        XCTAssertTrue(package.contains("https://github.com/apple/swift-openapi-generator"))
+        XCTAssertTrue(package.contains("https://github.com/apple/swift-openapi-runtime"))
+        XCTAssertTrue(package.contains("OpenAPIGenerator"))
+        XCTAssertTrue(package.contains("OpenAPIRuntime"))
+        XCTAssertNotNil(specification, "Vendor the upstream OpenAPI document at Sources/ColorMatchingLPSAppCore/OpenAPI/openapi.yaml")
+        guard let specification else { return }
+        XCTAssertTrue(specification.contains("/api/v1/test_sheets/{sheet_id}/manifest"))
+        XCTAssertTrue(specification.contains("/api/v1/test_sheets/recent"))
+        XCTAssertTrue(specification.contains("/api/v1/test_sheets/{sheet_id}/captures"))
+        XCTAssertTrue(specification.contains("/api/v1/captures/{capture_id}/measurements"))
+        XCTAssertTrue(specification.contains("/api/v1/captures/{capture_id}/judgments"))
+        XCTAssertTrue(specification.contains("/api/v1/test_sheets/{sheet_id}/ranked_results"))
+    }
+
     func testUploadMeasurementsEncodesScoresWithAlgorithmVersion() async throws {
         var capturedBody: Data?
         MockURLProtocol.handler = { request in
@@ -116,6 +168,40 @@ final class APIClientTests: XCTestCase {
             }
         }
         return data
+    }
+
+    private static let packageManifestURL = URL(fileURLWithPath: #filePath)
+        .deletingLastPathComponent()
+        .deletingLastPathComponent()
+        .deletingLastPathComponent()
+        .appendingPathComponent("Package.swift")
+
+    private static let openAPISpecificationURL = URL(fileURLWithPath: #filePath)
+        .deletingLastPathComponent()
+        .deletingLastPathComponent()
+        .deletingLastPathComponent()
+        .appendingPathComponent("Sources/ColorMatchingLPSAppCore/OpenAPI/openapi.yaml")
+
+    private static let manifestResponse = #"""
+    {
+      "schema_version": "lps-sheet-manifest/v1",
+      "sheet_version": "lps-letter-grid-v1",
+      "sheet_id": "sheet_1",
+      "manifest_url": "https://example.test/api/v1/test_sheets/sheet_1/manifest",
+      "page": {"units": "mm", "width": 215.9, "height": 279.4},
+      "registration_markers": [],
+      "patches": [
+        {"id": "black", "role": "reference", "pair_id": null, "pair_side": null, "reference_role": "black", "source_color": "#000000", "safe_inset_mm": 1, "rect": {"x": 1, "y": 1, "width": 1, "height": 1}},
+        {"id": "pair_1_a", "role": "pair_color", "pair_id": "pair_1", "pair_side": "first", "reference_role": null, "source_color": "#111111", "safe_inset_mm": 1, "rect": {"x": 2, "y": 2, "width": 1, "height": 1}}
+      ],
+      "pairs": [{"id": "pair_1", "grid_row": 0, "grid_col": 0, "first_patch_id": "pair_1_a", "second_patch_id": "pair_1_b", "source_colors": ["#111111", "#121212"]}]
+    }
+    """
+}
+
+private extension Collection {
+    var single: Element? {
+        count == 1 ? first : nil
     }
 }
 
