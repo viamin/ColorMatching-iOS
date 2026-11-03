@@ -1,0 +1,71 @@
+{
+  "status": "not_run",
+  "summary": "Red-phase migration tests and OpenAPI contract-delta evidence were added. Swift is unavailable in this container, so the Swift suite could not be run.",
+  "acceptance_criteria": [
+    {
+      "id": "AC-1",
+      "status": "not_run",
+      "verification": {
+        "kind": "unit_or_service_test",
+        "references": [
+          {
+            "locator": "iOS/Tests/ColorMatchingLPSAppTests/OpenAPIClientMigrationTests.swift:5",
+            "result": "red phase; requires generator/runtime dependencies and a vendored OpenAPI document"
+          }
+        ]
+      }
+    },
+    {
+      "id": "AC-2",
+      "status": "not_run",
+      "verification": {
+        "kind": "permanent_system_test",
+        "references": [
+          {
+            "locator": "docs/openapi-client-migration-evidence.md:5",
+            "result": "implementation handoff requires URLProtocol-generated-client stubs for all app-used operations"
+          }
+        ]
+      }
+    },
+    {
+      "id": "AC-3",
+      "status": "not_run",
+      "verification": {
+        "kind": "unit_or_service_test",
+        "references": [
+          {
+            "locator": "iOS/Tests/ColorMatchingLPSAppTests/OpenAPIClientMigrationTests.swift:27",
+            "result": "red phase; generated runtime import is absent"
+          }
+        ]
+      }
+    },
+    {
+      "id": "AC-4",
+      "status": "not_run",
+      "verification": {
+        "kind": "permanent_system_test",
+        "references": [
+          {
+            "locator": "iOS/Tests/ColorMatchingLPSAppTests/APIClientTests.swift:11",
+            "result": "existing URLProtocol stubs cover legacy capture/upload flow; Swift unavailable"
+          }
+        ]
+      }
+    },
+    {
+      "id": "AC-5",
+      "status": "passed",
+      "verification": {
+        "kind": "human_or_external_evidence",
+        "references": [
+          {
+            "locator": "docs/openapi-client-migration-evidence.md:16",
+            "result": "published-spec/prose deltas and gaps recorded"
+          }
+        ]
+      }
+    }
+  ]
+}
