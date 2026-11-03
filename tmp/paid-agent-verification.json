@@ -1,0 +1,71 @@
+{
+  "status": "not_run",
+  "summary": "Red-phase tests and the OpenAPI contract-gap record are committed; implementation is intentionally deferred to the paid-tests-approved run.",
+  "acceptance_criteria": [
+    {
+      "id": "AC-1",
+      "status": "not_run",
+      "verification": {
+        "kind": "human_or_external_evidence",
+        "references": [
+          {
+            "locator": "docs/issue-5-openapi-client-verification-plan.md:9",
+            "result": "The generated dependency and vendored/fetched specification require the implementation run."
+          }
+        ]
+      }
+    },
+    {
+      "id": "AC-2",
+      "status": "not_run",
+      "verification": {
+        "kind": "unit_or_service_test",
+        "references": [
+          {
+            "locator": "iOS/Tests/ColorMatchingLPSAppTests/APIClientTests.swift:12",
+            "result": "Permanent local-stub coverage exists for manifest, recent sheets, capture, measurements, and judgments; ranked results is blocked by the incomplete published response schema."
+          }
+        ]
+      }
+    },
+    {
+      "id": "AC-3",
+      "status": "not_run",
+      "verification": {
+        "kind": "human_or_external_evidence",
+        "references": [
+          {
+            "locator": "docs/issue-5-openapi-client-verification-plan.md:11",
+            "result": "Replacement of hand-written models is deferred by the tests-only phase."
+          }
+        ]
+      }
+    },
+    {
+      "id": "AC-4",
+      "status": "not_run",
+      "verification": {
+        "kind": "unit_or_service_test",
+        "references": [
+          {
+            "locator": "iOS/Tests/ColorMatchingLPSAppTests/APIClientTests.swift:6",
+            "result": "MockURLProtocol provides permanent no-live-server stub coverage; swift is unavailable in this container."
+          }
+        ]
+      }
+    },
+    {
+      "id": "AC-5",
+      "status": "passed",
+      "verification": {
+        "kind": "human_or_external_evidence",
+        "references": [
+          {
+            "locator": "docs/issue-5-openapi-client-verification-plan.md:16",
+            "result": "Published-spec deltas and ranked-results endpoint gap are recorded for the PR description."
+          }
+        ]
+      }
+    }
+  ]
+}
