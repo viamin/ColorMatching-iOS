@@ -1,0 +1,92 @@
+{
+  "status": "failed",
+  "summary": "Tests-only red phase committed. The ranked-results API operation is specified but absent; Swift is unavailable in this container, so no Swift test command could run.",
+  "acceptance_criteria": [
+    {
+      "id": "AC-1",
+      "status": "not_run",
+      "verification": {
+        "kind": "human_or_external_evidence",
+        "references": [
+          {
+            "locator": "docs/issue-5-openapi-client-test-plan.md:7",
+            "result": "Package and generated-artifact inspection is deferred to the implementation PR."
+          }
+        ]
+      }
+    },
+    {
+      "id": "AC-2",
+      "status": "failed",
+      "verification": {
+        "kind": "unit_or_service_test",
+        "references": [
+          {
+            "locator": "iOS/Tests/ColorMatchingLPSAppTests/APIClientTests.swift:137",
+            "result": "Red: fetchRankedResults is intentionally specified before it exists."
+          },
+          {
+            "locator": "iOS/Tests/ColorMatchingLPSAppTests/APIClientTests.swift:12",
+            "result": "Existing local-stub tests cover capture creation, measurement upload, and judgment upload."
+          },
+          {
+            "locator": "iOS/Tests/ColorMatchingLPSAppTests/APIClientTests.swift:95",
+            "result": "New local-stub tests cover manifest and recent sheets."
+          }
+        ]
+      }
+    },
+    {
+      "id": "AC-3",
+      "status": "not_run",
+      "verification": {
+        "kind": "human_or_external_evidence",
+        "references": [
+          {
+            "locator": "docs/issue-5-openapi-client-test-plan.md:11",
+            "result": "Generated-model replacement requires the later implementation phase."
+          }
+        ]
+      }
+    },
+    {
+      "id": "AC-4",
+      "status": "not_run",
+      "verification": {
+        "kind": "unit_or_service_test",
+        "references": [
+          {
+            "locator": "iOS/Tests/ColorMatchingLPSAppTests/APIClientTests.swift:177",
+            "result": "Tests use MockURLProtocol; execution is pending because Swift is unavailable."
+          }
+        ]
+      }
+    },
+    {
+      "id": "AC-5",
+      "status": "not_run",
+      "verification": {
+        "kind": "unit_or_service_test",
+        "references": [
+          {
+            "locator": "docs/issue-5-openapi-client-test-plan.md:13",
+            "result": "swift test --disable-sandbox could not be run: Swift is unavailable and the red operation is unimplemented."
+          }
+        ]
+      }
+    },
+    {
+      "id": "AC-6",
+      "status": "passed",
+      "verification": {
+        "kind": "human_or_external_evidence",
+        "references": [
+          {
+            "locator": "docs/issue-5-openapi-client-test-plan.md:19",
+            "result": "Provider-versus-prose contract deltas and endpoint gaps are recorded for the PR description."
+          }
+        ]
+      }
+    }
+  ]
+}
