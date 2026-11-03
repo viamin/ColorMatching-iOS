@@ -1,0 +1,84 @@
+{
+  "status": "not_run",
+  "summary": "Red-phase OpenAPI client tests and criterion map were added, but swift test could not run because the container has no swift executable.",
+  "acceptance_criteria": [
+    {
+      "id": "AC-1",
+      "status": "not_run",
+      "verification": {
+        "kind": "unit_or_service_test",
+        "references": [
+          {
+            "locator": "iOS/Tests/ColorMatchingLPSAppTests/GeneratedOpenAPIClientConfigurationTests.swift:5",
+            "result": "not_run: swift executable is unavailable in this container"
+          }
+        ]
+      }
+    },
+    {
+      "id": "AC-2",
+      "status": "not_run",
+      "verification": {
+        "kind": "unit_or_service_test",
+        "references": [
+          {
+            "locator": "iOS/Tests/ColorMatchingLPSAppTests/GeneratedOpenAPIClientConfigurationTests.swift:14",
+            "result": "not_run: swift executable is unavailable in this container"
+          }
+        ]
+      }
+    },
+    {
+      "id": "AC-3",
+      "status": "not_run",
+      "verification": {
+        "kind": "unit_or_service_test",
+        "references": [
+          {
+            "locator": "iOS/Tests/ColorMatchingLPSAppTests/APIClientTests.swift:49",
+            "result": "not_run: swift executable is unavailable in this container"
+          }
+        ]
+      }
+    },
+    {
+      "id": "AC-4",
+      "status": "not_run",
+      "verification": {
+        "kind": "unit_or_service_test",
+        "references": [
+          {
+            "locator": "iOS/Tests/ColorMatchingLPSAppTests/APIClientTests.swift:12",
+            "result": "not_run: swift executable is unavailable in this container"
+          }
+        ]
+      }
+    },
+    {
+      "id": "AC-5",
+      "status": "skipped",
+      "verification": {
+        "kind": "human_or_external_evidence",
+        "references": [
+          {
+            "locator": "docs/issue-5-openapi-client-verification.md:18",
+            "result": "The prose contract has no ranked-results response schema; implementation must derive the fixture from the provider OpenAPI document."
+          }
+        ]
+      }
+    },
+    {
+      "id": "AC-6",
+      "status": "skipped",
+      "verification": {
+        "kind": "human_or_external_evidence",
+        "references": [
+          {
+            "locator": "docs/issue-5-openapi-client-verification.md:19",
+            "result": "PR description cannot be written in this tests-only, no-push run."
+          }
+        ]
+      }
+    }
+  ]
+}
