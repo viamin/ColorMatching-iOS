@@ -1,0 +1,58 @@
+{
+  "status": "not_run",
+  "summary": "Test-writing phase: red migration tests and an inspectable contract-delta plan were added. swift is unavailable in the container, so the Swift suite could not run.",
+  "acceptance_criteria": [
+    {
+      "id": "AC-1",
+      "status": "not_run",
+      "verification": {
+        "kind": "unit_or_service_test",
+        "references": [
+          {
+            "locator": "iOS/Tests/ColorMatchingLPSAppTests/OpenAPIClientMigrationTests.swift:5",
+            "result": "red test added; not run because swift is unavailable"
+          }
+        ]
+      }
+    },
+    {
+      "id": "AC-2",
+      "status": "not_run",
+      "verification": {
+        "kind": "unit_or_service_test",
+        "references": [
+          {
+            "locator": "iOS/Tests/ColorMatchingLPSAppTests/OpenAPIClientMigrationTests.swift:27",
+            "result": "red test added; hand-written transport models remain"
+          }
+        ]
+      }
+    },
+    {
+      "id": "AC-3",
+      "status": "not_run",
+      "verification": {
+        "kind": "unit_or_service_test",
+        "references": [
+          {
+            "locator": "iOS/Tests/ColorMatchingLPSAppTests/APIClientTests.swift:12",
+            "result": "existing local URLProtocol coverage covers three write surfaces; generated client and remaining surfaces are pending"
+          }
+        ]
+      }
+    },
+    {
+      "id": "AC-4",
+      "status": "not_run",
+      "verification": {
+        "kind": "human_or_external_evidence",
+        "references": [
+          {
+            "locator": "docs/issue-5-openapi-client-verification.md:19",
+            "result": "published-spec comparison and gaps recorded for PR description"
+          }
+        ]
+      }
+    }
+  ]
+}
