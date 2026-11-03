@@ -93,7 +93,10 @@ final class APIClientTests: XCTestCase {
         var capturedBody: Data?
         MockURLProtocol.handler = { request in
             capturedBody = request.httpBodyStream.flatMap(Self.readBody) ?? request.httpBody
-            return (HTTPURLResponse(url: request.url!, statusCode: 204, httpVersion: nil, headerFields: nil)!, Data())
+            return (
+                HTTPURLResponse(url: request.url!, statusCode: 200, httpVersion: nil, headerFields: nil)!,
+                Data(#"{"capture_id":"cap_1","measurement_count":1,"pair_score_count":1}"#.utf8)
+            )
         }
 
         let rgb = RGB(r: 0.2, g: 0.3, b: 0.4)
@@ -120,7 +123,10 @@ final class APIClientTests: XCTestCase {
         MockURLProtocol.handler = { request in
             capturedRequest = request
             capturedBody = request.httpBodyStream.flatMap(Self.readBody) ?? request.httpBody
-            return (HTTPURLResponse(url: request.url!, statusCode: 204, httpVersion: nil, headerFields: nil)!, Data())
+            return (
+                HTTPURLResponse(url: request.url!, statusCode: 200, httpVersion: nil, headerFields: nil)!,
+                Data(#"{"capture_id":"cap_1","judgment_count":1}"#.utf8)
+            )
         }
 
         try await client().uploadJudgments(
@@ -133,6 +139,14 @@ final class APIClientTests: XCTestCase {
         XCTAssertEqual(capturedRequest?.url?.path, "/api/v1/captures/cap_1/judgments")
         let json = try XCTUnwrap(Self.jsonObject(from: capturedBody) as? [String: Any])
         XCTAssertEqual((json["judgments"] as? [[String: Any]])?.first?["judgment"] as? String, "near_match")
+    }
+
+    func testGeneratedOpenAPIClientTargetIsAvailable() {
+        #if canImport(ColorMatchingAPI)
+        XCTAssertTrue(true)
+        #else
+        XCTFail("Issue #5 requires the generated ColorMatchingAPI target to be added to this test target.")
+        #endif
     }
 
     private func client() -> APIClient {
