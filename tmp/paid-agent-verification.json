@@ -1,0 +1,84 @@
+{
+  "status": "not_run",
+  "summary": "Test-writing phase completed: permanent local-stub coverage and criterion plan were added. Swift is not installed in this container, and generated types are intentionally deferred to the approved implementation phase.",
+  "acceptance_criteria": [
+    {
+      "id": "AC-1",
+      "status": "not_run",
+      "verification": {
+        "kind": "human_or_external_evidence",
+        "references": [
+          {
+            "locator": "docs/issue-5-generated-client-verification-plan.md:11",
+            "result": "Upstream issue #110 is closed but its runtime-served OpenAPI document has not been fetched or vendored in this tests-only phase."
+          }
+        ]
+      }
+    },
+    {
+      "id": "AC-2",
+      "status": "not_run",
+      "verification": {
+        "kind": "unit_or_service_test",
+        "references": [
+          {
+            "locator": "iOS/Tests/ColorMatchingLPSAppTests/APIClientTests.swift:95",
+            "result": "Local-stub coverage exists for manifest and recent sheets; ranked results cannot be tested until the generated surface exists."
+          }
+        ]
+      }
+    },
+    {
+      "id": "AC-3",
+      "status": "not_run",
+      "verification": {
+        "kind": "unit_or_service_test",
+        "references": [
+          {
+            "locator": "docs/issue-5-generated-client-verification-plan.md:13",
+            "result": "Handwritten-model replacement is implementation-phase work."
+          }
+        ]
+      }
+    },
+    {
+      "id": "AC-4",
+      "status": "not_run",
+      "verification": {
+        "kind": "permanent_system_test",
+        "references": [
+          {
+            "locator": "iOS/Tests/ColorMatchingLPSAppTests/APIClientTests.swift:95",
+            "result": "Permanent URLProtocol-based local-stub test added; not executed because Swift is unavailable and not yet wired to generated types."
+          }
+        ]
+      }
+    },
+    {
+      "id": "AC-5",
+      "status": "not_run",
+      "verification": {
+        "kind": "human_or_external_evidence",
+        "references": [
+          {
+            "locator": "docs/issue-5-generated-client-verification-plan.md:31",
+            "result": "Preliminary endpoint gap recorded; field-level deltas require the fetched upstream specification."
+          }
+        ]
+      }
+    },
+    {
+      "id": "AC-6",
+      "status": "not_run",
+      "verification": {
+        "kind": "unit_or_service_test",
+        "references": [
+          {
+            "locator": "iOS/Package.swift:1",
+            "result": "swift test --disable-sandbox could not start because the swift executable is absent from the container."
+          }
+        ]
+      }
+    }
+  ]
+}
