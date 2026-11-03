@@ -92,6 +92,51 @@ final class APIClientTests: XCTestCase {
         XCTAssertEqual((json["judgments"] as? [[String: Any]])?.first?["judgment"] as? String, "near_match")
     }
 
+    func testMeasurementUploadReturnsThePublishedAcknowledgement() async throws {
+        MockURLProtocol.handler = { request in
+            XCTAssertEqual(request.url?.path, "/api/v1/captures/cap_1/measurements")
+            return (
+                HTTPURLResponse(url: request.url!, statusCode: 200, httpVersion: nil, headerFields: nil)!,
+                Data(#"{"capture_id":"cap_1","measurement_count":1,"pair_score_count":1}"#.utf8)
+            )
+        }
+
+        let rgb = RGB(r: 0.2, g: 0.3, b: 0.4)
+        let stats = ChannelStats(median: rgb, mean: rgb, standardDeviation: rgb, min: rgb, max: rgb, sampleCount: 9, clippingFraction: 0)
+        let acknowledgement: Any = try await client().uploadMeasurements(
+            captureID: "cap_1",
+            baseURL: URL(string: "https://example.test")!,
+            measurements: [PatchMeasurement(patchID: "patch_1", linearRGBMedian: rgb, normalizedLinearRGBMedian: rgb, stats: stats)],
+            scores: [PairScore(pairID: "pair_1", distance: 0.1, similarity: 0.9, algorithmVersion: LPSScorer.algorithmVersion)]
+        )
+
+        XCTAssertFalse(
+            acknowledgement is Void,
+            "The generated client must expose the OpenAPI measurement acknowledgement instead of discarding it."
+        )
+    }
+
+    func testJudgmentUploadReturnsThePublishedAcknowledgement() async throws {
+        MockURLProtocol.handler = { request in
+            XCTAssertEqual(request.url?.path, "/api/v1/captures/cap_1/judgments")
+            return (
+                HTTPURLResponse(url: request.url!, statusCode: 200, httpVersion: nil, headerFields: nil)!,
+                Data(#"{"capture_id":"cap_1","judgment_count":1}"#.utf8)
+            )
+        }
+
+        let acknowledgement: Any = try await client().uploadJudgments(
+            captureID: "cap_1",
+            baseURL: URL(string: "https://example.test")!,
+            judgments: [PairJudgment(pairID: "pair_1", judgment: "near_match")]
+        )
+
+        XCTAssertFalse(
+            acknowledgement is Void,
+            "The generated client must expose the OpenAPI judgment acknowledgement instead of discarding it."
+        )
+    }
+
     private func client() -> APIClient {
         let configuration = URLSessionConfiguration.ephemeral
         configuration.protocolClasses = [MockURLProtocol.self]
