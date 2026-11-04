@@ -1,0 +1,71 @@
+{
+  "status": "not_run",
+  "summary": "Test plan and local-stub coverage were added in the tests-only phase. Swift is not installed in this container, so package resolution and swift test could not run.",
+  "acceptance_criteria": [
+    {
+      "id": "AC-1",
+      "status": "not_run",
+      "verification": {
+        "kind": "human_or_external_evidence",
+        "references": [
+          {
+            "locator": "docs/issue-5-openapi-client-pr-notes.md:15",
+            "result": "The dependency/spec vendoring check is scoped to the implementation phase."
+          }
+        ]
+      }
+    },
+    {
+      "id": "AC-2",
+      "status": "not_run",
+      "verification": {
+        "kind": "unit_or_service_test",
+        "references": [
+          {
+            "locator": "iOS/Tests/ColorMatchingLPSAppTests/APIClientTests.swift:12",
+            "result": "Local-stub endpoint tests were added; ranked-results remains an intentional red test."
+          }
+        ]
+      }
+    },
+    {
+      "id": "AC-3",
+      "status": "not_run",
+      "verification": {
+        "kind": "unit_or_service_test",
+        "references": [
+          {
+            "locator": "docs/issue-5-openapi-client-pr-notes.md:17",
+            "result": "Replacement of hand-written models requires the implementation phase."
+          }
+        ]
+      }
+    },
+    {
+      "id": "AC-4",
+      "status": "not_run",
+      "verification": {
+        "kind": "unit_or_service_test",
+        "references": [
+          {
+            "locator": "iOS/Tests/ColorMatchingLPSAppTests/APIClientTests.swift:12",
+            "result": "Tests use MockURLProtocol and make no live-server requests; execution is blocked by a missing Swift toolchain."
+          }
+        ]
+      }
+    },
+    {
+      "id": "AC-5",
+      "status": "passed",
+      "verification": {
+        "kind": "human_or_external_evidence",
+        "references": [
+          {
+            "locator": "docs/issue-5-openapi-client-pr-notes.md:31",
+            "result": "Document records currently inspectable prose/server-contract deltas and final-spec follow-up."
+          }
+        ]
+      }
+    }
+  ]
+}
