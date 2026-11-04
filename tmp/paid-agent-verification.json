@@ -1,0 +1,49 @@
+{
+  "status": "not_run",
+  "summary": "Tests-only red phase completed. Swift and Xcode toolchains are unavailable in the container, so the Swift suite could not run.",
+  "acceptance_criteria": [
+    {
+      "id": "AC-1",
+      "status": "not_run",
+      "verification": {
+        "kind": "unit_or_service_test",
+        "references": [
+          {
+            "locator": "iOS/Tests/ColorMatchingLPSAppTests/GeneratedOpenAPIIntegrationTests.swift:5",
+            "result": "not_run: swift executable is unavailable"
+          }
+        ]
+      }
+    },
+    {
+      "id": "AC-2",
+      "status": "not_run",
+      "verification": {
+        "kind": "unit_or_service_test",
+        "references": [
+          {
+            "locator": "iOS/Tests/ColorMatchingLPSAppTests/APIClientTests.swift:49",
+            "result": "not_run: local URLProtocol stub tests added for manifest and recent sheets; generated wiring is intentionally red"
+          },
+          {
+            "locator": "iOS/Tests/ColorMatchingLPSAppTests/GeneratedOpenAPIIntegrationTests.swift:15",
+            "result": "not_run: requires the OpenAPI document from viamin/color_matching#110"
+          }
+        ]
+      }
+    },
+    {
+      "id": "AC-3",
+      "status": "skipped",
+      "verification": {
+        "kind": "human_or_external_evidence",
+        "references": [
+          {
+            "locator": "docs/issue-5-generated-openapi-client-verification.md:19",
+            "result": "blocked: published OpenAPI document was unavailable for comparison"
+          }
+        ]
+      }
+    }
+  ]
+}
