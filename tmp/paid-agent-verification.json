@@ -1,0 +1,75 @@
+{
+  "status": "failed",
+  "summary": "Tests-first revision added local-stub coverage and a red OpenAPI-document contract test. Swift is not installed in this container, and the upstream OpenAPI document has not yet been vendored.",
+  "acceptance_criteria": [
+    {
+      "id": "AC-1",
+      "status": "failed",
+      "verification": {
+        "kind": "human_or_external_evidence",
+        "references": [
+          {
+            "locator": "docs/issue-5-openapi-client-test-plan.md",
+            "result": "Upstream #110 is closed, but its main tree did not expose a vendorable OpenAPI JSON artifact at inspection time."
+          },
+          {
+            "locator": "iOS/Tests/ColorMatchingLPSAppTests/OpenAPISpecContractTests.swift:5",
+            "result": "Red test requires the future vendored document and all six client operations."
+          }
+        ]
+      }
+    },
+    {
+      "id": "AC-2",
+      "status": "not_run",
+      "verification": {
+        "kind": "unit_or_service_test",
+        "references": [
+          {
+            "locator": "iOS/Tests/ColorMatchingLPSAppTests/OpenAPISpecContractTests.swift:5",
+            "result": "Operation coverage test written; generated client does not exist in this tests-only revision."
+          }
+        ]
+      }
+    },
+    {
+      "id": "AC-3",
+      "status": "not_run",
+      "verification": {
+        "kind": "unit_or_service_test",
+        "references": [
+          {
+            "locator": "iOS/Tests/ColorMatchingLPSAppTests/APIClientTests.swift:95",
+            "result": "Local-stub adapter test is ready for generated-type wiring in the implementation revision."
+          }
+        ]
+      }
+    },
+    {
+      "id": "AC-4",
+      "status": "not_run",
+      "verification": {
+        "kind": "unit_or_service_test",
+        "references": [
+          {
+            "locator": "iOS/Tests/ColorMatchingLPSAppTests/APIClientTests.swift:6",
+            "result": "Local URLProtocol stubs cover reads and existing write operations; swift test could not start because swift is absent."
+          }
+        ]
+      }
+    },
+    {
+      "id": "AC-5",
+      "status": "not_run",
+      "verification": {
+        "kind": "human_or_external_evidence",
+        "references": [
+          {
+            "locator": "docs/issue-5-openapi-client-test-plan.md",
+            "result": "Contract deltas and the required PR-description review are recorded for the implementation PR."
+          }
+        ]
+      }
+    }
+  ]
+}
