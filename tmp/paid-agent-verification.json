@@ -1,0 +1,75 @@
+{
+  "status": "not_run",
+  "summary": "Tests and migration evidence were added in the required red-phase tests-only run. The Swift toolchain is unavailable in this container, so swift test could not be executed.",
+  "acceptance_criteria": [
+    {
+      "id": "AC-1",
+      "status": "not_run",
+      "verification": {
+        "kind": "unit_or_service_test",
+        "references": [
+          {
+            "locator": "iOS/Tests/ColorMatchingLPSAppTests/OpenAPIClientMigrationTests.swift:testPublishedSpecAndGeneratedClientConfigurationAreCheckedIn",
+            "result": "not run: swift is not installed"
+          }
+        ]
+      }
+    },
+    {
+      "id": "AC-2",
+      "status": "not_run",
+      "verification": {
+        "kind": "unit_or_service_test",
+        "references": [
+          {
+            "locator": "iOS/Tests/ColorMatchingLPSAppTests/OpenAPIClientMigrationTests.swift:testHandWrittenTransportPayloadModelsAreRemovedFromAPIClient",
+            "result": "not run: intentionally red until generated types replace payload models"
+          }
+        ]
+      }
+    },
+    {
+      "id": "AC-3",
+      "status": "not_run",
+      "verification": {
+        "kind": "unit_or_service_test",
+        "references": [
+          {
+            "locator": "iOS/Tests/ColorMatchingLPSAppTests/APIClientTests.swift:testFetchManifestDecodesPublishedManifestShape",
+            "result": "not run: local URLProtocol stub"
+          },
+          {
+            "locator": "iOS/Tests/ColorMatchingLPSAppTests/APIClientTests.swift:testFetchRecentSheetsDecodesPublishedResponseShape",
+            "result": "not run: local URLProtocol stub"
+          }
+        ]
+      }
+    },
+    {
+      "id": "AC-4",
+      "status": "skipped",
+      "verification": {
+        "kind": "unit_or_service_test",
+        "references": [
+          {
+            "locator": "docs/openapi-client-migration.md",
+            "result": "ranked-results local-stub test is an implementation-run gap because the current facade has no ranked-results operation"
+          }
+        ]
+      }
+    },
+    {
+      "id": "AC-5",
+      "status": "passed",
+      "verification": {
+        "kind": "human_or_external_evidence",
+        "references": [
+          {
+            "locator": "docs/openapi-client-migration.md",
+            "result": "records the comparison against viamin/color_matching#110 and the published controller/spec implementation"
+          }
+        ]
+      }
+    }
+  ]
+}
