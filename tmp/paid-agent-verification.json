@@ -1,0 +1,79 @@
+{
+  "status": "not_run",
+  "summary": "Red-phase tests and implementation plan added; Swift is unavailable in the container, and the upstream OpenAPI response schema was not retrievable.",
+  "acceptance_criteria": [
+    {
+      "id": "AC-1",
+      "status": "not_run",
+      "verification": {
+        "kind": "unit_or_service_test",
+        "references": [
+          {
+            "locator": "iOS/Tests/ColorMatchingLPSAppTests/APIClientTests.swift:94",
+            "result": "red test requires OpenAPIRuntime; not run because swift is unavailable"
+          }
+        ]
+      }
+    },
+    {
+      "id": "AC-2",
+      "status": "not_run",
+      "verification": {
+        "kind": "unit_or_service_test",
+        "references": [
+          {
+            "locator": "iOS/Tests/ColorMatchingLPSAppTests/APIClientTests.swift:53",
+            "result": "manifest stub test added; not run"
+          },
+          {
+            "locator": "iOS/Tests/ColorMatchingLPSAppTests/APIClientTests.swift:76",
+            "result": "recent-sheets stub test added; not run"
+          },
+          {
+            "locator": "docs/issue-5-generated-openapi-client-plan.md:15",
+            "result": "ranked-results response schema remains unavailable for a credible typed test"
+          }
+        ]
+      }
+    },
+    {
+      "id": "AC-3",
+      "status": "not_run",
+      "verification": {
+        "kind": "human_or_external_evidence",
+        "references": [
+          {
+            "locator": "docs/issue-5-generated-openapi-client-plan.md:16",
+            "result": "requires implementation-diff inspection in the subsequent implementation run"
+          }
+        ]
+      }
+    },
+    {
+      "id": "AC-4",
+      "status": "not_run",
+      "verification": {
+        "kind": "unit_or_service_test",
+        "references": [
+          {
+            "locator": "iOS/Tests/ColorMatchingLPSAppTests/APIClientTests.swift:53",
+            "result": "uses MockURLProtocol and no live server; not run because swift is unavailable"
+          }
+        ]
+      }
+    },
+    {
+      "id": "AC-5",
+      "status": "skipped",
+      "verification": {
+        "kind": "human_or_external_evidence",
+        "references": [
+          {
+            "locator": "docs/issue-5-generated-openapi-client-plan.md:28",
+            "result": "published OpenAPI document could not be retrieved from the upstream repository or a discoverable deployment"
+          }
+        ]
+      }
+    }
+  ]
+}
