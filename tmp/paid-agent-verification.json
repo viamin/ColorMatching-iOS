@@ -1,0 +1,84 @@
+{
+  "status": "not_run",
+  "summary": "Red-phase OpenAPI client contract tests and criterion plan were added. The required Swift command could not run because the isolated container does not include a swift executable.",
+  "acceptance_criteria": [
+    {
+      "id": "AC-1",
+      "status": "failed",
+      "verification": {
+        "kind": "unit_or_service_test",
+        "references": [
+          {
+            "locator": "iOS/Tests/ColorMatchingLPSAppTests/APIClientTests.swift:testPackageDeclaresGeneratedOpenAPIClientDependencies",
+            "result": "Expected red: Package.swift does not yet declare swift-openapi-generator or swift-openapi-runtime."
+          }
+        ]
+      }
+    },
+    {
+      "id": "AC-2",
+      "status": "failed",
+      "verification": {
+        "kind": "unit_or_service_test",
+        "references": [
+          {
+            "locator": "iOS/Tests/ColorMatchingLPSAppTests/APIClientTests.swift:testVendoredOpenAPISpecDefinesEveryCompanionSurface",
+            "result": "Expected red: iOS/OpenAPI/color-matching-openapi.json has not yet been vendored."
+          }
+        ]
+      }
+    },
+    {
+      "id": "AC-3",
+      "status": "not_run",
+      "verification": {
+        "kind": "unit_or_service_test",
+        "references": [
+          {
+            "locator": "iOS/Tests/ColorMatchingLPSAppTests/APIClientTests.swift:testFetchRecentSheetsDecodesPublishedResponseFromLocalStub",
+            "result": "Local-stub regression test added; not executed because swift is unavailable."
+          }
+        ]
+      }
+    },
+    {
+      "id": "AC-4",
+      "status": "not_run",
+      "verification": {
+        "kind": "unit_or_service_test",
+        "references": [
+          {
+            "locator": "docs/issue-5-openapi-client-verification-plan.md",
+            "result": "Ranked-results generated-client test is deferred until the implementation adds the public generated-client surface."
+          }
+        ]
+      }
+    },
+    {
+      "id": "AC-5",
+      "status": "not_run",
+      "verification": {
+        "kind": "human_or_external_evidence",
+        "references": [
+          {
+            "locator": "docs/issue-5-openapi-client-verification-plan.md",
+            "result": "Contract deltas and endpoint-scope comparison recorded from viamin/color_matching#110 source; final PR description remains implementation-run work."
+          }
+        ]
+      }
+    },
+    {
+      "id": "AC-6",
+      "status": "not_run",
+      "verification": {
+        "kind": "unit_or_service_test",
+        "references": [
+          {
+            "locator": "swift test --package-path iOS --disable-sandbox",
+            "result": "Not run: swift executable is unavailable in this container."
+          }
+        ]
+      }
+    }
+  ]
+}
