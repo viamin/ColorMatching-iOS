@@ -1,0 +1,79 @@
+{
+  "status": "failed",
+  "summary": "Tests-only red phase: permanent local-stub XCTest coverage was added for the generated-client migration, but implementation and Swift tooling are not present in this run.",
+  "acceptance_criteria": [
+    {
+      "id": "AC-1",
+      "status": "failed",
+      "verification": {
+        "kind": "unit_or_service_test",
+        "references": [
+          {
+            "locator": "iOS/Tests/ColorMatchingLPSAppTests/APIClientTests.swift:testFetchesRecentSheetsAndManifestFromLocalStubs",
+            "result": "red: explicit assertion requires generated OpenAPI types instead of the hand-written APIClient"
+          }
+        ]
+      }
+    },
+    {
+      "id": "AC-2",
+      "status": "failed",
+      "verification": {
+        "kind": "unit_or_service_test",
+        "references": [
+          {
+            "locator": "iOS/Tests/ColorMatchingLPSAppTests/APIClientTests.swift:testCreateCaptureEncodesMetadataAndQuality",
+            "result": "red for generated-client migration: hand-written request model remains in use"
+          },
+          {
+            "locator": "iOS/Tests/ColorMatchingLPSAppTests/APIClientTests.swift:testUploadMeasurementsEncodesScoresWithAlgorithmVersion",
+            "result": "red for generated-client migration: hand-written request model remains in use"
+          },
+          {
+            "locator": "iOS/Tests/ColorMatchingLPSAppTests/APIClientTests.swift:testUploadJudgmentsEncodesPathAndPayload",
+            "result": "red for generated-client migration: hand-written request model remains in use"
+          }
+        ]
+      }
+    },
+    {
+      "id": "AC-3",
+      "status": "failed",
+      "verification": {
+        "kind": "unit_or_service_test",
+        "references": [
+          {
+            "locator": "iOS/Tests/ColorMatchingLPSAppTests/APIClientTests.swift:testGeneratedClientDecodesRankedResultsFromLocalStub",
+            "result": "red: local stub response is exercised, but the production client has no typed ranked-results operation"
+          }
+        ]
+      }
+    },
+    {
+      "id": "AC-4",
+      "status": "not_run",
+      "verification": {
+        "kind": "human_or_external_evidence",
+        "references": [
+          {
+            "locator": "docs/issue-5-generated-openapi-client-test-plan.md",
+            "result": "upstream router evidence and prose-contract deltas recorded; package/spec review awaits implementation"
+          }
+        ]
+      }
+    },
+    {
+      "id": "AC-5",
+      "status": "not_run",
+      "verification": {
+        "kind": "unit_or_service_test",
+        "references": [
+          {
+            "locator": "swift test --disable-sandbox",
+            "result": "not run: the Swift executable is absent from this environment"
+          }
+        ]
+      }
+    }
+  ]
+}
