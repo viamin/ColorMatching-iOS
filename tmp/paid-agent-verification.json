@@ -1,0 +1,96 @@
+{
+  "status": "not_run",
+  "summary": "Added permanent local-stub coverage for the manifest and recent-sheet API responses. Swift verification could not run because this container has no swift executable.",
+  "acceptance_criteria": [
+    {
+      "id": "AC-1",
+      "status": "not_run",
+      "verification": {
+        "kind": "unit_or_service_test",
+        "references": [
+          {
+            "locator": "iOS/Tests/ColorMatchingLPSAppTests/APIClientTests.swift:testFetchManifestDecodesPublishedResponseWithRelativeManifestURL",
+            "result": "not_run: swift executable is unavailable"
+          },
+          {
+            "locator": "iOS/Tests/ColorMatchingLPSAppTests/APIClientTests.swift:testFetchRecentSheetsDecodesPublishedDiscoveryResponse",
+            "result": "not_run: swift executable is unavailable"
+          }
+        ]
+      }
+    },
+    {
+      "id": "AC-2",
+      "status": "not_run",
+      "verification": {
+        "kind": "unit_or_service_test",
+        "references": [
+          {
+            "locator": "iOS/Tests/ColorMatchingLPSAppTests/APIClientTests.swift:testCreateCaptureEncodesMetadataAndQuality",
+            "result": "not_run: swift executable is unavailable"
+          },
+          {
+            "locator": "iOS/Tests/ColorMatchingLPSAppTests/APIClientTests.swift:testUploadMeasurementsEncodesScoresWithAlgorithmVersion",
+            "result": "not_run: swift executable is unavailable"
+          },
+          {
+            "locator": "iOS/Tests/ColorMatchingLPSAppTests/APIClientTests.swift:testUploadJudgmentsEncodesPathAndPayload",
+            "result": "not_run: swift executable is unavailable"
+          }
+        ]
+      }
+    },
+    {
+      "id": "AC-3",
+      "status": "skipped",
+      "verification": {
+        "kind": "human_or_external_evidence",
+        "references": [
+          {
+            "locator": "docs/openapi-client-migration-test-plan.md",
+            "result": "The tests-only phase cannot add the generated types or ranked-results operation; the implementation phase must add a permanent local-stub test."
+          }
+        ]
+      }
+    },
+    {
+      "id": "AC-4",
+      "status": "skipped",
+      "verification": {
+        "kind": "human_or_external_evidence",
+        "references": [
+          {
+            "locator": "docs/openapi-client-migration-test-plan.md",
+            "result": "Replacing production models is prohibited during this tests-only phase."
+          }
+        ]
+      }
+    },
+    {
+      "id": "AC-5",
+      "status": "not_run",
+      "verification": {
+        "kind": "human_or_external_evidence",
+        "references": [
+          {
+            "locator": "docs/openapi-client-migration-test-plan.md",
+            "result": "The upstream endpoint and contract deltas were inspected, but package generation is reserved for the implementation phase."
+          }
+        ]
+      }
+    },
+    {
+      "id": "AC-6",
+      "status": "not_run",
+      "verification": {
+        "kind": "unit_or_service_test",
+        "references": [
+          {
+            "locator": "iOS/Package.swift",
+            "result": "swift test --disable-sandbox could not start: swift executable is unavailable"
+          }
+        ]
+      }
+    }
+  ]
+}
