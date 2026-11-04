@@ -1,0 +1,62 @@
+{
+  "status": "not_run",
+  "summary": "Tests and a criterion-level plan were added in the required tests-only phase. Swift is unavailable in this container, so the suite could not run; generated-client implementation is reserved for the follow-up implementation phase.",
+  "acceptance_criteria": [
+    {
+      "id": "AC-1",
+      "status": "not_run",
+      "verification": {
+        "kind": "human_or_external_evidence",
+        "references": [
+          {
+            "locator": "iOS/Package.swift",
+            "result": "The generated dependencies and vendored OpenAPI artifact are absent at the tests-only PR head."
+          }
+        ]
+      }
+    },
+    {
+      "id": "AC-2",
+      "status": "not_run",
+      "verification": {
+        "kind": "unit_or_service_test",
+        "references": [
+          {
+            "locator": "iOS/Tests/ColorMatchingLPSAppTests/APIClientTests.swift:14",
+            "result": "Local-stub manifest and recent-sheet tests were added; not executed because the Swift toolchain is unavailable."
+          },
+          {
+            "locator": "iOS/Tests/ColorMatchingLPSAppTests/APIClientTests.swift:55",
+            "result": "Existing local-stub capture and upload tests cover the current client boundary; not executed because the Swift toolchain is unavailable."
+          }
+        ]
+      }
+    },
+    {
+      "id": "AC-3",
+      "status": "not_run",
+      "verification": {
+        "kind": "unit_or_service_test",
+        "references": [
+          {
+            "locator": "docs/issue-5-openapi-client-verification-plan.md",
+            "result": "Ranked-results local-stub coverage is deferred because the current client has no ranked-results operation."
+          }
+        ]
+      }
+    },
+    {
+      "id": "AC-4",
+      "status": "not_run",
+      "verification": {
+        "kind": "human_or_external_evidence",
+        "references": [
+          {
+            "locator": "docs/issue-5-openapi-client-verification-plan.md",
+            "result": "Upstream specification deltas and the endpoint gap are recorded for the implementation PR description."
+          }
+        ]
+      }
+    }
+  ]
+}
