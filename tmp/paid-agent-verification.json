@@ -1,0 +1,71 @@
+{
+  "status": "not_run",
+  "summary": "Test-writing run added permanent local-stub API coverage and recorded the published-spec deltas. Swift is unavailable in this container, so compilation and XCTest execution could not run.",
+  "acceptance_criteria": [
+    {
+      "id": "AC-1",
+      "status": "not_run",
+      "verification": {
+        "kind": "unit_or_service_test",
+        "references": [
+          {
+            "locator": "iOS/Tests/ColorMatchingLPSAppTests/APIClientTests.swift:49",
+            "result": "not_run: swift executable is unavailable in the container"
+          }
+        ]
+      }
+    },
+    {
+      "id": "AC-2",
+      "status": "not_run",
+      "verification": {
+        "kind": "unit_or_service_test",
+        "references": [
+          {
+            "locator": "iOS/Tests/ColorMatchingLPSAppTests/APIClientTests.swift:103",
+            "result": "not_run: swift executable is unavailable in the container"
+          }
+        ]
+      }
+    },
+    {
+      "id": "AC-3",
+      "status": "not_run",
+      "verification": {
+        "kind": "unit_or_service_test",
+        "references": [
+          {
+            "locator": "docs/openapi-client-migration-test-plan.md:11",
+            "result": "deferred to implementation run; generated client is not present in this tests-only change"
+          }
+        ]
+      }
+    },
+    {
+      "id": "AC-4",
+      "status": "skipped",
+      "verification": {
+        "kind": "human_or_external_evidence",
+        "references": [
+          {
+            "locator": "docs/openapi-client-migration-test-plan.md:35",
+            "result": "current app has no ranked-results caller; no behavior may be added in this test-only run"
+          }
+        ]
+      }
+    },
+    {
+      "id": "AC-5",
+      "status": "passed",
+      "verification": {
+        "kind": "human_or_external_evidence",
+        "references": [
+          {
+            "locator": "docs/openapi-client-migration-test-plan.md:17",
+            "result": "published-spec versus prose-contract deltas are recorded with the dependent issue as external evidence"
+          }
+        ]
+      }
+    }
+  ]
+}
