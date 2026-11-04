@@ -1,0 +1,84 @@
+{
+  "status": "not_run",
+  "summary": "Test-writing run added local-stub coverage and a criterion verification plan. Swift is unavailable in this container, so the required test command could not run.",
+  "acceptance_criteria": [
+    {
+      "id": "AC-1",
+      "status": "not_run",
+      "verification": {
+        "kind": "unit_or_service_test",
+        "references": [
+          {
+            "locator": "docs/issue-5-generated-openapi-client-verification-plan.md",
+            "result": "Generated client, runtime, and upstream OpenAPI document are not present in this test-writing revision."
+          }
+        ]
+      }
+    },
+    {
+      "id": "AC-2",
+      "status": "not_run",
+      "verification": {
+        "kind": "unit_or_service_test",
+        "references": [
+          {
+            "locator": "iOS/Tests/ColorMatchingLPSAppTests/APIClientTests.swift:testFetchesManifestAndRecentSheetsFromLocalStubs",
+            "result": "Permanent local-stub coverage was added but could not execute because swift is unavailable."
+          }
+        ]
+      }
+    },
+    {
+      "id": "AC-3",
+      "status": "not_run",
+      "verification": {
+        "kind": "unit_or_service_test",
+        "references": [
+          {
+            "locator": "iOS/Tests/ColorMatchingLPSAppTests/APIClientTests.swift",
+            "result": "Capture, measurement, and judgment local-stub tests exist but could not execute because swift is unavailable."
+          }
+        ]
+      }
+    },
+    {
+      "id": "AC-4",
+      "status": "not_run",
+      "verification": {
+        "kind": "unit_or_service_test",
+        "references": [
+          {
+            "locator": "iOS/Tests/ColorMatchingLPSAppTests/APIClientTests.swift:testFetchesRankedResultsFromALocalStub",
+            "result": "Test is intentionally red until the generated-client adapter exposes ranked results; it could not compile or run without swift."
+          }
+        ]
+      }
+    },
+    {
+      "id": "AC-5",
+      "status": "skipped",
+      "verification": {
+        "kind": "human_or_external_evidence",
+        "references": [
+          {
+            "locator": "docs/issue-5-generated-openapi-client-verification-plan.md",
+            "result": "The upstream PR/spec was unavailable through the public GitHub API (404), so contract deltas cannot be verified yet."
+          }
+        ]
+      }
+    },
+    {
+      "id": "AC-6",
+      "status": "not_run",
+      "verification": {
+        "kind": "unit_or_service_test",
+        "references": [
+          {
+            "locator": "swift test --disable-sandbox",
+            "result": "Not run: rtk proxy reported swift: No such file or directory."
+          }
+        ]
+      }
+    }
+  ]
+}
