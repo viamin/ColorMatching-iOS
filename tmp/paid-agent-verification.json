@@ -1,0 +1,62 @@
+{
+  "status": "failed",
+  "summary": "Red-phase tests and a verification plan were added, but Swift is unavailable in this container and the provider OpenAPI document/ranked-results response schema is not retrievable.",
+  "acceptance_criteria": [
+    {
+      "id": "AC-1",
+      "status": "not_run",
+      "verification": {
+        "kind": "unit_or_service_test",
+        "references": [
+          {
+            "locator": "docs/openapi-client-migration-verification.md:8",
+            "result": "No generated package or provider OpenAPI document is present at this PR head."
+          }
+        ]
+      }
+    },
+    {
+      "id": "AC-2",
+      "status": "not_run",
+      "verification": {
+        "kind": "unit_or_service_test",
+        "references": [
+          {
+            "locator": "iOS/Tests/ColorMatchingLPSAppTests/APIClientTests.swift:12",
+            "result": "Manifest and recent-sheet URLProtocol tests were added but could not run because the swift executable is unavailable."
+          },
+          {
+            "locator": "iOS/Tests/ColorMatchingLPSAppTests/APIClientTests.swift:47",
+            "result": "Existing capture, measurement, and judgment URLProtocol tests cover the remaining implemented surfaces but could not run because the swift executable is unavailable."
+          }
+        ]
+      }
+    },
+    {
+      "id": "AC-3",
+      "status": "failed",
+      "verification": {
+        "kind": "unit_or_service_test",
+        "references": [
+          {
+            "locator": "iOS/Tests/ColorMatchingLPSAppTests/APIClientTests.swift:130",
+            "result": "Deliberate red test identifies that ranked-results has neither a generated operation nor a provider response schema."
+          }
+        ]
+      }
+    },
+    {
+      "id": "AC-4",
+      "status": "not_run",
+      "verification": {
+        "kind": "human_or_external_evidence",
+        "references": [
+          {
+            "locator": "docs/openapi-client-migration-verification.md:19",
+            "result": "Provider issue #110 is closed, but this run could not retrieve a public OpenAPI document to compare against the prose contract."
+          }
+        ]
+      }
+    }
+  ]
+}
