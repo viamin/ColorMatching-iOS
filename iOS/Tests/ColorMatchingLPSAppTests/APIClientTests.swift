@@ -46,6 +46,57 @@ final class APIClientTests: XCTestCase {
         XCTAssertEqual(quality["rejections"] as? [String], [])
     }
 
+    func testFetchRecentSheetsDecodesPublishedResponseFromLocalStub() async throws {
+        MockURLProtocol.handler = { request in
+            XCTAssertEqual(request.httpMethod, "GET")
+            XCTAssertEqual(request.url?.path, "/api/v1/test_sheets/recent")
+            return (
+                HTTPURLResponse(url: request.url!, statusCode: 200, httpVersion: nil, headerFields: nil)!,
+                Data(#"{"sheets":[{"sheet_id":"LPS-42","manifest_url":"https://example.test/api/v1/test_sheets/LPS-42/manifest","title":null}]}"#.utf8)
+            )
+        }
+
+        let sheets = try await client().fetchRecentSheets(baseURL: URL(string: "https://example.test")!)
+
+        XCTAssertEqual(sheets.map(\.sheetID), ["LPS-42"])
+        XCTAssertNil(sheets.first?.title)
+        XCTAssertEqual(sheets.first?.manifestURL.absoluteString, "https://example.test/api/v1/test_sheets/LPS-42/manifest")
+    }
+
+    func testVendoredOpenAPISpecDefinesEveryCompanionSurface() throws {
+        let specURL = URL(fileURLWithPath: #filePath)
+            .deletingLastPathComponent()
+            .appendingPathComponent("../../OpenAPI/color-matching-openapi.json")
+            .standardizedFileURL
+        let data = try XCTUnwrap(try? Data(contentsOf: specURL), "Vendor the published OpenAPI document at \(specURL.path).")
+        let document = try XCTUnwrap(try JSONSerialization.jsonObject(with: data) as? [String: Any])
+        let paths = try XCTUnwrap(document["paths"] as? [String: Any])
+
+        let requiredPaths = [
+            "/api/v1/test_sheets/recent",
+            "/api/v1/test_sheets/{sheet_id}/manifest",
+            "/api/v1/test_sheets/{sheet_id}/captures",
+            "/api/v1/captures/{capture_id}/measurements",
+            "/api/v1/captures/{capture_id}/judgments",
+            "/api/v1/test_sheets/{sheet_id}/ranked_results"
+        ]
+
+        requiredPaths.forEach { path in
+            XCTAssertNotNil(paths[path], "Published spec must define \(path).")
+        }
+    }
+
+    func testPackageDeclaresGeneratedOpenAPIClientDependencies() throws {
+        let packageURL = URL(fileURLWithPath: #filePath)
+            .deletingLastPathComponent()
+            .appendingPathComponent("../../Package.swift")
+            .standardizedFileURL
+        let package = try String(contentsOf: packageURL)
+
+        XCTAssertTrue(package.contains("swift-openapi-generator"))
+        XCTAssertTrue(package.contains("swift-openapi-runtime"))
+    }
+
     func testUploadMeasurementsEncodesScoresWithAlgorithmVersion() async throws {
         var capturedBody: Data?
         MockURLProtocol.handler = { request in
