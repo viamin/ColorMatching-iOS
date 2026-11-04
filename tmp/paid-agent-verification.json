@@ -1,0 +1,71 @@
+{
+  "status": "not_run",
+  "summary": "Red-phase OpenAPI adoption tests and contract-delta evidence were added. Swift is unavailable in this container, so the package test command could not start.",
+  "acceptance_criteria": [
+    {
+      "id": "AC-1",
+      "status": "not_run",
+      "verification": {
+        "kind": "unit_or_service_test",
+        "references": [
+          {
+            "locator": "iOS/Tests/ColorMatchingLPSAppTests/GeneratedOpenAPIClientAdoptionTests.swift:5",
+            "result": "Red-phase dependency and vendored-spec adoption assertions added; not run because `swift` is unavailable."
+          }
+        ]
+      }
+    },
+    {
+      "id": "AC-2",
+      "status": "not_run",
+      "verification": {
+        "kind": "unit_or_service_test",
+        "references": [
+          {
+            "locator": "iOS/Tests/ColorMatchingLPSAppTests/APIClientTests.swift:45",
+            "result": "Local URLProtocol manifest and recent-sheet response stubs added; generated-operation migration and execution remain for the implementation run."
+          }
+        ]
+      }
+    },
+    {
+      "id": "AC-3",
+      "status": "not_run",
+      "verification": {
+        "kind": "unit_or_service_test",
+        "references": [
+          {
+            "locator": "iOS/Tests/ColorMatchingLPSAppTests/GeneratedOpenAPIClientAdoptionTests.swift:27",
+            "result": "Red-phase assertion requires OpenAPI runtime use and removal of hand-written request transports; not run because `swift` is unavailable."
+          }
+        ]
+      }
+    },
+    {
+      "id": "AC-4",
+      "status": "not_run",
+      "verification": {
+        "kind": "unit_or_service_test",
+        "references": [
+          {
+            "locator": "iOS/Tests/ColorMatchingLPSAppTests/APIClientTests.swift:6",
+            "result": "MockURLProtocol provides no-live-server coverage; the generated client is not wired in during this tests-only run."
+          }
+        ]
+      }
+    },
+    {
+      "id": "AC-5",
+      "status": "passed",
+      "verification": {
+        "kind": "human_or_external_evidence",
+        "references": [
+          {
+            "locator": "docs/issue-5-openapi-client-plan.md:20",
+            "result": "Published-spec deltas and known endpoint/schema gaps recorded from viamin/color_matching#110."
+          }
+        ]
+      }
+    }
+  ]
+}
