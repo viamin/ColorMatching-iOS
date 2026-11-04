@@ -1,0 +1,71 @@
+{
+  "status": "not_run",
+  "summary": "Test-writing run added permanent URLProtocol stub coverage for manifest and recent-sheet reads. The required Swift test command could not run because the container has no swift executable.",
+  "acceptance_criteria": [
+    {
+      "id": "AC-1",
+      "status": "not_run",
+      "verification": {
+        "kind": "unit_or_service_test",
+        "references": [
+          {
+            "locator": "docs/issue-5-openapi-client-verification-plan.md",
+            "result": "Implementation verification planned; generator, runtime, and OpenAPI document are intentionally outside this test-only run."
+          }
+        ]
+      }
+    },
+    {
+      "id": "AC-2",
+      "status": "not_run",
+      "verification": {
+        "kind": "unit_or_service_test",
+        "references": [
+          {
+            "locator": "iOS/Tests/ColorMatchingLPSAppTests/APIClientTests.swift:12",
+            "result": "Manifest and recent-sheet generated-client acceptance tests added; capture, measurement, and judgment stub tests already exist. Ranked-results remains an upstream schema gap."
+          }
+        ]
+      }
+    },
+    {
+      "id": "AC-3",
+      "status": "not_run",
+      "verification": {
+        "kind": "unit_or_service_test",
+        "references": [
+          {
+            "locator": "docs/issue-5-openapi-client-verification-plan.md",
+            "result": "Requires the separate implementation run and a successful Swift compile."
+          }
+        ]
+      }
+    },
+    {
+      "id": "AC-4",
+      "status": "not_run",
+      "verification": {
+        "kind": "unit_or_service_test",
+        "references": [
+          {
+            "locator": "iOS/Tests/ColorMatchingLPSAppTests/APIClientTests.swift:12",
+            "result": "Permanent local URLProtocol stub coverage exists, but swift test --disable-sandbox was blocked: swift executable not installed."
+          }
+        ]
+      }
+    },
+    {
+      "id": "AC-5",
+      "status": "passed",
+      "verification": {
+        "kind": "human_or_external_evidence",
+        "references": [
+          {
+            "locator": "docs/issue-5-openapi-client-verification-plan.md",
+            "result": "Documents external comparison evidence from viamin/color_matching#110 and the deltas/gap that must be copied to the implementation PR description."
+          }
+        ]
+      }
+    }
+  ]
+}
