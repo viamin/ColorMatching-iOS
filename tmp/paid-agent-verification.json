@@ -1,0 +1,71 @@
+{
+  "status": "failed",
+  "summary": "Red-phase tests and contract-delta evidence were added. The generated OpenAPI client is absent, and Swift is not installed in this container, so the Swift suite could not run.",
+  "acceptance_criteria": [
+    {
+      "id": "AC-1",
+      "status": "failed",
+      "verification": {
+        "kind": "unit_or_service_test",
+        "references": [
+          {
+            "locator": "iOS/Tests/ColorMatchingLPSAppTests/APIClientTests.swift:testPackageWiresGeneratedOpenAPIClient",
+            "result": "red: Package.swift has neither swift-openapi dependency nor ColorMatchingAPI target; test not executed because swift is unavailable"
+          }
+        ]
+      }
+    },
+    {
+      "id": "AC-2",
+      "status": "failed",
+      "verification": {
+        "kind": "unit_or_service_test",
+        "references": [
+          {
+            "locator": "iOS/Tests/ColorMatchingLPSAppTests/APIClientTests.swift",
+            "result": "local-stub coverage exists for manifest, recent sheets, capture, measurements, and judgments; ranked-results and generated operation calls are absent"
+          }
+        ]
+      }
+    },
+    {
+      "id": "AC-3",
+      "status": "failed",
+      "verification": {
+        "kind": "unit_or_service_test",
+        "references": [
+          {
+            "locator": "iOS/Sources/ColorMatchingLPSAppCore/APIClient.swift",
+            "result": "handwritten Codable API models remain; generated module does not exist"
+          }
+        ]
+      }
+    },
+    {
+      "id": "AC-4",
+      "status": "not_run",
+      "verification": {
+        "kind": "unit_or_service_test",
+        "references": [
+          {
+            "locator": "iOS/Tests/ColorMatchingLPSAppTests/APIClientTests.swift:MockURLProtocol",
+            "result": "uses local URLProtocol stubs, but Swift tests could not run: swift executable is unavailable"
+          }
+        ]
+      }
+    },
+    {
+      "id": "AC-5",
+      "status": "not_run",
+      "verification": {
+        "kind": "human_or_external_evidence",
+        "references": [
+          {
+            "locator": "docs/issue-5-openapi-client-verification.md:Published-spec comparison",
+            "result": "provider commit and contract deltas recorded; final PR description remains for the implementation/PR run"
+          }
+        ]
+      }
+    }
+  ]
+}
