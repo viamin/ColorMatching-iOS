@@ -1,0 +1,75 @@
+{
+  "status": "failed",
+  "summary": "Red-phase Swift tests and implementation notes were added. Verification could not run because this environment has no Swift toolchain, and the generated-client dependency/spec integration is intentionally not implemented in this tests-only run.",
+  "acceptance_criteria": [
+    {
+      "id": "AC-1",
+      "status": "failed",
+      "verification": {
+        "kind": "unit_or_service_test",
+        "references": [
+          {
+            "locator": "iOS/Tests/ColorMatchingLPSAppTests/OpenAPIIntegrationTests.swift:5",
+            "result": "red: requires swift-openapi-generator and swift-openapi-runtime package declarations"
+          }
+        ]
+      }
+    },
+    {
+      "id": "AC-2",
+      "status": "not_run",
+      "verification": {
+        "kind": "permanent_system_test",
+        "references": [
+          {
+            "locator": "iOS/Tests/ColorMatchingLPSAppTests/APIClientTests.swift:49",
+            "result": "local URLProtocol stubs cover manifest and recent sheets; test execution blocked because swift is unavailable"
+          },
+          {
+            "locator": "iOS/Tests/ColorMatchingLPSAppTests/APIClientTests.swift:12",
+            "result": "local URLProtocol stubs cover capture creation, measurement upload, and judgment upload; test execution blocked because swift is unavailable"
+          }
+        ]
+      }
+    },
+    {
+      "id": "AC-3",
+      "status": "skipped",
+      "verification": {
+        "kind": "human_or_external_evidence",
+        "references": [
+          {
+            "locator": "docs/issue-5-generated-openapi-client-pr-notes.md:1",
+            "result": "implementation-phase code review required to confirm hand-written wire models are replaced"
+          }
+        ]
+      }
+    },
+    {
+      "id": "AC-4",
+      "status": "failed",
+      "verification": {
+        "kind": "unit_or_service_test",
+        "references": [
+          {
+            "locator": "iOS/Tests/ColorMatchingLPSAppTests/OpenAPIIntegrationTests.swift:12",
+            "result": "red: vendored OpenAPI document and generated ranked-results operation are absent"
+          }
+        ]
+      }
+    },
+    {
+      "id": "AC-5",
+      "status": "passed",
+      "verification": {
+        "kind": "human_or_external_evidence",
+        "references": [
+          {
+            "locator": "docs/issue-5-generated-openapi-client-pr-notes.md:15",
+            "result": "records upstream OpenAPI/prose-contract deltas and endpoint gaps from color_matching PR #113"
+          }
+        ]
+      }
+    }
+  ]
+}
