@@ -1,0 +1,71 @@
+{
+  "status": "not_run",
+  "summary": "Focused local-stub tests and the criterion plan are committed for the tests-only phase; Swift is unavailable in this container.",
+  "acceptance_criteria": [
+    {
+      "id": "AC-1",
+      "status": "not_run",
+      "verification": {
+        "kind": "unit_or_service_test",
+        "references": [
+          {
+            "locator": "docs/issue-5-openapi-client-verification.md",
+            "result": "Generator/runtime dependencies and generated source are intentionally deferred to the implementation phase."
+          }
+        ]
+      }
+    },
+    {
+      "id": "AC-2",
+      "status": "not_run",
+      "verification": {
+        "kind": "unit_or_service_test",
+        "references": [
+          {
+            "locator": "iOS/Tests/ColorMatchingLPSAppTests/APIClientTests.swift:12",
+            "result": "Local-stub manifest and recent-sheets tests added; not executed because the swift executable is absent."
+          }
+        ]
+      }
+    },
+    {
+      "id": "AC-3",
+      "status": "not_run",
+      "verification": {
+        "kind": "unit_or_service_test",
+        "references": [
+          {
+            "locator": "iOS/Tests/ColorMatchingLPSAppTests/APIClientTests.swift:50",
+            "result": "Local-stub capture and upload tests cover the existing operation facade; not executed because the swift executable is absent."
+          }
+        ]
+      }
+    },
+    {
+      "id": "AC-4",
+      "status": "skipped",
+      "verification": {
+        "kind": "human_or_external_evidence",
+        "references": [
+          {
+            "locator": "docs/issue-5-openapi-client-verification.md",
+            "result": "Ranked-results endpoint exists upstream, but this app has no call site or model at this PR head; implementation must add a typed local-stub test."
+          }
+        ]
+      }
+    },
+    {
+      "id": "AC-5",
+      "status": "passed",
+      "verification": {
+        "kind": "human_or_external_evidence",
+        "references": [
+          {
+            "locator": "docs/issue-5-openapi-client-verification.md",
+            "result": "Comparison against viamin/color_matching#110 at upstream revision 47057afd58f7d46b4d4b740ca7d2d08947774471 is recorded."
+          }
+        ]
+      }
+    }
+  ]
+}
