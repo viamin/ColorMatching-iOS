@@ -1,0 +1,75 @@
+{
+  "status": "not_run",
+  "summary": "Red-phase OpenAPI tests and the verification plan were added. Swift is unavailable in this container, so no XCTest result is claimed.",
+  "acceptance_criteria": [
+    {
+      "id": "AC-1",
+      "status": "not_run",
+      "verification": {
+        "kind": "unit_or_service_test",
+        "references": [
+          {
+            "locator": "iOS/Tests/ColorMatchingLPSAppTests/OpenAPIGenerationTests.swift:5",
+            "result": "Not run: swift executable is unavailable; test is intentionally red until generator/runtime dependencies are declared."
+          }
+        ]
+      }
+    },
+    {
+      "id": "AC-2",
+      "status": "not_run",
+      "verification": {
+        "kind": "unit_or_service_test",
+        "references": [
+          {
+            "locator": "iOS/Tests/ColorMatchingLPSAppTests/OpenAPIGenerationTests.swift:12",
+            "result": "Not run: test requires vendored OpenAPI snapshot and verifies all six required operations."
+          }
+        ]
+      }
+    },
+    {
+      "id": "AC-3",
+      "status": "not_run",
+      "verification": {
+        "kind": "human_or_external_evidence",
+        "references": [
+          {
+            "locator": "docs/issue-5-openapi-client-test-plan.md:12",
+            "result": "Requires implementation review after generated client is wired."
+          }
+        ]
+      }
+    },
+    {
+      "id": "AC-4",
+      "status": "not_run",
+      "verification": {
+        "kind": "unit_or_service_test",
+        "references": [
+          {
+            "locator": "iOS/Tests/ColorMatchingLPSAppTests/APIClientTests.swift:12",
+            "result": "Local MockURLProtocol coverage exists for five app-facing operations; not run because Swift is unavailable."
+          },
+          {
+            "locator": "iOS/Tests/ColorMatchingLPSAppTests/APIClientTests.swift:49",
+            "result": "Manifest stub response coverage added; not run because Swift is unavailable."
+          }
+        ]
+      }
+    },
+    {
+      "id": "AC-5",
+      "status": "not_run",
+      "verification": {
+        "kind": "human_or_external_evidence",
+        "references": [
+          {
+            "locator": "docs/issue-5-openapi-client-test-plan.md:15",
+            "result": "Contract deltas and endpoint-gap evidence are prepared for the implementation PR description."
+          }
+        ]
+      }
+    }
+  ]
+}
