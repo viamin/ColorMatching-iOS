@@ -1,0 +1,71 @@
+{
+  "status": "failed",
+  "summary": "Tests-only phase added permanent local-stub coverage and a red contract-generation guard. Swift could not run because the container has no Swift executable.",
+  "acceptance_criteria": [
+    {
+      "id": "AC-1",
+      "status": "failed",
+      "verification": {
+        "kind": "unit_or_service_test",
+        "references": [
+          {
+            "locator": "iOS/Tests/ColorMatchingLPSAppTests/OpenAPIClientMigrationTests.swift:5",
+            "result": "red: Package.swift has no swift-openapi-generator/swift-openapi-runtime dependency and iOS/OpenAPI/color-matching.openapi.json is not yet vendored"
+          }
+        ]
+      }
+    },
+    {
+      "id": "AC-2",
+      "status": "failed",
+      "verification": {
+        "kind": "unit_or_service_test",
+        "references": [
+          {
+            "locator": "iOS/Tests/ColorMatchingLPSAppTests/OpenAPIClientMigrationTests.swift:5",
+            "result": "red: required generated-client operation paths are asserted but no vendored OpenAPI document or generated target exists"
+          }
+        ]
+      }
+    },
+    {
+      "id": "AC-3",
+      "status": "not_run",
+      "verification": {
+        "kind": "human_or_external_evidence",
+        "references": [
+          {
+            "locator": "iOS/Sources/ColorMatchingLPSAppCore/APIClient.swift:87",
+            "result": "hand-written API DTOs remain; implementation is prohibited during this tests-only phase"
+          }
+        ]
+      }
+    },
+    {
+      "id": "AC-4",
+      "status": "not_run",
+      "verification": {
+        "kind": "unit_or_service_test",
+        "references": [
+          {
+            "locator": "iOS/Tests/ColorMatchingLPSAppTests/APIClientTests.swift:44",
+            "result": "local URLProtocol stubs were added; execution not possible because swift is unavailable in the container"
+          }
+        ]
+      }
+    },
+    {
+      "id": "AC-5",
+      "status": "not_run",
+      "verification": {
+        "kind": "human_or_external_evidence",
+        "references": [
+          {
+            "locator": "docs/openapi-client-migration.md:14",
+            "result": "contract-delta material is recorded for the future PR description; no PR is opened in this tests-only run"
+          }
+        ]
+      }
+    }
+  ]
+}
