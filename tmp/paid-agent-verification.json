@@ -1,0 +1,84 @@
+{
+  "status": "failed",
+  "summary": "Tests and verification-plan documentation committed in the required test-writing phase. Swift is unavailable in this container, so the suite could not run; the generator declaration test is intentionally red until the implementation run adds the OpenAPI dependencies.",
+  "acceptance_criteria": [
+    {
+      "id": "AC-1",
+      "status": "failed",
+      "verification": {
+        "kind": "unit_or_service_test",
+        "references": [
+          {
+            "locator": "iOS/Tests/ColorMatchingLPSAppTests/OpenAPIClientAdoptionTests.swift:5",
+            "result": "Expected red assertion: Package.swift does not yet declare swift-openapi-generator, swift-openapi-runtime, or OpenAPIGenerator."
+          }
+        ]
+      }
+    },
+    {
+      "id": "AC-2",
+      "status": "not_run",
+      "verification": {
+        "kind": "permanent_system_test",
+        "references": [
+          {
+            "locator": "iOS/Tests/ColorMatchingLPSAppTests/APIClientTests.swift:49",
+            "result": "Stubbed manifest and recent-sheets test added; not run because no Swift executable is installed."
+          }
+        ]
+      }
+    },
+    {
+      "id": "AC-3",
+      "status": "not_run",
+      "verification": {
+        "kind": "unit_or_service_test",
+        "references": [
+          {
+            "locator": "iOS/Tests/ColorMatchingLPSAppTests/APIClientTests.swift:11",
+            "result": "Existing stubbed create/measurement/judgment tests retained; not run because no Swift executable is installed."
+          }
+        ]
+      }
+    },
+    {
+      "id": "AC-4",
+      "status": "skipped",
+      "verification": {
+        "kind": "human_or_external_evidence",
+        "references": [
+          {
+            "locator": "docs/issue-5-openapi-client-verification.md:14",
+            "result": "The published OpenAPI document must supply the ranked-results response schema; the prose contract has no response model."
+          }
+        ]
+      }
+    },
+    {
+      "id": "AC-5",
+      "status": "failed",
+      "verification": {
+        "kind": "unit_or_service_test",
+        "references": [
+          {
+            "locator": "docs/issue-5-openapi-client-verification.md:15",
+            "result": "Hand-written API transport and models remain until the implementation phase."
+          }
+        ]
+      }
+    },
+    {
+      "id": "AC-6",
+      "status": "not_run",
+      "verification": {
+        "kind": "unit_or_service_test",
+        "references": [
+          {
+            "locator": "iOS/Package.swift:1",
+            "result": "swift test --disable-sandbox could not start: the Swift toolchain is absent."
+          }
+        ]
+      }
+    }
+  ]
+}
