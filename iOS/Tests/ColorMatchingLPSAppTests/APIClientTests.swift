@@ -71,6 +71,29 @@ final class APIClientTests: XCTestCase {
         XCTAssertEqual((json["pair_scores"] as? [[String: Any]])?.first?["pair_id"] as? String, "pair_1")
     }
 
+    func testUploadMeasurementsMatchesPublishedOpenAPISchema() async throws {
+        var capturedBody: Data?
+        MockURLProtocol.handler = { request in
+            capturedBody = request.httpBodyStream.flatMap(Self.readBody) ?? request.httpBody
+            return (HTTPURLResponse(url: request.url!, statusCode: 200, httpVersion: nil, headerFields: nil)!, Data(#"{"capture_id":"cap_1","measurement_count":1,"pair_score_count":1}"#.utf8))
+        }
+
+        let rgb = RGB(r: 0.2, g: 0.3, b: 0.4)
+        let stats = ChannelStats(median: rgb, mean: rgb, standardDeviation: RGB(r: 0.01, g: 0.01, b: 0.01), min: rgb, max: rgb, sampleCount: 9, clippingFraction: 0)
+        try await client().uploadMeasurements(
+            captureID: "cap_1",
+            baseURL: URL(string: "https://example.test")!,
+            measurements: [PatchMeasurement(patchID: "patch_1", linearRGBMedian: rgb, normalizedLinearRGBMedian: rgb, stats: stats)],
+            scores: [PairScore(pairID: "pair_1", distance: 0.1, similarity: 0.9, algorithmVersion: LPSScorer.algorithmVersion)]
+        )
+
+        let json = try XCTUnwrap(Self.jsonObject(from: capturedBody) as? [String: Any])
+        XCTAssertNil(json["scoring_algorithm_version"], "The published MeasurementUploadRequest has no top-level scoring_algorithm_version.")
+        let measurement = try XCTUnwrap((json["measurements"] as? [[String: Any]])?.first)
+        XCTAssertNil(measurement["stats"], "The published MeasurementUploadRequest does not accept client-side sampling statistics.")
+        XCTAssertNotNil(measurement["normalized_linear_rgb_median"], "The published MeasurementUploadRequest requires normalized_linear_rgb_median.")
+    }
+
     func testUploadJudgmentsEncodesPathAndPayload() async throws {
         var capturedRequest: URLRequest?
         var capturedBody: Data?
