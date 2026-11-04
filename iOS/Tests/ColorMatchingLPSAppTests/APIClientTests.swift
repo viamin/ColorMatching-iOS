@@ -141,11 +141,12 @@ final class APIClientTests: XCTestCase {
             )
         }
 
-        await XCTAssertThrowsErrorAsync(
-            try await client().fetchManifest(
+        do {
+            _ = try await client().fetchManifest(
                 from: URL(string: "https://example.test/api/v1/test_sheets/sheet_1/ranked_results")!
             )
-        )
+            XCTFail("Expected the handwritten manifest decoder not to represent ranked results.")
+        } catch {}
     }
 
     private func client() -> APIClient {
@@ -206,17 +207,6 @@ final class APIClientTests: XCTestCase {
       "results": []
     }
     """#
-}
-
-private func XCTAssertThrowsErrorAsync<T>(
-    _ expression: @autoclosure () async throws -> T,
-    file: StaticString = #filePath,
-    line: UInt = #line
-) async {
-    do {
-        _ = try await expression()
-        XCTFail("Expected the handwritten manifest decoder not to represent ranked results.", file: file, line: line)
-    } catch {}
 }
 
 private final class MockURLProtocol: URLProtocol {
