@@ -2,8 +2,8 @@ import Foundation
 import XCTest
 
 final class GeneratedClientConfigurationTests: XCTestCase {
-    func testPackageBuildsTheClientFromVendoredOpenAPISpecification() throws {
-        let package = try String(contentsOf: packageURL, encoding: .utf8)
+    func testPackageBuildsTheClientFromVendoredOpenAPISpecification() {
+        let package = source(at: packageURL)
 
         XCTAssertTrue(package.contains("swift-openapi-generator"))
         XCTAssertTrue(package.contains("swift-openapi-runtime"))
@@ -11,8 +11,8 @@ final class GeneratedClientConfigurationTests: XCTestCase {
         XCTAssertTrue(FileManager.default.fileExists(atPath: openAPISpecURL.path))
     }
 
-    func testGeneratedClientCoversEveryCompanionSurface() throws {
-        let generatedClient = try String(contentsOf: generatedClientURL, encoding: .utf8)
+    func testGeneratedClientCoversEveryCompanionSurface() {
+        let generatedClient = source(at: generatedClientURL)
 
         [
             "/api/v1/test_sheets/{sheet_id}/manifest",
@@ -44,5 +44,9 @@ final class GeneratedClientConfigurationTests: XCTestCase {
             .deletingLastPathComponent()
             .deletingLastPathComponent()
             .deletingLastPathComponent()
+    }
+
+    private func source(at url: URL) -> String {
+        (try? String(contentsOf: url, encoding: .utf8)) ?? ""
     }
 }
