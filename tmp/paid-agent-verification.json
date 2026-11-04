@@ -1,0 +1,75 @@
+{
+  "status": "not_run",
+  "summary": "Tests and implementation-facing acceptance checks were added for the generated-client migration. The Swift toolchain is unavailable in this container, so swift test --disable-sandbox could not run.",
+  "acceptance_criteria": [
+    {
+      "id": "AC-1",
+      "status": "not_run",
+      "verification": {
+        "kind": "unit_or_service_test",
+        "references": [
+          {
+            "locator": "iOS/Tests/ColorMatchingLPSAppTests/GeneratedClientAdoptionTests.swift:5",
+            "result": "red test added; requires swift-openapi-generator, swift-openapi-runtime, and iOS/OpenAPI/color-matching.json"
+          }
+        ]
+      }
+    },
+    {
+      "id": "AC-2",
+      "status": "not_run",
+      "verification": {
+        "kind": "unit_or_service_test",
+        "references": [
+          {
+            "locator": "iOS/Tests/ColorMatchingLPSAppTests/GeneratedClientAdoptionTests.swift:18",
+            "result": "red test added; requires all six app-used OpenAPI paths in the vendored snapshot"
+          }
+        ]
+      }
+    },
+    {
+      "id": "AC-3",
+      "status": "not_run",
+      "verification": {
+        "kind": "unit_or_service_test",
+        "references": [
+          {
+            "locator": "iOS/Tests/ColorMatchingLPSAppTests/APIClientTests.swift:95",
+            "result": "local URLProtocol manifest stub test added; not executed because swift is unavailable"
+          },
+          {
+            "locator": "iOS/Tests/ColorMatchingLPSAppTests/APIClientTests.swift:111",
+            "result": "local URLProtocol recent-sheets stub test added; not executed because swift is unavailable"
+          }
+        ]
+      }
+    },
+    {
+      "id": "AC-4",
+      "status": "skipped",
+      "verification": {
+        "kind": "human_or_external_evidence",
+        "references": [
+          {
+            "locator": "docs/issue-5-generated-openapi-client-plan.md:17",
+            "result": "ranked-results adapter does not exist yet; test is deferred to the implementation run"
+          }
+        ]
+      }
+    },
+    {
+      "id": "AC-5",
+      "status": "passed",
+      "verification": {
+        "kind": "human_or_external_evidence",
+        "references": [
+          {
+            "locator": "docs/issue-5-generated-openapi-client-plan.md:20",
+            "result": "upstream issue/controller evidence and prose-contract gaps recorded for the implementation PR"
+          }
+        ]
+      }
+    }
+  ]
+}
