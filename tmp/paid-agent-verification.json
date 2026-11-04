@@ -1,0 +1,88 @@
+{
+  "status": "not_run",
+  "summary": "Tests-only red phase: local stub tests and an upstream OpenAPI contract audit were added, but Swift is unavailable in this container and implementation is intentionally deferred.",
+  "acceptance_criteria": [
+    {
+      "id": "AC-1",
+      "status": "not_run",
+      "verification": {
+        "kind": "human_or_external_evidence",
+        "references": [
+          {
+            "locator": "docs/openapi-client-migration-evidence.md:8",
+            "result": "Implementation verification plan recorded; dependency additions and vendored artifact are deferred to the implementation run."
+          }
+        ]
+      }
+    },
+    {
+      "id": "AC-2",
+      "status": "not_run",
+      "verification": {
+        "kind": "unit_or_service_test",
+        "references": [
+          {
+            "locator": "iOS/Tests/ColorMatchingLPSAppTests/APIClientTests.swift:49",
+            "result": "Red tests specify typed upload acknowledgements; generated client is not yet present."
+          },
+          {
+            "locator": "iOS/Tests/ColorMatchingLPSAppTests/APIClientTests.swift:103",
+            "result": "Red test exposes the published manifest schema gap."
+          }
+        ]
+      }
+    },
+    {
+      "id": "AC-3",
+      "status": "not_run",
+      "verification": {
+        "kind": "human_or_external_evidence",
+        "references": [
+          {
+            "locator": "docs/openapi-client-migration-evidence.md:14",
+            "result": "Hand-written-model removal is an implementation-run verification item."
+          }
+        ]
+      }
+    },
+    {
+      "id": "AC-4",
+      "status": "not_run",
+      "verification": {
+        "kind": "unit_or_service_test",
+        "references": [
+          {
+            "locator": "iOS/Tests/ColorMatchingLPSAppTests/APIClientTests.swift:122",
+            "result": "MockURLProtocol supplies local stubbed responses; execution was not possible because swift is absent."
+          }
+        ]
+      }
+    },
+    {
+      "id": "AC-5",
+      "status": "passed",
+      "verification": {
+        "kind": "human_or_external_evidence",
+        "references": [
+          {
+            "locator": "docs/openapi-client-migration-evidence.md:21",
+            "result": "Contract deltas and endpoint gaps audited against viamin/color_matching commit 094bd6d3443ddacbda7e63354299867eb5bdfa9f."
+          }
+        ]
+      }
+    },
+    {
+      "id": "AC-6",
+      "status": "not_run",
+      "verification": {
+        "kind": "unit_or_service_test",
+        "references": [
+          {
+            "locator": "iOS/Package.swift:1",
+            "result": "swift test --disable-sandbox could not start: swift executable is unavailable in the container."
+          }
+        ]
+      }
+    }
+  ]
+}
