@@ -1,0 +1,73 @@
+{
+  "status": "not_run",
+  "summary": "Added permanent local-stub coverage and implementation evidence, but swift is unavailable in this container so swift test --disable-sandbox could not run.",
+  "acceptance_criteria": [
+    {
+      "id": "AC-1",
+      "status": "not_run",
+      "verification": {
+        "kind": "human_or_external_evidence",
+        "references": [
+          {
+            "locator": "docs/openapi-client-migration-test-plan.md:5",
+            "result": "The implementation PR must inspect the package dependency and generated-document diff."
+          }
+        ]
+      }
+    },
+    {
+      "id": "AC-2",
+      "status": "not_run",
+      "verification": {
+        "kind": "unit_or_service_test",
+        "references": [
+          {
+            "locator": "iOS/Tests/ColorMatchingLPSAppTests/APIClientTests.swift:44",
+            "result": "Manifest and recent-sheet local-stub tests added; ranked-results coverage is blocked until its generated operation exists."
+          }
+        ],
+        "reason": "swift is not installed in this container."
+      }
+    },
+    {
+      "id": "AC-3",
+      "status": "not_run",
+      "verification": {
+        "kind": "human_or_external_evidence",
+        "references": [
+          {
+            "locator": "docs/openapi-client-migration-test-plan.md:9",
+            "result": "Implementation PR must inspect removal of hand-written transport models and compile the app."
+          }
+        ]
+      }
+    },
+    {
+      "id": "AC-4",
+      "status": "not_run",
+      "verification": {
+        "kind": "unit_or_service_test",
+        "references": [
+          {
+            "locator": "iOS/Tests/ColorMatchingLPSAppTests/APIClientTests.swift:6",
+            "result": "MockURLProtocol supplies local stubbed responses without a live server."
+          }
+        ],
+        "reason": "swift is not installed in this container."
+      }
+    },
+    {
+      "id": "AC-5",
+      "status": "passed",
+      "verification": {
+        "kind": "human_or_external_evidence",
+        "references": [
+          {
+            "locator": "docs/openapi-client-migration-test-plan.md:17",
+            "result": "Published-spec deltas and the ranked-results schema gap are recorded for the implementation PR description."
+          }
+        ]
+      }
+    }
+  ]
+}
