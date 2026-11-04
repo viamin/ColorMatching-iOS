@@ -1,0 +1,71 @@
+{
+  "status": "not_run",
+  "summary": "Red-phase Swift API-client tests and acceptance plan added. Swift is unavailable in this container, and ranked-results coverage intentionally fails until the generated client is implemented.",
+  "acceptance_criteria": [
+    {
+      "id": "AC-1",
+      "status": "not_run",
+      "verification": {
+        "kind": "human_or_external_evidence",
+        "references": [
+          {
+            "locator": "docs/issue-5-openapi-client-test-plan.md",
+            "result": "Implementation must inspect package dependencies and vendored/pinned OpenAPI document."
+          }
+        ]
+      }
+    },
+    {
+      "id": "AC-2",
+      "status": "not_run",
+      "verification": {
+        "kind": "unit_or_service_test",
+        "references": [
+          {
+            "locator": "iOS/Tests/ColorMatchingLPSAppTests/APIClientTests.swift",
+            "result": "Local URLProtocol tests cover manifest, recent sheets, capture creation, measurement upload, and judgment upload; not executed because Swift is unavailable."
+          }
+        ]
+      }
+    },
+    {
+      "id": "AC-3",
+      "status": "failed",
+      "verification": {
+        "kind": "unit_or_service_test",
+        "references": [
+          {
+            "locator": "iOS/Tests/ColorMatchingLPSAppTests/APIClientTests.swift:testFetchRankedResultsIsImplementedByTheGeneratedClient",
+            "result": "Intentional red test: no ranked-results API operation exists in the current client."
+          }
+        ]
+      }
+    },
+    {
+      "id": "AC-4",
+      "status": "not_run",
+      "verification": {
+        "kind": "human_or_external_evidence",
+        "references": [
+          {
+            "locator": "docs/issue-5-openapi-client-test-plan.md",
+            "result": "Requires implementation-diff review and compilation."
+          }
+        ]
+      }
+    },
+    {
+      "id": "AC-5",
+      "status": "not_run",
+      "verification": {
+        "kind": "human_or_external_evidence",
+        "references": [
+          {
+            "locator": "docs/issue-5-openapi-client-test-plan.md",
+            "result": "Requires PR-description review against the fetched upstream specification."
+          }
+        ]
+      }
+    }
+  ]
+}
