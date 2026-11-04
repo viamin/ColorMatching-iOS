@@ -1,0 +1,84 @@
+{
+  "status": "not_run",
+  "summary": "Red-phase OpenAPI adoption tests and verification plan were added. The Swift toolchain is unavailable in this container, and the upstream public repository tree exposes no vendorable OpenAPI document.",
+  "acceptance_criteria": [
+    {
+      "id": "AC-1",
+      "status": "not_run",
+      "verification": {
+        "kind": "unit_or_service_test",
+        "references": [
+          {
+            "locator": "iOS/Tests/ColorMatchingLPSAppTests/APIClientTests.swift:187",
+            "result": "Not run: swift executable is unavailable; test is intentionally red until package dependencies and vendored specification are added."
+          }
+        ]
+      }
+    },
+    {
+      "id": "AC-2",
+      "status": "not_run",
+      "verification": {
+        "kind": "unit_or_service_test",
+        "references": [
+          {
+            "locator": "iOS/Tests/ColorMatchingLPSAppTests/APIClientTests.swift:201",
+            "result": "Not run: test requires all six generated-client operations in the vendored specification."
+          }
+        ]
+      }
+    },
+    {
+      "id": "AC-3",
+      "status": "skipped",
+      "verification": {
+        "kind": "human_or_external_evidence",
+        "references": [
+          {
+            "locator": "docs/openapi-client-adoption-verification.md:13",
+            "result": "Requires implementation review because the generated types do not exist in this red phase."
+          }
+        ]
+      }
+    },
+    {
+      "id": "AC-4",
+      "status": "not_run",
+      "verification": {
+        "kind": "unit_or_service_test",
+        "references": [
+          {
+            "locator": "iOS/Tests/ColorMatchingLPSAppTests/APIClientTests.swift:49",
+            "result": "Local URLProtocol stubs cover manifest and recent-sheet responses; migration to generated operations remains pending."
+          }
+        ]
+      }
+    },
+    {
+      "id": "AC-5",
+      "status": "not_run",
+      "verification": {
+        "kind": "unit_or_service_test",
+        "references": [
+          {
+            "locator": "docs/openapi-client-adoption-verification.md:15",
+            "result": "swift test --disable-sandbox could not start because swift is not installed."
+          }
+        ]
+      }
+    },
+    {
+      "id": "AC-6",
+      "status": "skipped",
+      "verification": {
+        "kind": "human_or_external_evidence",
+        "references": [
+          {
+            "locator": "docs/openapi-client-adoption-verification.md:19",
+            "result": "The upstream issue is closed, but no public spec was inspectable in this environment; the actual contract delta remains to be recorded in the implementation PR."
+          }
+        ]
+      }
+    }
+  ]
+}
