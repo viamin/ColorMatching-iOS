@@ -1,0 +1,75 @@
+{
+  "status": "not_run",
+  "summary": "Test-writing run added permanent local-stub coverage and migration evidence. Swift is unavailable in the container, and generated-client implementation is intentionally deferred to the approved implementation run.",
+  "acceptance_criteria": [
+    {
+      "id": "AC-1",
+      "status": "not_run",
+      "verification": {
+        "kind": "human_or_external_evidence",
+        "references": [
+          {
+            "locator": "docs/openapi-client-migration-evidence.md:10",
+            "result": "Package dependency and vendored OpenAPI input are deferred to implementation."
+          }
+        ]
+      }
+    },
+    {
+      "id": "AC-2",
+      "status": "not_run",
+      "verification": {
+        "kind": "unit_or_service_test",
+        "references": [
+          {
+            "locator": "iOS/Tests/ColorMatchingLPSAppTests/APIClientTests.swift:49",
+            "result": "Manifest and recent-sheet local stubs are committed; generated routing and ranked-results operation remain implementation work."
+          },
+          {
+            "locator": "docs/openapi-client-migration-evidence.md:24",
+            "result": "Documents ranked-results endpoint gap."
+          }
+        ]
+      }
+    },
+    {
+      "id": "AC-3",
+      "status": "not_run",
+      "verification": {
+        "kind": "human_or_external_evidence",
+        "references": [
+          {
+            "locator": "docs/openapi-client-migration-evidence.md:12",
+            "result": "Handwritten model replacement is deferred to implementation."
+          }
+        ]
+      }
+    },
+    {
+      "id": "AC-4",
+      "status": "not_run",
+      "verification": {
+        "kind": "unit_or_service_test",
+        "references": [
+          {
+            "locator": "iOS/Tests/ColorMatchingLPSAppTests/APIClientTests.swift:13",
+            "result": "All API tests use MockURLProtocol; execution was not possible because neither swift nor xcodebuild is installed."
+          }
+        ]
+      }
+    },
+    {
+      "id": "AC-5",
+      "status": "not_run",
+      "verification": {
+        "kind": "human_or_external_evidence",
+        "references": [
+          {
+            "locator": "docs/openapi-client-migration-evidence.md:30",
+            "result": "PR description draft records published-spec deltas and endpoint gap; final PR-body inspection remains required."
+          }
+        ]
+      }
+    }
+  ]
+}
