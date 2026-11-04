@@ -1,0 +1,75 @@
+{
+  "status": "not_run",
+  "summary": "Tests-only red phase: local-stub coverage and a vendored-spec contract test were added, but Swift is unavailable in this container and the upstream OpenAPI artifact is not vendored yet.",
+  "acceptance_criteria": [
+    {
+      "id": "AC-1",
+      "status": "not_run",
+      "verification": {
+        "kind": "unit_or_service_test",
+        "references": [
+          {
+            "locator": "iOS/Tests/ColorMatchingLPSAppTests/APIClientTests.swift:testVendoredOpenAPISpecDeclaresEveryCompanionOperation",
+            "result": "not_run: Swift executable is unavailable; test is intentionally red until iOS/OpenAPI/color-matching-api.json is vendored"
+          }
+        ]
+      }
+    },
+    {
+      "id": "AC-2",
+      "status": "not_run",
+      "verification": {
+        "kind": "unit_or_service_test",
+        "references": [
+          {
+            "locator": "iOS/Tests/ColorMatchingLPSAppTests/APIClientTests.swift:testFetchesManifestFromLocalStub",
+            "result": "not_run: Swift executable is unavailable"
+          },
+          {
+            "locator": "iOS/Tests/ColorMatchingLPSAppTests/APIClientTests.swift:testFetchesRecentSheetsFromLocalStub",
+            "result": "not_run: Swift executable is unavailable"
+          }
+        ]
+      }
+    },
+    {
+      "id": "AC-3",
+      "status": "not_run",
+      "verification": {
+        "kind": "unit_or_service_test",
+        "references": [
+          {
+            "locator": "iOS/Tests/MeasurementCoreTests/MeasurementCoreTests.swift",
+            "result": "not_run: Swift executable is unavailable"
+          }
+        ]
+      }
+    },
+    {
+      "id": "AC-4",
+      "status": "not_run",
+      "verification": {
+        "kind": "unit_or_service_test",
+        "references": [
+          {
+            "locator": "iOS/Tests/ColorMatchingLPSAppTests/APIClientTests.swift:MockURLProtocol",
+            "result": "not_run: local URLProtocol stubs are the test transport; Swift executable is unavailable"
+          }
+        ]
+      }
+    },
+    {
+      "id": "AC-5",
+      "status": "skipped",
+      "verification": {
+        "kind": "human_or_external_evidence",
+        "references": [
+          {
+            "locator": "docs/openapi-client-migration.md",
+            "result": "upstream issue #110 is closed but no vendorable OpenAPI artifact or deployed base URL was discoverable from its public repository branch"
+          }
+        ]
+      }
+    }
+  ]
+}
