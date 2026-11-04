@@ -1,0 +1,79 @@
+{
+  "status": "not_run",
+  "summary": "Red-phase XCTest coverage was added for the existing local-stub API seams. Swift is unavailable in this container, and the ranked-results generated operation has not been implemented.",
+  "acceptance_criteria": [
+    {
+      "id": "AC-1",
+      "status": "not_run",
+      "verification": {
+        "kind": "human_or_external_evidence",
+        "references": [
+          {
+            "locator": "https://github.com/viamin/color_matching/issues/110",
+            "result": "The issue is closed, but its default branch did not expose an OpenAPI artifact when inspected on 2026-11-04."
+          }
+        ]
+      }
+    },
+    {
+      "id": "AC-2",
+      "status": "not_run",
+      "verification": {
+        "kind": "unit_or_service_test",
+        "references": [
+          {
+            "locator": "iOS/Tests/ColorMatchingLPSAppTests/APIClientTests.swift:49",
+            "result": "Local-stub manifest test added; execution blocked because Swift is unavailable."
+          },
+          {
+            "locator": "iOS/Tests/ColorMatchingLPSAppTests/APIClientTests.swift:70",
+            "result": "Local-stub recent-sheets test added; execution blocked because Swift is unavailable."
+          },
+          {
+            "locator": "iOS/Tests/ColorMatchingLPSAppTests/APIClientTests.swift:136",
+            "result": "Ranked-results test is intentionally red until a generated typed operation exists."
+          }
+        ]
+      }
+    },
+    {
+      "id": "AC-3",
+      "status": "not_run",
+      "verification": {
+        "kind": "human_or_external_evidence",
+        "references": [
+          {
+            "locator": "docs/issue-5-openapi-client-verification.md",
+            "result": "Requires implementation-phase compile and source review."
+          }
+        ]
+      }
+    },
+    {
+      "id": "AC-4",
+      "status": "not_run",
+      "verification": {
+        "kind": "unit_or_service_test",
+        "references": [
+          {
+            "locator": "iOS/Tests/ColorMatchingLPSAppTests/APIClientTests.swift:122",
+            "result": "Capture, measurement, and judgment tests use MockURLProtocol; execution blocked because Swift is unavailable."
+          }
+        ]
+      }
+    },
+    {
+      "id": "AC-5",
+      "status": "skipped",
+      "verification": {
+        "kind": "human_or_external_evidence",
+        "references": [
+          {
+            "locator": "docs/issue-5-openapi-client-verification.md",
+            "result": "Contract-delta record is blocked on the unpublished OpenAPI document."
+          }
+        ]
+      }
+    }
+  ]
+}
