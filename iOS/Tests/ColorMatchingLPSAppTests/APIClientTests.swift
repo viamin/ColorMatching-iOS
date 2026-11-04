@@ -46,6 +46,54 @@ final class APIClientTests: XCTestCase {
         XCTAssertEqual(quality["rejections"] as? [String], [])
     }
 
+    func testFetchManifestDecodesPublishedManifestResponse() async throws {
+        MockURLProtocol.handler = { request in
+            XCTAssertEqual(request.httpMethod, "GET")
+            XCTAssertEqual(request.value(forHTTPHeaderField: "Authorization"), "Bearer token")
+            return (
+                HTTPURLResponse(url: request.url!, statusCode: 200, httpVersion: nil, headerFields: nil)!,
+                Data(
+                    #"""
+                    {
+                      "schema_version":"lps-sheet-manifest/v1",
+                      "sheet_version":"lps-letter-grid-v1",
+                      "sheet_id":"sheet_1",
+                      "manifest_url":"https://example.test/api/v1/test_sheets/sheet_1/manifest",
+                      "page":{"units":"mm","width":215.9,"height":279.4},
+                      "registration_markers":[],
+                      "capture_profile":{"scoring_algorithm_version":"lps-distance-v1"},
+                      "patches":[],
+                      "pairs":[]
+                    }
+                    """#.utf8
+                )
+            )
+        }
+
+        let manifest = try await client().fetchManifest(
+            baseURL: URL(string: "https://example.test")!,
+            sheetCode: "sheet_1"
+        )
+
+        XCTAssertEqual(manifest.schemaVersion, "lps-sheet-manifest/v1")
+        XCTAssertEqual(manifest.sheetID, "sheet_1")
+    }
+
+    func testFetchRecentSheetsDecodesNullableTitleFromPublishedResponse() async throws {
+        MockURLProtocol.handler = { request in
+            XCTAssertEqual(request.url?.path, "/api/v1/test_sheets/recent")
+            return (
+                HTTPURLResponse(url: request.url!, statusCode: 200, httpVersion: nil, headerFields: nil)!,
+                Data(#"{"sheets":[{"sheet_id":"sheet_1","manifest_url":"https://example.test/api/v1/test_sheets/sheet_1/manifest","title":null}]}"#.utf8)
+            )
+        }
+
+        let sheets = try await client().fetchRecentSheets(baseURL: URL(string: "https://example.test")!)
+
+        XCTAssertEqual(sheets.map(\.sheetID), ["sheet_1"])
+        XCTAssertNil(sheets.first?.title)
+    }
+
     func testUploadMeasurementsEncodesScoresWithAlgorithmVersion() async throws {
         var capturedBody: Data?
         MockURLProtocol.handler = { request in
@@ -69,6 +117,31 @@ final class APIClientTests: XCTestCase {
         let statsPayload = try XCTUnwrap(measurement["stats"] as? [String: Any])
         XCTAssertEqual(Set(statsPayload.keys), ["sample_count", "clipping_fraction", "mean", "standard_deviation"])
         XCTAssertEqual((json["pair_scores"] as? [[String: Any]])?.first?["pair_id"] as? String, "pair_1")
+    }
+
+    func testUploadMeasurementsRejectsMalformedPublishedAcknowledgement() async throws {
+        MockURLProtocol.handler = { request in
+            XCTAssertEqual(request.url?.path, "/api/v1/captures/cap_1/measurements")
+            return (
+                HTTPURLResponse(url: request.url!, statusCode: 200, httpVersion: nil, headerFields: nil)!,
+                Data(#"{"capture_id":"cap_1"}"#.utf8)
+            )
+        }
+
+        let rgb = RGB(r: 0.2, g: 0.3, b: 0.4)
+        let stats = ChannelStats(median: rgb, mean: rgb, standardDeviation: rgb, min: rgb, max: rgb, sampleCount: 9, clippingFraction: 0)
+
+        do {
+            try await client().uploadMeasurements(
+                captureID: "cap_1",
+                baseURL: URL(string: "https://example.test")!,
+                measurements: [PatchMeasurement(patchID: "patch_1", linearRGBMedian: rgb, normalizedLinearRGBMedian: rgb, stats: stats)],
+                scores: [PairScore(pairID: "pair_1", distance: 0.1, similarity: 0.9, algorithmVersion: LPSScorer.algorithmVersion)]
+            )
+            XCTFail("A generated response type must reject an acknowledgement missing measurement_count and pair_score_count.")
+        } catch {
+            // Expected once the generated MeasurementUploadResponse is decoded.
+        }
     }
 
     func testUploadJudgmentsEncodesPathAndPayload() async throws {
