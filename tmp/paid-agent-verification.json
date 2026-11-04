@@ -1,0 +1,71 @@
+{
+  "status": "not_run",
+  "summary": "Tests-only red phase: package wiring and vendored-spec assertions deliberately fail until implementation. Swift is unavailable in this container, so swift test could not run.",
+  "acceptance_criteria": [
+    {
+      "id": "AC-1",
+      "status": "not_run",
+      "verification": {
+        "kind": "unit_or_service_test",
+        "references": [
+          {
+            "locator": "iOS/Tests/ColorMatchingLPSAppTests/APIClientTests.swift:testPackageWiresGeneratedOpenAPIClientAndVendoredSpecification",
+            "result": "not run: swift executable unavailable; expected red until generator/runtime and vendored specification are added"
+          }
+        ]
+      }
+    },
+    {
+      "id": "AC-2",
+      "status": "not_run",
+      "verification": {
+        "kind": "unit_or_service_test",
+        "references": [
+          {
+            "locator": "iOS/Tests/ColorMatchingLPSAppTests/APIClientTests.swift:testPackageWiresGeneratedOpenAPIClientAndVendoredSpecification",
+            "result": "spec-route assertions cover manifest, recent sheets, capture, measurement, judgment, and ranked results once the spec is vendored"
+          }
+        ]
+      }
+    },
+    {
+      "id": "AC-3",
+      "status": "not_run",
+      "verification": {
+        "kind": "human_or_external_evidence",
+        "references": [
+          {
+            "locator": "docs/issue-5-verification-plan.md",
+            "result": "requires implementation diff review and successful compile"
+          }
+        ]
+      }
+    },
+    {
+      "id": "AC-4",
+      "status": "not_run",
+      "verification": {
+        "kind": "unit_or_service_test",
+        "references": [
+          {
+            "locator": "iOS/Tests/ColorMatchingLPSAppTests/APIClientTests.swift:testFetchesManifestAndRecentSheetsFromStubbedPublishedResponses",
+            "result": "not run: local URLProtocol stub test added; no live server required"
+          }
+        ]
+      }
+    },
+    {
+      "id": "AC-5",
+      "status": "not_run",
+      "verification": {
+        "kind": "human_or_external_evidence",
+        "references": [
+          {
+            "locator": "docs/issue-5-verification-plan.md",
+            "result": "requires PR-description comparison with the pinned published OpenAPI document"
+          }
+        ]
+      }
+    }
+  ]
+}
