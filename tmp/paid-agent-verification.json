@@ -1,0 +1,58 @@
+{
+  "status": "not_run",
+  "summary": "Red-phase tests and PR evidence were added. Swift is unavailable in this container, so package resolution and XCTest execution could not run. The OpenAPI fixture test is intentionally red until the implementation run vendors the provider document.",
+  "acceptance_criteria": [
+    {
+      "id": "AC-1",
+      "status": "not_run",
+      "verification": {
+        "kind": "unit_or_service_test",
+        "references": [
+          {
+            "locator": "iOS/Tests/ColorMatchingLPSAppTests/APIClientTests.swift:174",
+            "result": "not_run: intentionally requires iOS/Sources/ColorMatchingAPI/openapi.json, which does not exist in the red phase"
+          }
+        ]
+      }
+    },
+    {
+      "id": "AC-2",
+      "status": "not_run",
+      "verification": {
+        "kind": "unit_or_service_test",
+        "references": [
+          {
+            "locator": "iOS/Tests/ColorMatchingLPSAppTests/APIClientTests.swift:174",
+            "result": "not_run: checks all six required OpenAPI operations including ranked results"
+          }
+        ]
+      }
+    },
+    {
+      "id": "AC-3",
+      "status": "not_run",
+      "verification": {
+        "kind": "unit_or_service_test",
+        "references": [
+          {
+            "locator": "iOS/Tests/ColorMatchingLPSAppTests/APIClientTests.swift:12",
+            "result": "not_run: local MockURLProtocol stubs cover manifest, recent sheets, capture creation, measurement upload, and judgment upload"
+          }
+        ]
+      }
+    },
+    {
+      "id": "AC-4",
+      "status": "not_run",
+      "verification": {
+        "kind": "human_or_external_evidence",
+        "references": [
+          {
+            "locator": "docs/issue-5-openapi-client-test-plan.md:29",
+            "result": "not_run: provider source was inspected, but the live provider host could not resolve from this container"
+          }
+        ]
+      }
+    }
+  ]
+}
