@@ -1,0 +1,75 @@
+{
+  "status": "not_run",
+  "summary": "Test-writing phase added permanent local-stub coverage and contract-delta evidence; Swift is unavailable in this container, so the XCTest suite could not run.",
+  "acceptance_criteria": [
+    {
+      "id": "AC-1",
+      "status": "not_run",
+      "verification": {
+        "kind": "human_or_external_evidence",
+        "references": [
+          {
+            "locator": "docs/issue-5-openapi-client-test-plan.md:7",
+            "result": "Implementation-phase source review is required for package dependencies, generation configuration, and vendored/fetched spec."
+          }
+        ]
+      }
+    },
+    {
+      "id": "AC-2",
+      "status": "not_run",
+      "verification": {
+        "kind": "unit_or_service_test",
+        "references": [
+          {
+            "locator": "iOS/Tests/ColorMatchingLPSAppTests/APIClientTests.swift:49",
+            "result": "Local-stub manifest and recent-sheet test added; not executed because swift is unavailable."
+          },
+          {
+            "locator": "iOS/Tests/ColorMatchingLPSAppTests/APIClientTests.swift:132",
+            "result": "Local-stub ranked-results test added and intentionally red until the adapter is implemented."
+          }
+        ]
+      }
+    },
+    {
+      "id": "AC-3",
+      "status": "not_run",
+      "verification": {
+        "kind": "human_or_external_evidence",
+        "references": [
+          {
+            "locator": "docs/issue-5-openapi-client-test-plan.md:13",
+            "result": "Implementation-phase source review is required to distinguish generated API models from client-only measurement models."
+          }
+        ]
+      }
+    },
+    {
+      "id": "AC-4",
+      "status": "not_run",
+      "verification": {
+        "kind": "unit_or_service_test",
+        "references": [
+          {
+            "locator": "iOS/Tests/ColorMatchingLPSAppTests/APIClientTests.swift:6",
+            "result": "All API responses are supplied by MockURLProtocol, but swift test --disable-sandbox could not start because swift is not installed."
+          }
+        ]
+      }
+    },
+    {
+      "id": "AC-5",
+      "status": "passed",
+      "verification": {
+        "kind": "human_or_external_evidence",
+        "references": [
+          {
+            "locator": "docs/issue-5-openapi-client-test-plan.md:25",
+            "result": "Pinned comparison records the published-spec deltas and endpoint gaps."
+          }
+        ]
+      }
+    }
+  ]
+}
