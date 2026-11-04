@@ -1,0 +1,71 @@
+{
+  "status": "not_run",
+  "summary": "Test-plan coverage was added for the OpenAPI migration, but Swift is not installed in this container and implementation is deferred to the following run.",
+  "acceptance_criteria": [
+    {
+      "id": "AC-1",
+      "status": "not_run",
+      "verification": {
+        "kind": "human_or_external_evidence",
+        "references": [
+          {
+            "locator": "docs/openapi-client-test-plan.md",
+            "result": "Implementation must add Swift OpenAPI dependencies and vendor or fetch the published document."
+          }
+        ]
+      }
+    },
+    {
+      "id": "AC-2",
+      "status": "not_run",
+      "verification": {
+        "kind": "unit_or_service_test",
+        "references": [
+          {
+            "locator": "iOS/Tests/ColorMatchingLPSAppTests/APIClientTests.swift",
+            "result": "Local-stub coverage exists for five existing flows; ranked-results coverage awaits the generated facade."
+          }
+        ]
+      }
+    },
+    {
+      "id": "AC-3",
+      "status": "not_run",
+      "verification": {
+        "kind": "human_or_external_evidence",
+        "references": [
+          {
+            "locator": "docs/openapi-client-test-plan.md",
+            "result": "Requires source inspection after generated types replace handwritten transport models."
+          }
+        ]
+      }
+    },
+    {
+      "id": "AC-4",
+      "status": "not_run",
+      "verification": {
+        "kind": "unit_or_service_test",
+        "references": [
+          {
+            "locator": "iOS/Tests/ColorMatchingLPSAppTests/APIClientTests.swift",
+            "result": "Tests use MockURLProtocol and require no live server; they could not execute because swift is unavailable."
+          }
+        ]
+      }
+    },
+    {
+      "id": "AC-5",
+      "status": "not_run",
+      "verification": {
+        "kind": "human_or_external_evidence",
+        "references": [
+          {
+            "locator": "docs/openapi-client-test-plan.md",
+            "result": "Contract deltas are recorded for transfer to the implementation PR description."
+          }
+        ]
+      }
+    }
+  ]
+}
