@@ -1,0 +1,45 @@
+{
+  "status": "not_run",
+  "summary": "Red-phase OpenAPI contract tests and local stub tests were added. Swift is not installed in this environment, so the required test command could not run.",
+  "acceptance_criteria": [
+    {
+      "id": "AC-1",
+      "status": "not_run",
+      "verification": {
+        "kind": "unit_or_service_test",
+        "references": [
+          {
+            "locator": "iOS/Tests/ColorMatchingLPSAppTests/OpenAPIContractTests.swift:5",
+            "result": "not_run: Swift toolchain unavailable; test is intentionally red until the published document is vendored"
+          }
+        ]
+      }
+    },
+    {
+      "id": "AC-2",
+      "status": "not_run",
+      "verification": {
+        "kind": "unit_or_service_test",
+        "references": [
+          {
+            "locator": "iOS/Tests/ColorMatchingLPSAppTests/APIClientTests.swift:49",
+            "result": "not_run: local-stub tests added; Swift toolchain unavailable"
+          }
+        ]
+      }
+    },
+    {
+      "id": "AC-3",
+      "status": "not_run",
+      "verification": {
+        "kind": "human_or_external_evidence",
+        "references": [
+          {
+            "locator": "docs/openapi-client-test-plan.md:23",
+            "result": "upstream #110 router and schema source inspected; implementation must resolve recorded schema gaps"
+          }
+        ]
+      }
+    }
+  ]
+}
