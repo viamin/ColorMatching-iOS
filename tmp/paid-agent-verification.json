@@ -1,0 +1,75 @@
+{
+  "status": "not_run",
+  "summary": "Red-phase tests and PR-description evidence were added, but the container has no Swift toolchain, so dependency resolution and swift test could not run.",
+  "acceptance_criteria": [
+    {
+      "id": "AC-1",
+      "status": "not_run",
+      "verification": {
+        "kind": "human_or_external_evidence",
+        "references": [
+          {
+            "locator": "docs/issue-5-openapi-client-verification.md:5",
+            "result": "The implementation must pin the upstream OpenAPI document; no generated dependency can be resolved without Swift in this container."
+          }
+        ]
+      }
+    },
+    {
+      "id": "AC-2",
+      "status": "not_run",
+      "verification": {
+        "kind": "unit_or_service_test",
+        "references": [
+          {
+            "locator": "iOS/Tests/ColorMatchingLPSAppTests/APIClientTests.swift:49",
+            "result": "Red-phase upload response assertions added; current APIClient returns Void."
+          },
+          {
+            "locator": "iOS/Tests/ColorMatchingLPSAppTests/APIClientTests.swift:145",
+            "result": "Red-phase ranked-results stub test added; current APIClient has no fetchRankedResults operation."
+          }
+        ]
+      }
+    },
+    {
+      "id": "AC-3",
+      "status": "not_run",
+      "verification": {
+        "kind": "human_or_external_evidence",
+        "references": [
+          {
+            "locator": "docs/issue-5-openapi-client-verification.md:11",
+            "result": "Requires implementation diff review and compilation with generated types."
+          }
+        ]
+      }
+    },
+    {
+      "id": "AC-4",
+      "status": "not_run",
+      "verification": {
+        "kind": "unit_or_service_test",
+        "references": [
+          {
+            "locator": "iOS/Tests/ColorMatchingLPSAppTests/APIClientTests.swift:106",
+            "result": "Local URLProtocol stub test covers recent sheets without a live server."
+          }
+        ]
+      }
+    },
+    {
+      "id": "AC-5",
+      "status": "passed",
+      "verification": {
+        "kind": "human_or_external_evidence",
+        "references": [
+          {
+            "locator": "docs/issue-5-openapi-client-verification.md:28",
+            "result": "PR-description-ready contract-delta and endpoint-gap record added."
+          }
+        ]
+      }
+    }
+  ]
+}
