@@ -9,7 +9,7 @@ final class APIClientTests: XCTestCase {
         super.tearDown()
     }
 
-    func testCreateCaptureEncodesMetadataAndQuality() async throws {
+    func testCreateCaptureEncodesPublishedFlatCapturePayload() async throws {
         var capturedRequest: URLRequest?
         var capturedBody: Data?
         MockURLProtocol.handler = { request in
@@ -40,17 +40,19 @@ final class APIClientTests: XCTestCase {
         XCTAssertEqual(capturedRequest?.url?.path, "/api/v1/test_sheets/sheet_1/captures")
         XCTAssertEqual(capturedRequest?.value(forHTTPHeaderField: "Authorization"), "Bearer token")
         let json = try XCTUnwrap(Self.jsonObject(from: capturedBody) as? [String: Any])
-        XCTAssertNotNil(json["metadata"])
-        let quality = try XCTUnwrap(json["quality"] as? [String: Any])
-        XCTAssertEqual(quality["detected_marker_count"] as? Int, 4)
-        XCTAssertEqual(quality["rejections"] as? [String], [])
+        XCTAssertEqual(json["device_model"] as? String, "iPhone")
+        XCTAssertEqual(json["lens"] as? String, "wide")
+        XCTAssertEqual(json["detected_marker_count"] as? Int, 4)
+        XCTAssertEqual(json["rejection_reasons"] as? [String], [])
+        XCTAssertNil(json["metadata"])
+        XCTAssertNil(json["quality"])
     }
 
-    func testUploadMeasurementsEncodesScoresWithAlgorithmVersion() async throws {
+    func testUploadMeasurementsEncodesPublishedFlatMeasurementPayload() async throws {
         var capturedBody: Data?
         MockURLProtocol.handler = { request in
             capturedBody = request.httpBodyStream.flatMap(Self.readBody) ?? request.httpBody
-            return (HTTPURLResponse(url: request.url!, statusCode: 204, httpVersion: nil, headerFields: nil)!, Data())
+            return (HTTPURLResponse(url: request.url!, statusCode: 200, httpVersion: nil, headerFields: nil)!, Data(#"{"capture_id":"cap_1","measurement_count":1,"pair_score_count":1}"#.utf8))
         }
 
         let rgb = RGB(r: 0.2, g: 0.3, b: 0.4)
@@ -63,12 +65,16 @@ final class APIClientTests: XCTestCase {
         )
 
         let json = try XCTUnwrap(Self.jsonObject(from: capturedBody) as? [String: Any])
-        XCTAssertEqual(json["scoring_algorithm_version"] as? String, "lps-distance-v1")
         let measurement = try XCTUnwrap((json["measurements"] as? [[String: Any]])?.first)
         XCTAssertEqual(measurement["patch_id"] as? String, "patch_1")
-        let statsPayload = try XCTUnwrap(measurement["stats"] as? [String: Any])
-        XCTAssertEqual(Set(statsPayload.keys), ["sample_count", "clipping_fraction", "mean", "standard_deviation"])
-        XCTAssertEqual((json["pair_scores"] as? [[String: Any]])?.first?["pair_id"] as? String, "pair_1")
+        XCTAssertEqual(measurement["sample_count"] as? Int, 9)
+        XCTAssertEqual(measurement["clipping_fraction"] as? Double, 0)
+        XCTAssertNil(measurement["stats"])
+        let pairScore = try XCTUnwrap((json["pair_scores"] as? [[String: Any]])?.first)
+        XCTAssertEqual(pairScore["pair_id"] as? String, "pair_1")
+        XCTAssertEqual(pairScore["algorithm_version"] as? String, "lps-distance-v1")
+        XCTAssertEqual(pairScore["score"] as? Double, 0.9)
+        XCTAssertNil(json["scoring_algorithm_version"])
     }
 
     func testUploadJudgmentsEncodesPathAndPayload() async throws {
