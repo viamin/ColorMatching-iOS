@@ -46,6 +46,48 @@ final class APIClientTests: XCTestCase {
         XCTAssertEqual(quality["rejections"] as? [String], [])
     }
 
+    func testFetchManifestDecodesPublishedManifestFields() async throws {
+        var capturedRequest: URLRequest?
+        MockURLProtocol.handler = { request in
+            capturedRequest = request
+            return (
+                HTTPURLResponse(url: request.url!, statusCode: 200, httpVersion: nil, headerFields: nil)!,
+                Data(
+                    #"""
+                    {"schema_version":"lps-sheet-manifest/v1","sheet_version":"lps-letter-grid-v1","sheet_id":"sheet_1","manifest_url":"https://example.test/api/v1/test_sheets/sheet_1/manifest","created_at":"2026-10-30T12:00:00Z","page":{"units":"mm","width":215.9,"height":279.4},"registration_markers":[],"printer_profile":{"printer_make_model":"Research printer"},"capture_profile":{"expected_illuminant":"low_pressure_sodium","preferred_camera":"built_in_wide_angle_rear","scoring_algorithm_version":"lps-distance-v1"},"patches":[],"pairs":[]}
+                    """#.utf8
+                )
+            )
+        }
+
+        let manifest = try await client().fetchManifest(
+            baseURL: URL(string: "https://example.test")!,
+            sheetCode: "sheet_1"
+        )
+
+        XCTAssertEqual(capturedRequest?.url?.path, "/api/v1/test_sheets/sheet_1/manifest")
+        XCTAssertEqual(capturedRequest?.value(forHTTPHeaderField: "Authorization"), "Bearer token")
+        XCTAssertEqual(manifest.sheetID, "sheet_1")
+        XCTAssertEqual(manifest.schemaVersion, "lps-sheet-manifest/v1")
+    }
+
+    func testFetchRecentSheetsDecodesPublishedResponse() async throws {
+        var capturedRequest: URLRequest?
+        MockURLProtocol.handler = { request in
+            capturedRequest = request
+            return (
+                HTTPURLResponse(url: request.url!, statusCode: 200, httpVersion: nil, headerFields: nil)!,
+                Data(#"{"sheets":[{"sheet_id":"sheet_1","manifest_url":"https://example.test/api/v1/test_sheets/sheet_1/manifest","title":null}]}"#.utf8)
+            )
+        }
+
+        let sheets = try await client().fetchRecentSheets(baseURL: URL(string: "https://example.test")!)
+
+        XCTAssertEqual(capturedRequest?.url?.path, "/api/v1/test_sheets/recent")
+        XCTAssertEqual(sheets.map(\.sheetID), ["sheet_1"])
+        XCTAssertNil(sheets.first?.title)
+    }
+
     func testUploadMeasurementsEncodesScoresWithAlgorithmVersion() async throws {
         var capturedBody: Data?
         MockURLProtocol.handler = { request in
@@ -90,6 +132,31 @@ final class APIClientTests: XCTestCase {
         XCTAssertEqual(capturedRequest?.url?.path, "/api/v1/captures/cap_1/judgments")
         let json = try XCTUnwrap(Self.jsonObject(from: capturedBody) as? [String: Any])
         XCTAssertEqual((json["judgments"] as? [[String: Any]])?.first?["judgment"] as? String, "near_match")
+    }
+
+    func testFetchRankedResultsDecodesPublishedResponse() async throws {
+        var capturedRequest: URLRequest?
+        MockURLProtocol.handler = { request in
+            capturedRequest = request
+            return (
+                HTTPURLResponse(url: request.url!, statusCode: 200, httpVersion: nil, headerFields: nil)!,
+                Data(
+                    #"""
+                    {"schema_version":"lps-ranked-results/v1","sheet_id":"sheet_1","printer_profile":{"printer_make_model":"Research printer"},"capture_count":1,"latest_capture_at":"2026-10-30T12:00:00Z","earliest_capture_at":"2026-10-30T12:00:00Z","scoring_algorithm_versions":["lps-distance-v1"],"results":[{"rank":1,"pair_id":"pair_1","scoring_algorithm_version":"lps-distance-v1","row":0,"col":0,"source_colors":{"color_a_hex":"#FF0000","color_b_hex":"#00FF00"},"score":{"average":0.9,"latest":0.9,"minimum":0.9,"maximum":0.9,"capture_count":1,"sample_count":1,"algorithm_versions":["lps-distance-v1"]},"current_judgment":"near_match","current_judgment_observed_at":"2026-10-30T12:00:00Z","observation_count":1,"latest_observation":{"judgment":"near_match","observed_at":"2026-10-30T12:00:00Z"},"capture_count":1,"latest_capture_at":"2026-10-30T12:00:00Z","earliest_capture_at":"2026-10-30T12:00:00Z"}]}
+                    """#.utf8
+                )
+            )
+        }
+
+        let rankedResults = try await client().fetchRankedResults(
+            sheetID: "sheet_1",
+            baseURL: URL(string: "https://example.test")!
+        )
+
+        XCTAssertEqual(capturedRequest?.url?.path, "/api/v1/test_sheets/sheet_1/ranked_results")
+        XCTAssertEqual(rankedResults.sheetID, "sheet_1")
+        XCTAssertEqual(rankedResults.results.first?.pairID, "pair_1")
+        XCTAssertEqual(rankedResults.results.first?.currentJudgment, "near_match")
     }
 
     private func client() -> APIClient {
