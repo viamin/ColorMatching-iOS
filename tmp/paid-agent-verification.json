@@ -1,0 +1,62 @@
+{
+  "status": "not_run",
+  "summary": "Red-phase generated-client adoption tests and documentation added. Swift is unavailable in this container, so swift test --disable-sandbox could not run.",
+  "acceptance_criteria": [
+    {
+      "id": "AC-1",
+      "status": "not_run",
+      "verification": {
+        "kind": "unit_or_service_test",
+        "references": [
+          {
+            "locator": "iOS/Tests/ColorMatchingLPSAppTests/APIClientTests.swift:testOpenAPIArtifactsDescribeEveryRequiredSurface",
+            "result": "not_run: swift executable is unavailable"
+          }
+        ]
+      }
+    },
+    {
+      "id": "AC-2",
+      "status": "not_run",
+      "verification": {
+        "kind": "unit_or_service_test",
+        "references": [
+          {
+            "locator": "iOS/Tests/ColorMatchingLPSAppTests/APIClientTests.swift:testHandWrittenWireModelsAreReplacedByGeneratedTypes",
+            "result": "not_run: swift executable is unavailable"
+          }
+        ]
+      }
+    },
+    {
+      "id": "AC-3",
+      "status": "not_run",
+      "verification": {
+        "kind": "permanent_system_test",
+        "references": [
+          {
+            "locator": "iOS/Tests/ColorMatchingLPSAppTests/APIClientTests.swift:testCaptureUploadFlowUsesStubbedResponses",
+            "result": "not_run: swift executable is unavailable"
+          },
+          {
+            "locator": "iOS/Tests/ColorMatchingLPSAppTests/APIClientTests.swift:testFetchManifestAndRecentSheetsDecodeStubbedResponses",
+            "result": "not_run: swift executable is unavailable"
+          }
+        ]
+      }
+    },
+    {
+      "id": "AC-4",
+      "status": "passed",
+      "verification": {
+        "kind": "human_or_external_evidence",
+        "references": [
+          {
+            "locator": "docs/openapi-client-issue-5-verification.md",
+            "result": "records provider PR #113 contract deltas and endpoint gaps for the PR description"
+          }
+        ]
+      }
+    }
+  ]
+}
