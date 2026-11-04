@@ -1,0 +1,75 @@
+{
+  "status": "not_run",
+  "summary": "Test-writing run added local-stub XCTest coverage and a criterion-level plan. Swift is not installed in this container, so the XCTest target could not run; generated-client implementation is intentionally deferred to the next phase.",
+  "acceptance_criteria": [
+    {
+      "id": "AC-1",
+      "status": "not_run",
+      "verification": {
+        "kind": "human_or_external_evidence",
+        "references": [
+          {
+            "locator": "https://github.com/viamin/color_matching/issues/110",
+            "result": "Provider dependency is closed; its OpenAPI document is served dynamically at /api/v1/openapi.json and has not yet been pinned in this test-only revision."
+          }
+        ]
+      }
+    },
+    {
+      "id": "AC-2",
+      "status": "not_run",
+      "verification": {
+        "kind": "unit_or_service_test",
+        "references": [
+          {
+            "locator": "iOS/Tests/ColorMatchingLPSAppTests/APIClientTests.swift:12",
+            "result": "Manifest local-stub test added; not run because Swift is unavailable."
+          },
+          {
+            "locator": "iOS/Tests/ColorMatchingLPSAppTests/APIClientTests.swift:31",
+            "result": "Recent-sheets local-stub test added; ranked-results adapter remains an implementation-phase gap."
+          }
+        ]
+      }
+    },
+    {
+      "id": "AC-3",
+      "status": "not_run",
+      "verification": {
+        "kind": "human_or_external_evidence",
+        "references": [
+          {
+            "locator": "docs/issue-5-openapi-client-verification-plan.md:14",
+            "result": "Source/compile verification is planned for the generated-client implementation phase."
+          }
+        ]
+      }
+    },
+    {
+      "id": "AC-4",
+      "status": "not_run",
+      "verification": {
+        "kind": "unit_or_service_test",
+        "references": [
+          {
+            "locator": "iOS/Tests/ColorMatchingLPSAppTests/APIClientTests.swift:6",
+            "result": "Permanent MockURLProtocol test suite contains local stubs; swift test --disable-sandbox could not run because the Swift executable is absent."
+          }
+        ]
+      }
+    },
+    {
+      "id": "AC-5",
+      "status": "not_run",
+      "verification": {
+        "kind": "human_or_external_evidence",
+        "references": [
+          {
+            "locator": "docs/issue-5-openapi-client-verification-plan.md:27",
+            "result": "Contract-delta and endpoint-gap record prepared for the implementation PR description; no PR has been opened in this test-only run."
+          }
+        ]
+      }
+    }
+  ]
+}
