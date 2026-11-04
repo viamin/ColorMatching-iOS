@@ -92,6 +92,67 @@ final class APIClientTests: XCTestCase {
         XCTAssertEqual((json["judgments"] as? [[String: Any]])?.first?["judgment"] as? String, "near_match")
     }
 
+    func testFetchesRecentSheetsAndManifestFromLocalStubs() async throws {
+        var requestedPaths = [String]()
+        MockURLProtocol.handler = { request in
+            requestedPaths.append(request.url!.path)
+
+            switch request.url!.path {
+            case "/api/v1/test_sheets/recent":
+                return (
+                    HTTPURLResponse(url: request.url!, statusCode: 200, httpVersion: nil, headerFields: nil)!,
+                    Data(#"{"sheets":[{"sheet_id":"sheet_1","manifest_url":"https://example.test/api/v1/test_sheets/sheet_1/manifest","title":null}]}"#.utf8)
+                )
+            case "/api/v1/test_sheets/sheet_1/manifest":
+                return (
+                    HTTPURLResponse(url: request.url!, statusCode: 200, httpVersion: nil, headerFields: nil)!,
+                    Self.manifestResponse
+                )
+            default:
+                throw URLError(.badURL)
+            }
+        }
+
+        let baseURL = URL(string: "https://example.test")!
+        let sheets = try await client().fetchRecentSheets(baseURL: baseURL)
+        let manifest = try await client().fetchManifest(baseURL: baseURL, sheetCode: "sheet_1")
+
+        XCTAssertEqual(sheets.map(\.sheetID), ["sheet_1"])
+        XCTAssertNil(sheets.first?.title)
+        XCTAssertEqual(manifest.sheetID, "sheet_1")
+        XCTAssertEqual(requestedPaths, [
+            "/api/v1/test_sheets/recent",
+            "/api/v1/test_sheets/sheet_1/manifest"
+        ])
+        XCTFail("Red phase: replace the hand-written APIClient and Codable response models with generated OpenAPI client types.")
+    }
+
+    func testGeneratedClientDecodesRankedResultsFromLocalStub() async throws {
+        let rankedResultsURL = URL(string: "https://example.test/api/v1/test_sheets/sheet_1/ranked_results")!
+        MockURLProtocol.handler = { request in
+            XCTAssertEqual(request.url, rankedResultsURL)
+            return (
+                HTTPURLResponse(url: request.url!, statusCode: 200, httpVersion: nil, headerFields: nil)!,
+                Self.rankedResultsResponse
+            )
+        }
+
+        let configuration = URLSessionConfiguration.ephemeral
+        configuration.protocolClasses = [MockURLProtocol.self]
+        let (data, response) = try await URLSession(configuration: configuration).data(from: rankedResultsURL)
+
+        XCTAssertEqual((response as? HTTPURLResponse)?.statusCode, 200)
+        XCTAssertEqual(
+            (try XCTUnwrap(Self.jsonObject(from: data) as? [String: Any]))["schema_version"] as? String,
+            "lps-ranked-results/v1"
+        )
+
+        // The generated client must expose a typed ranked-results operation. The
+        // existing hand-written client has no such operation, so this assertion
+        // deliberately keeps the test red until that generated surface is wired in.
+        XCTFail("Red phase: decode the ranked-results response through the generated OpenAPI client.")
+    }
+
     private func client() -> APIClient {
         let configuration = URLSessionConfiguration.ephemeral
         configuration.protocolClasses = [MockURLProtocol.self]
@@ -117,6 +178,10 @@ final class APIClientTests: XCTestCase {
         }
         return data
     }
+
+    private static let manifestResponse = Data(#"{"schema_version":"lps-sheet-manifest/v1","sheet_version":"lps-letter-grid-v1","sheet_id":"sheet_1","manifest_url":"https://example.test/api/v1/test_sheets/sheet_1/manifest","page":{"units":"mm","width":215.9,"height":279.4},"registration_markers":[],"patches":[],"pairs":[]}"#.utf8)
+
+    private static let rankedResultsResponse = Data(#"{"schema_version":"lps-ranked-results/v1","sheet_id":"sheet_1","printer_profile":{"printer_make_model":"Printer","paper_type":"Paper","ink_type":"Ink","icc_profile":null,"print_settings":{},"driver_name":null,"driver_version":null,"calibration_date":null,"calibration_version":null,"notes":null},"capture_count":1,"latest_capture_at":"2026-10-30T12:00:00Z","earliest_capture_at":"2026-10-30T12:00:00Z","scoring_algorithm_versions":["lps-distance-v1"],"results":[{"rank":1,"pair_id":"pair_1","scoring_algorithm_version":"lps-distance-v1","row":0,"col":0,"source_colors":{"color_a_hex":"#111111","color_b_hex":"#121212"},"score":{"average":0.9,"latest":0.9,"minimum":0.9,"maximum":0.9,"capture_count":1,"sample_count":1,"algorithm_versions":["lps-distance-v1"]},"current_judgment":"near_match","current_judgment_observed_at":"2026-10-30T12:00:00Z","observation_count":1,"latest_observation":{"judgment":"near_match","observed_at":"2026-10-30T12:00:00Z"},"capture_count":1,"latest_capture_at":"2026-10-30T12:00:00Z","earliest_capture_at":"2026-10-30T12:00:00Z"}]}"#.utf8)
 }
 
 private final class MockURLProtocol: URLProtocol {
