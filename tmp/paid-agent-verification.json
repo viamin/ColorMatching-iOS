@@ -1,0 +1,84 @@
+{
+  "status": "not_run",
+  "summary": "Tests-only phase: permanent URLProtocol stub coverage was added, but Swift is unavailable in the container and generated OpenAPI types have not yet been wired in.",
+  "acceptance_criteria": [
+    {
+      "id": "AC-1",
+      "status": "not_run",
+      "verification": {
+        "kind": "human_or_external_evidence",
+        "references": [
+          {
+            "locator": "docs/openapi-client-migration-plan.md",
+            "result": "The upstream served OpenAPI artifact has no published static URL or vendored copy in this repository."
+          }
+        ]
+      }
+    },
+    {
+      "id": "AC-2",
+      "status": "not_run",
+      "verification": {
+        "kind": "unit_or_service_test",
+        "references": [
+          {
+            "locator": "iOS/Tests/ColorMatchingLPSAppTests/APIClientTests.swift",
+            "result": "Generated operation types are not present in this tests-only phase; ranked-results coverage awaits their generated surface."
+          }
+        ]
+      }
+    },
+    {
+      "id": "AC-3",
+      "status": "not_run",
+      "verification": {
+        "kind": "human_or_external_evidence",
+        "references": [
+          {
+            "locator": "docs/openapi-client-migration-plan.md",
+            "result": "Handwritten models remain until the implementation phase."
+          }
+        ]
+      }
+    },
+    {
+      "id": "AC-4",
+      "status": "not_run",
+      "verification": {
+        "kind": "unit_or_service_test",
+        "references": [
+          {
+            "locator": "iOS/Tests/ColorMatchingLPSAppTests/APIClientTests.swift",
+            "result": "Local URLProtocol fixtures cover five existing transport paths; execution was blocked because swift is unavailable."
+          }
+        ]
+      }
+    },
+    {
+      "id": "AC-5",
+      "status": "passed",
+      "verification": {
+        "kind": "human_or_external_evidence",
+        "references": [
+          {
+            "locator": "docs/openapi-client-migration-plan.md",
+            "result": "Records source-backed prose/spec deltas and endpoint-schema gaps."
+          }
+        ]
+      }
+    },
+    {
+      "id": "AC-6",
+      "status": "not_run",
+      "verification": {
+        "kind": "unit_or_service_test",
+        "references": [
+          {
+            "locator": "iOS/Package.swift",
+            "result": "swift test --disable-sandbox could not start because swift is not installed in the container."
+          }
+        ]
+      }
+    }
+  ]
+}
