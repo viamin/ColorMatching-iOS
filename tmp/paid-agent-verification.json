@@ -1,0 +1,71 @@
+{
+  "status": "not_run",
+  "summary": "Red-phase OpenAPI generation guard and contract-delta record added. Swift is unavailable in the container, so the Swift suite and expected red assertion could not run.",
+  "acceptance_criteria": [
+    {
+      "id": "AC-1",
+      "status": "not_run",
+      "verification": {
+        "kind": "unit_or_service_test",
+        "references": [
+          {
+            "locator": "iOS/Tests/ColorMatchingLPSAppTests/APIClientTests.swift:testOpenAPIClientInputsAreVendoredAndConfiguredForGeneration",
+            "result": "not_run: swift executable is unavailable; test is intentionally red until the document and dependencies are added"
+          }
+        ]
+      }
+    },
+    {
+      "id": "AC-2",
+      "status": "not_run",
+      "verification": {
+        "kind": "permanent_system_test",
+        "references": [
+          {
+            "locator": "docs/openapi-client-generation.md:criterion-to-verification map",
+            "result": "not_run: generated operation types and their local-stub tests must be added in the implementation run"
+          }
+        ]
+      }
+    },
+    {
+      "id": "AC-3",
+      "status": "not_run",
+      "verification": {
+        "kind": "unit_or_service_test",
+        "references": [
+          {
+            "locator": "docs/openapi-client-generation.md:Prose-contract deltas and endpoint gaps",
+            "result": "not_run: published schemas omit fields needed to replace the hand-written manifest and ranked-results models"
+          }
+        ]
+      }
+    },
+    {
+      "id": "AC-4",
+      "status": "not_run",
+      "verification": {
+        "kind": "permanent_system_test",
+        "references": [
+          {
+            "locator": "iOS/Tests/ColorMatchingLPSAppTests/APIClientTests.swift",
+            "result": "not_run: existing URLProtocol stubs are local, but cannot yet exercise generated operations"
+          }
+        ]
+      }
+    },
+    {
+      "id": "AC-5",
+      "status": "passed",
+      "verification": {
+        "kind": "human_or_external_evidence",
+        "references": [
+          {
+            "locator": "docs/openapi-client-generation.md:Prose-contract deltas and endpoint gaps",
+            "result": "passed: deltas were compared against viamin/color_matching commit 47057afd58f7d46b4d4b740ca7d2d08947774471"
+          }
+        ]
+      }
+    }
+  ]
+}
