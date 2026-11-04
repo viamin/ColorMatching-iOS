@@ -9,6 +9,48 @@ final class APIClientTests: XCTestCase {
         super.tearDown()
     }
 
+    func testFetchManifestDecodesSheetUsedByCaptureFlow() async throws {
+        var capturedRequest: URLRequest?
+        MockURLProtocol.handler = { request in
+            capturedRequest = request
+            return (Self.response(for: request), Data(Self.manifestJSON.utf8))
+        }
+
+        let manifest = try await client().fetchManifest(
+            baseURL: URL(string: "https://example.test")!,
+            sheetCode: "sheet_1"
+        )
+
+        XCTAssertEqual(capturedRequest?.url?.path, "/api/v1/test_sheets/sheet_1/manifest")
+        XCTAssertEqual(capturedRequest?.value(forHTTPHeaderField: "Authorization"), "Bearer token")
+        XCTAssertEqual(manifest.sheetID, "sheet_1")
+        XCTAssertEqual(manifest.registrationMarkers.count, 4)
+        XCTAssertEqual(manifest.pairs.first?.firstPatchID, "patch_1")
+    }
+
+    func testFetchRecentSheetsDecodesSheetSelectionResponse() async throws {
+        var capturedRequest: URLRequest?
+        MockURLProtocol.handler = { request in
+            capturedRequest = request
+            return (Self.response(for: request), Data(#"""
+            {"sheets":[{"sheet_id":"sheet_1","manifest_url":"https://example.test/api/v1/test_sheets/sheet_1/manifest","title":null}]}
+            """#.utf8))
+        }
+
+        let sheets = try await client().fetchRecentSheets(baseURL: URL(string: "https://example.test")!)
+
+        XCTAssertEqual(capturedRequest?.url?.path, "/api/v1/test_sheets/recent")
+        XCTAssertEqual(sheets.map(\.sheetID), ["sheet_1"])
+        XCTAssertNil(sheets.first?.title)
+    }
+
+    func testGeneratedClientSupportsRankedResultsResponse() {
+        XCTFail(
+            "Red phase: the published RankedResults schema defines only schema_version and sheet_id, " +
+                "so there is no generated type or APIClient method capable of decoding the app's ranked results."
+        )
+    }
+
     func testCreateCaptureEncodesMetadataAndQuality() async throws {
         var capturedRequest: URLRequest?
         var capturedBody: Data?
@@ -117,6 +159,33 @@ final class APIClientTests: XCTestCase {
         }
         return data
     }
+
+    private static func response(for request: URLRequest, statusCode: Int = 200) -> HTTPURLResponse {
+        HTTPURLResponse(url: try! XCTUnwrap(request.url), statusCode: statusCode, httpVersion: nil, headerFields: nil)!
+    }
+
+    private static let manifestJSON = #"""
+    {
+      "schema_version": "lps-sheet-manifest/v1",
+      "sheet_version": "lps-letter-grid-v1",
+      "sheet_id": "sheet_1",
+      "manifest_url": "https://example.test/api/v1/test_sheets/sheet_1/manifest",
+      "page": {"units": "mm", "width": 215.9, "height": 279.4},
+      "registration_markers": [
+        {"role": "top_left", "shape": "solid_square", "rect": {"x": 12, "y": 12, "width": 8, "height": 8}},
+        {"role": "top_right", "shape": "solid_square", "rect": {"x": 196, "y": 12, "width": 8, "height": 8}},
+        {"role": "bottom_right", "shape": "solid_square", "rect": {"x": 196, "y": 259, "width": 8, "height": 8}},
+        {"role": "bottom_left", "shape": "solid_square", "rect": {"x": 12, "y": 259, "width": 8, "height": 8}}
+      ],
+      "patches": [
+        {"id": "patch_1", "role": "pair_color", "pair_id": "pair_1", "pair_side": "first", "reference_role": null, "source_color": "#FF0000", "safe_inset_mm": 1.5, "rect": {"x": 16, "y": 38, "width": 16, "height": 10}},
+        {"id": "patch_2", "role": "pair_color", "pair_id": "pair_1", "pair_side": "second", "reference_role": null, "source_color": "#00FF00", "safe_inset_mm": 1.5, "rect": {"x": 36, "y": 38, "width": 16, "height": 10}}
+      ],
+      "pairs": [
+        {"id": "pair_1", "first_patch_id": "patch_1", "second_patch_id": "patch_2", "source_colors": ["#FF0000", "#00FF00"], "grid_row": 0, "grid_col": 1}
+      ]
+    }
+    """
 }
 
 private final class MockURLProtocol: URLProtocol {
