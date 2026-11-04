@@ -1,0 +1,66 @@
+{
+  "status": "failed",
+  "summary": "Red-phase API-client tests and contract-delta evidence are recorded; the generated OpenAPI client is not implemented yet, and Swift is unavailable in this container.",
+  "acceptance_criteria": [
+    {
+      "id": "AC-1",
+      "status": "failed",
+      "verification": {
+        "kind": "unit_or_service_test",
+        "references": [
+          {
+            "locator": "iOS/Tests/ColorMatchingLPSAppTests/APIClientTests.swift:125",
+            "result": "red guard: Package.swift has no swift-openapi-generator/runtime dependency and APIClient has no ranked-results surface"
+          }
+        ]
+      }
+    },
+    {
+      "id": "AC-2",
+      "status": "failed",
+      "verification": {
+        "kind": "permanent_system_test",
+        "references": [
+          {
+            "locator": "iOS/Tests/ColorMatchingLPSAppTests/APIClientTests.swift:49",
+            "result": "local-stub manifest test added"
+          },
+          {
+            "locator": "iOS/Tests/ColorMatchingLPSAppTests/APIClientTests.swift:68",
+            "result": "local-stub recent-sheets test added"
+          },
+          {
+            "locator": "iOS/Tests/ColorMatchingLPSAppTests/APIClientTests.swift:122",
+            "result": "ranked-results generated-client surface remains missing"
+          }
+        ]
+      }
+    },
+    {
+      "id": "AC-3",
+      "status": "not_run",
+      "verification": {
+        "kind": "permanent_system_test",
+        "references": [
+          {
+            "locator": "iOS/Tests/ColorMatchingLPSAppTests/APIClientTests.swift:195",
+            "result": "tests use MockURLProtocol; swift test --disable-sandbox could not run because swift is not installed"
+          }
+        ]
+      }
+    },
+    {
+      "id": "AC-4",
+      "status": "passed",
+      "verification": {
+        "kind": "human_or_external_evidence",
+        "references": [
+          {
+            "locator": "docs/issue-5-verification-plan.md:17",
+            "result": "documents upstream controller/spec deltas and endpoint gap from viamin/color_matching#110"
+          }
+        ]
+      }
+    }
+  ]
+}
