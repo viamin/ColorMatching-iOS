@@ -1,0 +1,71 @@
+{
+  "status": "not_run",
+  "summary": "Tests-only preparation for issue #5. Local-stub coverage was added for the currently implemented API operations; generated-client implementation and published-spec comparison require the inaccessible upstream specification. The container has no Swift toolchain, so the suite could not run.",
+  "acceptance_criteria": [
+    {
+      "id": "AC-1",
+      "status": "skipped",
+      "verification": {
+        "kind": "human_or_external_evidence",
+        "references": [
+          {
+            "locator": "https://api.github.com/repos/viamin/color_matching/pulls/110",
+            "result": "HTTP 404 from this environment on 2026-11-04; the published OpenAPI document cannot be fetched or inspected."
+          }
+        ]
+      }
+    },
+    {
+      "id": "AC-2",
+      "status": "skipped",
+      "verification": {
+        "kind": "unit_or_service_test",
+        "references": [
+          {
+            "locator": "docs/issue-5-generated-openapi-client-verification.md:8",
+            "result": "Ranked-results has no app call or prose response schema; generated operation coverage awaits the upstream spec."
+          }
+        ]
+      }
+    },
+    {
+      "id": "AC-3",
+      "status": "not_run",
+      "verification": {
+        "kind": "unit_or_service_test",
+        "references": [
+          {
+            "locator": "docs/issue-5-generated-openapi-client-verification.md:9",
+            "result": "Implementation changes are prohibited in this tests-only run."
+          }
+        ]
+      }
+    },
+    {
+      "id": "AC-4",
+      "status": "not_run",
+      "verification": {
+        "kind": "unit_or_service_test",
+        "references": [
+          {
+            "locator": "iOS/Tests/ColorMatchingLPSAppTests/APIClientTests.swift:11",
+            "result": "Local URLProtocol stubs cover the legacy client now; `swift test --disable-sandbox` was not runnable because no `swift` executable exists in the container. Rerun against the generated client after implementation."
+          }
+        ]
+      }
+    },
+    {
+      "id": "AC-5",
+      "status": "skipped",
+      "verification": {
+        "kind": "human_or_external_evidence",
+        "references": [
+          {
+            "locator": "docs/issue-5-generated-openapi-client-verification.md:21",
+            "result": "Contract-delta comparison is blocked pending access to the published OpenAPI document."
+          }
+        ]
+      }
+    }
+  ]
+}
