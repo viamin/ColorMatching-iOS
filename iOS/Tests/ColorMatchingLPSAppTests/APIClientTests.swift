@@ -92,6 +92,25 @@ final class APIClientTests: XCTestCase {
         XCTAssertEqual((json["judgments"] as? [[String: Any]])?.first?["judgment"] as? String, "near_match")
     }
 
+    func testOpenAPIClientInputsAreVendoredAndConfiguredForGeneration() throws {
+        let packageRoot = URL(fileURLWithPath: #filePath)
+            .deletingLastPathComponent()
+            .deletingLastPathComponent()
+            .deletingLastPathComponent()
+        let openAPIDocument = packageRoot.appending(path: "OpenAPI/color-matching-api-v1.json")
+        let packageManifest = packageRoot.appending(path: "Package.swift")
+
+        XCTAssertTrue(
+            FileManager.default.fileExists(atPath: openAPIDocument.path),
+            "Vendor the published /api/v1 OpenAPI document so generation is reproducible in CI."
+        )
+
+        let manifest = try String(contentsOf: packageManifest, encoding: .utf8)
+        XCTAssertTrue(manifest.contains("swift-openapi-generator"))
+        XCTAssertTrue(manifest.contains("swift-openapi-runtime"))
+        XCTAssertTrue(manifest.contains("color-matching-api-v1.json"))
+    }
+
     private func client() -> APIClient {
         let configuration = URLSessionConfiguration.ephemeral
         configuration.protocolClasses = [MockURLProtocol.self]
