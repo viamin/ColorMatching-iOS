@@ -46,7 +46,7 @@ final class APIClientTests: XCTestCase {
         XCTAssertEqual(quality["rejections"] as? [String], [])
     }
 
-    func testUploadMeasurementsEncodesScoresWithAlgorithmVersion() async throws {
+    func testUploadMeasurementsUsesThePublishedOpenAPIRequestShape() async throws {
         var capturedBody: Data?
         MockURLProtocol.handler = { request in
             capturedBody = request.httpBodyStream.flatMap(Self.readBody) ?? request.httpBody
@@ -63,12 +63,47 @@ final class APIClientTests: XCTestCase {
         )
 
         let json = try XCTUnwrap(Self.jsonObject(from: capturedBody) as? [String: Any])
-        XCTAssertEqual(json["scoring_algorithm_version"] as? String, "lps-distance-v1")
         let measurement = try XCTUnwrap((json["measurements"] as? [[String: Any]])?.first)
         XCTAssertEqual(measurement["patch_id"] as? String, "patch_1")
-        let statsPayload = try XCTUnwrap(measurement["stats"] as? [String: Any])
-        XCTAssertEqual(Set(statsPayload.keys), ["sample_count", "clipping_fraction", "mean", "standard_deviation"])
+        XCTAssertNil(json["scoring_algorithm_version"])
+        XCTAssertNil(measurement["stats"])
         XCTAssertEqual((json["pair_scores"] as? [[String: Any]])?.first?["pair_id"] as? String, "pair_1")
+        XCTAssertEqual((json["pair_scores"] as? [[String: Any]])?.first?["algorithm_version"] as? String, "lps-distance-v1")
+    }
+
+    func testFetchManifestDecodesThePublishedMinimumSchema() async throws {
+        MockURLProtocol.handler = { request in
+            XCTAssertEqual(request.url?.path, "/api/v1/test_sheets/sheet_1/manifest")
+            let response = HTTPURLResponse(url: try XCTUnwrap(request.url), statusCode: 200, httpVersion: nil, headerFields: nil)!
+            let body = Data(
+                #"{"schema_version":"lps-sheet-manifest/v1","sheet_id":"sheet_1","capture_profile":{"scoring_algorithm_version":"lps-distance-v1"}}"#.utf8
+            )
+            return (response, body)
+        }
+
+        let manifest = try await client().fetchManifest(
+            baseURL: URL(string: "https://example.test")!,
+            sheetCode: "sheet_1"
+        )
+
+        XCTAssertEqual(manifest.schemaVersion, "lps-sheet-manifest/v1")
+        XCTAssertEqual(manifest.sheetID, "sheet_1")
+    }
+
+    func testFetchRecentSheetsDecodesPublishedResponse() async throws {
+        MockURLProtocol.handler = { request in
+            XCTAssertEqual(request.url?.path, "/api/v1/test_sheets/recent")
+            let response = HTTPURLResponse(url: try XCTUnwrap(request.url), statusCode: 200, httpVersion: nil, headerFields: nil)!
+            let body = Data(
+                #"{"sheets":[{"sheet_id":"sheet_1","manifest_url":"https://example.test/api/v1/test_sheets/sheet_1/manifest","title":null}]}"#.utf8
+            )
+            return (response, body)
+        }
+
+        let sheets = try await client().fetchRecentSheets(baseURL: URL(string: "https://example.test")!)
+
+        XCTAssertEqual(sheets.map(\.sheetID), ["sheet_1"])
+        XCTAssertNil(sheets.first?.title)
     }
 
     func testUploadJudgmentsEncodesPathAndPayload() async throws {
