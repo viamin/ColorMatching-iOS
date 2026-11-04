@@ -1,0 +1,75 @@
+{
+  "status": "passed",
+  "summary": "Tests-only phase completed: permanent local-stub coverage was added for manifest and recent-sheet reads. Swift tests were not run because the container has no swift executable; generated-client implementation remains for the approved follow-up run.",
+  "acceptance_criteria": [
+    {
+      "id": "AC-1",
+      "status": "not_run",
+      "verification": {
+        "kind": "human_or_external_evidence",
+        "references": [
+          {
+            "locator": "docs/openapi-client-migration.md",
+            "result": "The upstream issue records a dynamic OpenAPI endpoint but no stable JSON artifact or deployed URL was available to fetch in this run."
+          }
+        ]
+      }
+    },
+    {
+      "id": "AC-2",
+      "status": "not_run",
+      "verification": {
+        "kind": "unit_or_service_test",
+        "references": [
+          {
+            "locator": "iOS/Tests/ColorMatchingLPSAppTests/APIClientTests.swift:testFetchManifestDecodesLocalStubbedResponse",
+            "result": "Written against the current client; it must be redirected to generated operations during implementation."
+          },
+          {
+            "locator": "iOS/Tests/ColorMatchingLPSAppTests/APIClientTests.swift:testFetchRecentSheetsDecodesLocalStubbedResponse",
+            "result": "Written against the current client; no ranked-results operation exists yet."
+          }
+        ]
+      }
+    },
+    {
+      "id": "AC-3",
+      "status": "not_run",
+      "verification": {
+        "kind": "human_or_external_evidence",
+        "references": [
+          {
+            "locator": "docs/openapi-client-migration.md",
+            "result": "The model-replacement inspection is deferred to the implementation phase."
+          }
+        ]
+      }
+    },
+    {
+      "id": "AC-4",
+      "status": "not_run",
+      "verification": {
+        "kind": "unit_or_service_test",
+        "references": [
+          {
+            "locator": "iOS/Tests/ColorMatchingLPSAppTests/APIClientTests.swift",
+            "result": "Local URLProtocol stubs are present, but the suite was not executable because swift is absent."
+          }
+        ]
+      }
+    },
+    {
+      "id": "AC-5",
+      "status": "passed",
+      "verification": {
+        "kind": "human_or_external_evidence",
+        "references": [
+          {
+            "locator": "docs/openapi-client-migration.md",
+            "result": "Records the currently evidenced prose-contract deltas and the ranked-results/openapi-artifact gaps."
+          }
+        ]
+      }
+    }
+  ]
+}
