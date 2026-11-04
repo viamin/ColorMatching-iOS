@@ -50,12 +50,15 @@ final class APIClientTests: XCTestCase {
         var capturedBody: Data?
         MockURLProtocol.handler = { request in
             capturedBody = request.httpBodyStream.flatMap(Self.readBody) ?? request.httpBody
-            return (HTTPURLResponse(url: request.url!, statusCode: 204, httpVersion: nil, headerFields: nil)!, Data())
+            return (
+                HTTPURLResponse(url: request.url!, statusCode: 200, httpVersion: nil, headerFields: nil)!,
+                Data(#"{"capture_id":"cap_1","measurement_count":1,"pair_score_count":1}"#.utf8)
+            )
         }
 
         let rgb = RGB(r: 0.2, g: 0.3, b: 0.4)
         let stats = ChannelStats(median: rgb, mean: rgb, standardDeviation: RGB(r: 0.01, g: 0.01, b: 0.01), min: rgb, max: rgb, sampleCount: 9, clippingFraction: 0)
-        try await client().uploadMeasurements(
+        let response: Any = try await client().uploadMeasurements(
             captureID: "cap_1",
             baseURL: URL(string: "https://example.test")!,
             measurements: [PatchMeasurement(patchID: "patch_1", linearRGBMedian: rgb, normalizedLinearRGBMedian: rgb, stats: stats)],
@@ -69,6 +72,7 @@ final class APIClientTests: XCTestCase {
         let statsPayload = try XCTUnwrap(measurement["stats"] as? [String: Any])
         XCTAssertEqual(Set(statsPayload.keys), ["sample_count", "clipping_fraction", "mean", "standard_deviation"])
         XCTAssertEqual((json["pair_scores"] as? [[String: Any]])?.first?["pair_id"] as? String, "pair_1")
+        XCTAssertFalse(response is Void, "The generated client must expose the documented measurement acknowledgement.")
     }
 
     func testUploadJudgmentsEncodesPathAndPayload() async throws {
@@ -77,10 +81,13 @@ final class APIClientTests: XCTestCase {
         MockURLProtocol.handler = { request in
             capturedRequest = request
             capturedBody = request.httpBodyStream.flatMap(Self.readBody) ?? request.httpBody
-            return (HTTPURLResponse(url: request.url!, statusCode: 204, httpVersion: nil, headerFields: nil)!, Data())
+            return (
+                HTTPURLResponse(url: request.url!, statusCode: 200, httpVersion: nil, headerFields: nil)!,
+                Data(#"{"capture_id":"cap_1","judgment_count":1}"#.utf8)
+            )
         }
 
-        try await client().uploadJudgments(
+        let response: Any = try await client().uploadJudgments(
             captureID: "cap_1",
             baseURL: URL(string: "https://example.test")!,
             judgments: [PairJudgment(pairID: "pair_1", judgment: "near_match")]
@@ -90,6 +97,39 @@ final class APIClientTests: XCTestCase {
         XCTAssertEqual(capturedRequest?.url?.path, "/api/v1/captures/cap_1/judgments")
         let json = try XCTUnwrap(Self.jsonObject(from: capturedBody) as? [String: Any])
         XCTAssertEqual((json["judgments"] as? [[String: Any]])?.first?["judgment"] as? String, "near_match")
+        XCTAssertFalse(response is Void, "The generated client must expose the documented judgment acknowledgement.")
+    }
+
+    func testManifestDecodesPublishedMinimumSchema() async throws {
+        MockURLProtocol.handler = { request in
+            XCTAssertEqual(request.url?.path, "/api/v1/test_sheets/sheet_1/manifest")
+            return (
+                HTTPURLResponse(url: request.url!, statusCode: 200, httpVersion: nil, headerFields: nil)!,
+                Data(#"{"schema_version":"lps-sheet-manifest/v1","sheet_id":"sheet_1","capture_profile":{"scoring_algorithm_version":"lps-distance-v1"}}"#.utf8)
+            )
+        }
+
+        let manifest = try await client().fetchManifest(
+            baseURL: URL(string: "https://example.test")!,
+            sheetCode: "sheet_1"
+        )
+
+        XCTAssertEqual(manifest.sheetID, "sheet_1")
+    }
+
+    func testFetchRecentSheetsDecodesNullableTitle() async throws {
+        MockURLProtocol.handler = { request in
+            XCTAssertEqual(request.url?.path, "/api/v1/test_sheets/recent")
+            return (
+                HTTPURLResponse(url: request.url!, statusCode: 200, httpVersion: nil, headerFields: nil)!,
+                Data(#"{"sheets":[{"sheet_id":"sheet_1","manifest_url":"https://example.test/api/v1/test_sheets/sheet_1/manifest","title":null}]}"#.utf8)
+            )
+        }
+
+        let sheets = try await client().fetchRecentSheets(baseURL: URL(string: "https://example.test")!)
+
+        XCTAssertEqual(sheets.map(\.sheetID), ["sheet_1"])
+        XCTAssertNil(sheets.first?.title)
     }
 
     private func client() -> APIClient {
