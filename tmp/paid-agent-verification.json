@@ -1,0 +1,58 @@
+{
+  "status": "not_run",
+  "summary": "Red-phase tests and verification plan added; the container has no Swift toolchain, so swift test could not run.",
+  "acceptance_criteria": [
+    {
+      "id": "AC-1",
+      "status": "not_run",
+      "verification": {
+        "kind": "unit_or_service_test",
+        "references": [
+          {
+            "locator": "iOS/Tests/ColorMatchingLPSAppTests/OpenAPIContractTests.swift:5",
+            "result": "red by design: vendored OpenAPI document and package dependencies are absent"
+          }
+        ]
+      }
+    },
+    {
+      "id": "AC-2",
+      "status": "not_run",
+      "verification": {
+        "kind": "unit_or_service_test",
+        "references": [
+          {
+            "locator": "iOS/Tests/ColorMatchingLPSAppTests/OpenAPIContractTests.swift:27",
+            "result": "red by design: hand-written API models remain"
+          }
+        ]
+      }
+    },
+    {
+      "id": "AC-3",
+      "status": "not_run",
+      "verification": {
+        "kind": "unit_or_service_test",
+        "references": [
+          {
+            "locator": "iOS/Tests/ColorMatchingLPSAppTests/APIClientTests.swift:6",
+            "result": "local URLProtocol stub coverage added; not run because swift is unavailable"
+          }
+        ]
+      }
+    },
+    {
+      "id": "AC-4",
+      "status": "not_run",
+      "verification": {
+        "kind": "human_or_external_evidence",
+        "references": [
+          {
+            "locator": "docs/issue-5-openapi-client-verification.md:15",
+            "result": "requires comparison against the actual upstream generated OpenAPI JSON in the implementation PR"
+          }
+        ]
+      }
+    }
+  ]
+}
