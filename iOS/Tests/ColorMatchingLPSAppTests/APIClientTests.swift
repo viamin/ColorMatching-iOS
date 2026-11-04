@@ -46,6 +46,106 @@ final class APIClientTests: XCTestCase {
         XCTAssertEqual(quality["rejections"] as? [String], [])
     }
 
+    func testFetchManifestDecodesLocalStubResponse() async throws {
+        var capturedRequest: URLRequest?
+        MockURLProtocol.handler = { request in
+            capturedRequest = request
+            let response = #"""
+            {
+              "schema_version": "lps-sheet-manifest/v1",
+              "sheet_version": "lps-letter-grid-v1",
+              "sheet_id": "sheet_1",
+              "manifest_url": "https://example.test/api/v1/test_sheets/sheet_1/manifest",
+              "page": {"units": "mm", "width": 215.9, "height": 279.4},
+              "registration_markers": [],
+              "patches": [],
+              "pairs": []
+            }
+            """#
+            return (HTTPURLResponse(url: request.url!, statusCode: 200, httpVersion: nil, headerFields: nil)!, Data(response.utf8))
+        }
+
+        let manifest = try await client().fetchManifest(
+            baseURL: URL(string: "https://example.test")!,
+            sheetCode: "sheet_1"
+        )
+
+        XCTAssertEqual(capturedRequest?.url?.path, "/api/v1/test_sheets/sheet_1/manifest")
+        XCTAssertEqual(capturedRequest?.value(forHTTPHeaderField: "Authorization"), "Bearer token")
+        XCTAssertEqual(manifest.schemaVersion, "lps-sheet-manifest/v1")
+        XCTAssertEqual(manifest.sheetID, "sheet_1")
+        XCTAssertEqual(manifest.page.units, "mm")
+    }
+
+    func testFetchRecentSheetsDecodesLocalStubResponse() async throws {
+        var capturedRequest: URLRequest?
+        MockURLProtocol.handler = { request in
+            capturedRequest = request
+            let response = #"""
+            {"sheets":[{"sheet_id":"sheet_1","manifest_url":"https://example.test/api/v1/test_sheets/sheet_1/manifest","title":null}]}
+            """#
+            return (HTTPURLResponse(url: request.url!, statusCode: 200, httpVersion: nil, headerFields: nil)!, Data(response.utf8))
+        }
+
+        let sheets = try await client().fetchRecentSheets(baseURL: URL(string: "https://example.test")!)
+
+        XCTAssertEqual(capturedRequest?.url?.path, "/api/v1/test_sheets/recent")
+        XCTAssertEqual(sheets.map(\.sheetID), ["sheet_1"])
+        XCTAssertNil(sheets.first?.title)
+    }
+
+    func testCaptureUploadFlowUsesOnlyLocalStubbedAPIResponses() async throws {
+        var paths = [String]()
+        MockURLProtocol.handler = { request in
+            let path = try XCTUnwrap(request.url?.path)
+            paths.append(path)
+            let response: String
+            switch path {
+            case "/api/v1/test_sheets/sheet_1/manifest":
+                response = #"{"schema_version":"lps-sheet-manifest/v1","sheet_version":"lps-letter-grid-v1","sheet_id":"sheet_1","manifest_url":"https://example.test/api/v1/test_sheets/sheet_1/manifest","page":{"units":"mm","width":215.9,"height":279.4},"registration_markers":[],"patches":[],"pairs":[]}"#
+            case "/api/v1/test_sheets/sheet_1/captures":
+                response = #"{"capture_id":"capture_1"}"#
+            case "/api/v1/captures/capture_1/measurements", "/api/v1/captures/capture_1/judgments":
+                response = ""
+            default:
+                throw URLError(.badURL)
+            }
+            return (HTTPURLResponse(url: request.url!, statusCode: path.contains("captures") && path.hasSuffix("captures") ? 201 : 204, httpVersion: nil, headerFields: nil)!, Data(response.utf8))
+        }
+
+        let client = client()
+        let baseURL = URL(string: "https://example.test")!
+        let manifest = try await client.fetchManifest(baseURL: baseURL, sheetCode: "sheet_1")
+        let capture = try await client.createCapture(
+            sheetID: manifest.sheetID,
+            baseURL: baseURL,
+            metadata: CaptureMetadata(deviceModel: "iPhone", lens: "wide", exposureDurationSeconds: nil, iso: nil, focusLensPosition: nil, whiteBalanceGains: nil, imageWidth: nil, imageHeight: nil, appVersion: "0.1.0", timestamp: .now),
+            quality: CaptureQuality(detectedMarkerCount: 4, blurScore: 0, rejections: [])
+        )
+        try await client.uploadMeasurements(captureID: capture.captureID, baseURL: baseURL, measurements: [], scores: [])
+        try await client.uploadJudgments(captureID: capture.captureID, baseURL: baseURL, judgments: [])
+
+        XCTAssertEqual(paths, [
+            "/api/v1/test_sheets/sheet_1/manifest",
+            "/api/v1/test_sheets/sheet_1/captures",
+            "/api/v1/captures/capture_1/measurements",
+            "/api/v1/captures/capture_1/judgments"
+        ])
+    }
+
+    func testPackageConfiguresGeneratedClientAndPinnedOpenAPISpecification() throws {
+        let packageDirectory = URL(fileURLWithPath: #filePath)
+            .deletingLastPathComponent()
+            .deletingLastPathComponent()
+            .deletingLastPathComponent()
+        let packageManifest = try String(contentsOf: packageDirectory.appending(path: "Package.swift"))
+
+        XCTAssertTrue(packageManifest.contains("swift-openapi-generator"))
+        XCTAssertTrue(packageManifest.contains("swift-openapi-runtime"))
+        XCTAssertTrue(packageManifest.contains("OpenAPIGenerator"))
+        XCTAssertTrue(FileManager.default.fileExists(atPath: packageDirectory.appending(path: "OpenAPI/color-matching.json").path))
+    }
+
     func testUploadMeasurementsEncodesScoresWithAlgorithmVersion() async throws {
         var capturedBody: Data?
         MockURLProtocol.handler = { request in
