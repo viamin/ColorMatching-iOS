@@ -1,0 +1,71 @@
+{
+  "status": "not_run",
+  "summary": "Red-phase tests and contract-delta evidence were added. Swift is unavailable in the environment, so the XCTest suite could not execute.",
+  "acceptance_criteria": [
+    {
+      "id": "AC-1",
+      "status": "not_run",
+      "verification": {
+        "kind": "unit_or_service_test",
+        "references": [
+          {
+            "locator": "iOS/Tests/ColorMatchingLPSAppTests/GeneratedClientConfigurationTests.swift:5",
+            "result": "not_run: swift executable is unavailable; this is intentionally red until generator/runtime dependencies and generated client are added"
+          }
+        ]
+      }
+    },
+    {
+      "id": "AC-2",
+      "status": "not_run",
+      "verification": {
+        "kind": "permanent_system_test",
+        "references": [
+          {
+            "locator": "iOS/Tests/ColorMatchingLPSAppTests/APIClientTests.swift:9",
+            "result": "not_run: local URLProtocol stubs cover capture and upload paths; generated-client and ranked-results coverage await implementation"
+          }
+        ]
+      }
+    },
+    {
+      "id": "AC-3",
+      "status": "not_run",
+      "verification": {
+        "kind": "human_or_external_evidence",
+        "references": [
+          {
+            "locator": "docs/issue-5-generated-client-verification-plan.md:33",
+            "result": "not_run: requires implementation diff and application compile"
+          }
+        ]
+      }
+    },
+    {
+      "id": "AC-4",
+      "status": "not_run",
+      "verification": {
+        "kind": "unit_or_service_test",
+        "references": [
+          {
+            "locator": "iOS/Tests/ColorMatchingLPSAppTests/APIClientTests.swift:95",
+            "result": "not_run: tests use URLProtocol stubs and no live server, but Swift is unavailable"
+          }
+        ]
+      }
+    },
+    {
+      "id": "AC-5",
+      "status": "passed",
+      "verification": {
+        "kind": "human_or_external_evidence",
+        "references": [
+          {
+            "locator": "docs/issue-5-generated-client-verification-plan.md:37",
+            "result": "published viamin/color_matching#113 source was inspected; contract deltas and endpoint schema gaps are recorded"
+          }
+        ]
+      }
+    }
+  ]
+}
