@@ -9,6 +9,43 @@ final class APIClientTests: XCTestCase {
         super.tearDown()
     }
 
+    func testFetchManifestDecodesLocalStubResponse() async throws {
+        var capturedRequest: URLRequest?
+        MockURLProtocol.handler = { request in
+            capturedRequest = request
+            return (HTTPURLResponse(url: request.url!, statusCode: 200, httpVersion: nil, headerFields: nil)!, Self.manifestResponse)
+        }
+
+        let manifest = try await client().fetchManifest(
+            baseURL: URL(string: "https://example.test")!,
+            sheetCode: "SHEET-123"
+        )
+
+        XCTAssertEqual(capturedRequest?.httpMethod, "GET")
+        XCTAssertEqual(capturedRequest?.url?.path, "/api/v1/test_sheets/SHEET-123/manifest")
+        XCTAssertEqual(capturedRequest?.value(forHTTPHeaderField: "Authorization"), "Bearer token")
+        XCTAssertEqual(manifest.schemaVersion, "lps-sheet-manifest/v1")
+        XCTAssertEqual(manifest.sheetID, "SHEET-123")
+        XCTAssertEqual(manifest.pairs.first?.id, "pair_1")
+    }
+
+    func testFetchRecentSheetsDecodesLocalStubResponse() async throws {
+        var capturedRequest: URLRequest?
+        MockURLProtocol.handler = { request in
+            capturedRequest = request
+            return (HTTPURLResponse(url: request.url!, statusCode: 200, httpVersion: nil, headerFields: nil)!, Data(#"""
+            {"sheets":[{"sheet_id":"SHEET-123","manifest_url":"https://example.test/api/v1/test_sheets/SHEET-123/manifest","title":null}]}
+            """#.utf8))
+        }
+
+        let sheets = try await client().fetchRecentSheets(baseURL: URL(string: "https://example.test")!)
+
+        XCTAssertEqual(capturedRequest?.httpMethod, "GET")
+        XCTAssertEqual(capturedRequest?.url?.path, "/api/v1/test_sheets/recent")
+        XCTAssertEqual(sheets.map(\.sheetID), ["SHEET-123"])
+        XCTAssertNil(sheets.first?.title)
+    }
+
     func testCreateCaptureEncodesMetadataAndQuality() async throws {
         var capturedRequest: URLRequest?
         var capturedBody: Data?
@@ -117,6 +154,19 @@ final class APIClientTests: XCTestCase {
         }
         return data
     }
+
+    private static let manifestResponse = Data(#"""
+    {
+      "schema_version":"lps-sheet-manifest/v1",
+      "sheet_version":"lps-letter-grid-v1",
+      "sheet_id":"SHEET-123",
+      "manifest_url":"https://example.test/api/v1/test_sheets/SHEET-123/manifest",
+      "page":{"units":"mm","width":215.9,"height":279.4},
+      "registration_markers":[{"role":"top_left","shape":"solid_square","rect":{"x":12,"y":12,"width":8,"height":8}}],
+      "patches":[{"id":"patch_1","role":"pair_color","pair_id":"pair_1","pair_side":"first","reference_role":null,"source_color":"#FF0000","safe_inset_mm":1.5,"rect":{"x":16,"y":38,"width":16,"height":10}}],
+      "pairs":[{"id":"pair_1","first_patch_id":"patch_1","second_patch_id":"patch_2","source_colors":["#FF0000","#00FF00"],"grid_row":0,"grid_col":1}]
+    }
+    """#.utf8)
 }
 
 private final class MockURLProtocol: URLProtocol {
