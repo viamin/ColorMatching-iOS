@@ -92,6 +92,55 @@ final class APIClientTests: XCTestCase {
         XCTAssertEqual((json["judgments"] as? [[String: Any]])?.first?["judgment"] as? String, "near_match")
     }
 
+    func testFetchesManifestAndRecentSheetsFromStubbedPublishedResponses() async throws {
+        MockURLProtocol.handler = { request in
+            let response = HTTPURLResponse(url: try XCTUnwrap(request.url), statusCode: 200, httpVersion: nil, headerFields: nil)!
+            switch request.url?.path {
+            case "/api/v1/test_sheets/sheet_1/manifest":
+                return (response, Data(Self.manifestResponse.utf8))
+            case "/api/v1/test_sheets/recent":
+                return (response, Data(#"{"sheets":[{"sheet_id":"sheet_1","manifest_url":"https://example.test/api/v1/test_sheets/sheet_1/manifest","title":"Published sheet"}]}"#.utf8))
+            default:
+                throw URLError(.badURL)
+            }
+        }
+
+        let baseURL = URL(string: "https://example.test")!
+        let manifest = try await client().fetchManifest(baseURL: baseURL, sheetCode: "sheet_1")
+        let sheets = try await client().fetchRecentSheets(baseURL: baseURL)
+
+        XCTAssertEqual(manifest.sheetID, "sheet_1")
+        XCTAssertEqual(sheets.map(\.sheetID), ["sheet_1"])
+        XCTAssertEqual(sheets.first?.title, "Published sheet")
+    }
+
+    func testPackageWiresGeneratedOpenAPIClientAndVendoredSpecification() throws {
+        let packageDirectory = URL(fileURLWithPath: #filePath)
+            .deletingLastPathComponent()
+            .deletingLastPathComponent()
+            .deletingLastPathComponent()
+        let package = try String(contentsOf: packageDirectory.appending(path: "Package.swift"), encoding: .utf8)
+
+        XCTAssertTrue(package.contains("swift-openapi-generator"), "Package.swift must declare swift-openapi-generator.")
+        XCTAssertTrue(package.contains("swift-openapi-runtime"), "Package.swift must declare swift-openapi-runtime.")
+        let specificationURL = packageDirectory.appending(path: "OpenAPI/color_matching.json")
+        guard FileManager.default.fileExists(atPath: specificationURL.path) else {
+            return XCTFail("The published OpenAPI document must be vendored for reproducible client generation.")
+        }
+
+        let specification = try String(contentsOf: specificationURL, encoding: .utf8)
+        [
+            "/api/v1/test_sheets/{sheet_id}/manifest",
+            "/api/v1/test_sheets/recent",
+            "/api/v1/test_sheets/{sheet_id}/captures",
+            "/api/v1/captures/{capture_id}/measurements",
+            "/api/v1/captures/{capture_id}/judgments",
+            "/api/v1/test_sheets/{sheet_id}/ranked_results"
+        ].forEach { path in
+            XCTAssertTrue(specification.contains(path), "Published spec is missing \(path).")
+        }
+    }
+
     private func client() -> APIClient {
         let configuration = URLSessionConfiguration.ephemeral
         configuration.protocolClasses = [MockURLProtocol.self]
@@ -117,6 +166,19 @@ final class APIClientTests: XCTestCase {
         }
         return data
     }
+
+    private static let manifestResponse = #"""
+    {
+      "schema_version": "lps-sheet-manifest/v1",
+      "sheet_version": "lps-letter-grid-v1",
+      "sheet_id": "sheet_1",
+      "manifest_url": "https://example.test/api/v1/test_sheets/sheet_1/manifest",
+      "page": {"units": "mm", "width": 215.9, "height": 279.4},
+      "registration_markers": [],
+      "patches": [],
+      "pairs": []
+    }
+    """
 }
 
 private final class MockURLProtocol: URLProtocol {
