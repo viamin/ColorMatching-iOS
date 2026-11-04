@@ -1,0 +1,79 @@
+{
+  "status": "failed",
+  "summary": "Test-writing run completed. Local-stub tests cover the current manifest and recent-sheet client calls; the new package/spec contract test is intentionally red until the generated OpenAPI client is implemented. Swift is unavailable in this container, so the suite could not be executed.",
+  "acceptance_criteria": [
+    {
+      "id": "AC-1",
+      "status": "failed",
+      "verification": {
+        "kind": "unit_or_service_test",
+        "references": [
+          {
+            "locator": "iOS/Tests/ColorMatchingLPSAppTests/OpenAPIClientContractTests.swift:5",
+            "result": "intentionally red: requires swift-openapi-generator and swift-openapi-runtime package dependencies"
+          },
+          {
+            "locator": "iOS/Tests/ColorMatchingLPSAppTests/OpenAPIClientContractTests.swift:12",
+            "result": "intentionally red: requires a vendored OpenAPI document covering six app surfaces"
+          }
+        ]
+      }
+    },
+    {
+      "id": "AC-2",
+      "status": "not_run",
+      "verification": {
+        "kind": "unit_or_service_test",
+        "references": [
+          {
+            "locator": "iOS/Tests/ColorMatchingLPSAppTests/APIClientTests.swift:95",
+            "result": "local URLProtocol manifest test added; not run because swift is unavailable"
+          },
+          {
+            "locator": "iOS/Tests/ColorMatchingLPSAppTests/APIClientTests.swift:116",
+            "result": "local URLProtocol recent-sheets test added; not run because swift is unavailable"
+          }
+        ]
+      }
+    },
+    {
+      "id": "AC-3",
+      "status": "not_run",
+      "verification": {
+        "kind": "unit_or_service_test",
+        "references": [
+          {
+            "locator": "docs/issue-5-openapi-client-pr-notes.md:12",
+            "result": "implementation verification plan recorded; generated target does not exist in this tests-only run"
+          }
+        ]
+      }
+    },
+    {
+      "id": "AC-4",
+      "status": "not_run",
+      "verification": {
+        "kind": "unit_or_service_test",
+        "references": [
+          {
+            "locator": "iOS/Tests/ColorMatchingLPSAppTests/APIClientTests.swift:180",
+            "result": "MockURLProtocol provides local stubs; not run because swift is unavailable"
+          }
+        ]
+      }
+    },
+    {
+      "id": "AC-5",
+      "status": "passed",
+      "verification": {
+        "kind": "human_or_external_evidence",
+        "references": [
+          {
+            "locator": "docs/issue-5-openapi-client-pr-notes.md:20",
+            "result": "records upstream source, prose/spec deltas, and endpoint-gap finding"
+          }
+        ]
+      }
+    }
+  ]
+}
