@@ -1,0 +1,79 @@
+{
+  "status": "not_run",
+  "summary": "Test-writing phase added permanent local-stub coverage and a red package-dependency test. The Swift toolchain is unavailable in this container, so swift test --disable-sandbox could not run.",
+  "acceptance_criteria": [
+    {
+      "id": "AC-1",
+      "status": "not_run",
+      "verification": {
+        "kind": "unit_or_service_test",
+        "references": [
+          {
+            "locator": "iOS/Tests/ColorMatchingLPSAppTests/APIClientTests.swift:testPackageDeclaresSwiftOpenAPIRuntimeForGeneratedClient",
+            "result": "Red by design: the package does not yet declare swift-openapi-runtime."
+          }
+        ]
+      }
+    },
+    {
+      "id": "AC-2",
+      "status": "not_run",
+      "verification": {
+        "kind": "unit_or_service_test",
+        "references": [
+          {
+            "locator": "iOS/Tests/ColorMatchingLPSAppTests/APIClientTests.swift:testFetchManifestDecodesServerManifestFromLocalStub",
+            "result": "Not run: Swift toolchain unavailable."
+          },
+          {
+            "locator": "iOS/Tests/ColorMatchingLPSAppTests/APIClientTests.swift:testFetchRecentSheetsDecodesServerListFromLocalStub",
+            "result": "Not run: Swift toolchain unavailable."
+          },
+          {
+            "locator": "docs/issue-5-generated-openapi-client-verification.md",
+            "result": "Ranked-results typed-client coverage is blocked by the upstream schema gap recorded in the document."
+          }
+        ]
+      }
+    },
+    {
+      "id": "AC-3",
+      "status": "not_run",
+      "verification": {
+        "kind": "human_or_external_evidence",
+        "references": [
+          {
+            "locator": "docs/issue-5-generated-openapi-client-verification.md",
+            "result": "Deferred to implementation phase; no production files may be changed in this test-writing run."
+          }
+        ]
+      }
+    },
+    {
+      "id": "AC-4",
+      "status": "not_run",
+      "verification": {
+        "kind": "unit_or_service_test",
+        "references": [
+          {
+            "locator": "iOS/Tests/ColorMatchingLPSAppTests/APIClientTests.swift:MockURLProtocol",
+            "result": "Local URLProtocol stub is inspectable; execution is blocked by missing Swift."
+          }
+        ]
+      }
+    },
+    {
+      "id": "AC-5",
+      "status": "passed",
+      "verification": {
+        "kind": "human_or_external_evidence",
+        "references": [
+          {
+            "locator": "docs/issue-5-generated-openapi-client-verification.md",
+            "result": "Records contract deltas and endpoint schema gaps derived from viamin/color_matching#110."
+          }
+        ]
+      }
+    }
+  ]
+}
