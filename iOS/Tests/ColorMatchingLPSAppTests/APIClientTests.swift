@@ -92,6 +92,35 @@ final class APIClientTests: XCTestCase {
         XCTAssertEqual((json["judgments"] as? [[String: Any]])?.first?["judgment"] as? String, "near_match")
     }
 
+    func testFetchManifestAndRecentSheetsDecodeLocalStubbedResponses() async throws {
+        var requestedPaths: [String] = []
+        MockURLProtocol.handler = { request in
+            let path = try XCTUnwrap(request.url?.path)
+            requestedPaths.append(path)
+
+            switch path {
+            case "/api/v1/test_sheets/sheet_1/manifest":
+                return (Self.okResponse(for: request), Data(Self.manifestJSON.utf8))
+            case "/api/v1/test_sheets/recent":
+                return (Self.okResponse(for: request), Data(Self.recentSheetsJSON.utf8))
+            default:
+                throw URLError(.badURL)
+            }
+        }
+
+        let baseURL = URL(string: "https://example.test")!
+        let manifest = try await client().fetchManifest(baseURL: baseURL, sheetCode: "sheet_1")
+        let recentSheets = try await client().fetchRecentSheets(baseURL: baseURL)
+
+        XCTAssertEqual(manifest.schemaVersion, "lps-sheet-manifest/v1")
+        XCTAssertEqual(manifest.sheetID, "sheet_1")
+        XCTAssertEqual(recentSheets.map(\.sheetID), ["sheet_1"])
+        XCTAssertEqual(requestedPaths, [
+            "/api/v1/test_sheets/sheet_1/manifest",
+            "/api/v1/test_sheets/recent"
+        ])
+    }
+
     private func client() -> APIClient {
         let configuration = URLSessionConfiguration.ephemeral
         configuration.protocolClasses = [MockURLProtocol.self]
@@ -117,6 +146,35 @@ final class APIClientTests: XCTestCase {
         }
         return data
     }
+
+    private static func okResponse(for request: URLRequest) -> HTTPURLResponse {
+        HTTPURLResponse(url: request.url!, statusCode: 200, httpVersion: nil, headerFields: nil)!
+    }
+
+    private static let manifestJSON = #"""
+    {
+      "schema_version": "lps-sheet-manifest/v1",
+      "sheet_version": "lps-letter-grid-v1",
+      "sheet_id": "sheet_1",
+      "manifest_url": "https://example.test/api/v1/test_sheets/sheet_1/manifest",
+      "page": {"units": "mm", "width": 215.9, "height": 279.4},
+      "registration_markers": [],
+      "patches": [],
+      "pairs": []
+    }
+    """#
+
+    private static let recentSheetsJSON = #"""
+    {
+      "sheets": [
+        {
+          "sheet_id": "sheet_1",
+          "manifest_url": "https://example.test/api/v1/test_sheets/sheet_1/manifest",
+          "title": null
+        }
+      ]
+    }
+    """#
 }
 
 private final class MockURLProtocol: URLProtocol {
