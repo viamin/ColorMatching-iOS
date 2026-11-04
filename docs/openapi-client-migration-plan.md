@@ -27,4 +27,3 @@ Differences found by comparing the current prose contract with the OpenAPI schem
 1. Vendor the actual JSON served by `/api/v1/openapi.json` at a pinned upstream revision, then run the generated client plugin from that artifact.
 2. Confirm whether the sparse manifest and ranked-results schemas are intentionally permissive. If they are not expanded upstream, keep the app-only analysis models separate and document any unavoidable decoding boundary rather than presenting them as generated API types.
 3. Add a generated operation for ranked results once its response schema includes the values the app renders. This is an upstream contract gap, not a new endpoint request.
-

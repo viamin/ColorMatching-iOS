@@ -174,7 +174,7 @@ final class APIClientTests: XCTestCase {
         {"id": "pair_1", "first_patch_id": "patch_1", "second_patch_id": "patch_2", "source_colors": ["#FF0000", "#00FF00"], "grid_row": 0, "grid_col": 1}
       ]
     }
-    """# 
+    """#
 }
 
 private final class MockURLProtocol: URLProtocol {
