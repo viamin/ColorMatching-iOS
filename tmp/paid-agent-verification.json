@@ -1,0 +1,75 @@
+{
+  "status": "failed",
+  "summary": "Tests and documentation are committed in the required red phase. The Swift toolchain is unavailable, so the suite could not run; the generation-input tests intentionally fail until the implementation phase vendors the provider document and adds the generated-client dependencies.",
+  "acceptance_criteria": [
+    {
+      "id": "AC-1",
+      "status": "failed",
+      "verification": {
+        "kind": "unit_or_service_test",
+        "references": [
+          {
+            "locator": "iOS/Tests/ColorMatchingLPSAppTests/APIClientTests.swift:testGeneratedClientInputsAreCheckedIn",
+            "result": "red: Package.swift lacks swift-openapi-generator/swift-openapi-runtime and OpenAPI/color-matching.json is absent"
+          }
+        ]
+      }
+    },
+    {
+      "id": "AC-2",
+      "status": "failed",
+      "verification": {
+        "kind": "unit_or_service_test",
+        "references": [
+          {
+            "locator": "iOS/Tests/ColorMatchingLPSAppTests/APIClientTests.swift:testVendoredOpenAPIDocumentDeclaresEveryAppOperation",
+            "result": "red: vendored document absent; test requires manifest, recent, capture, measurements, judgments, and ranked-results routes"
+          }
+        ]
+      }
+    },
+    {
+      "id": "AC-3",
+      "status": "not_run",
+      "verification": {
+        "kind": "unit_or_service_test",
+        "references": [
+          {
+            "locator": "iOS/Sources/ColorMatchingLPSAppCore/APIClient.swift",
+            "result": "not run: replacement is implementation-phase work"
+          }
+        ]
+      }
+    },
+    {
+      "id": "AC-4",
+      "status": "not_run",
+      "verification": {
+        "kind": "unit_or_service_test",
+        "references": [
+          {
+            "locator": "iOS/Tests/ColorMatchingLPSAppTests/APIClientTests.swift:testFetchManifestDecodesStubbedResponse",
+            "result": "not run: swift executable is unavailable; fixture is permanent and makes no live-server request"
+          },
+          {
+            "locator": "iOS/Tests/ColorMatchingLPSAppTests/APIClientTests.swift:testFetchRecentSheetsDecodesStubbedResponse",
+            "result": "not run: swift executable is unavailable; fixture is permanent and makes no live-server request"
+          }
+        ]
+      }
+    },
+    {
+      "id": "AC-5",
+      "status": "passed",
+      "verification": {
+        "kind": "human_or_external_evidence",
+        "references": [
+          {
+            "locator": "docs/issue-5-openapi-client-test-plan.md",
+            "result": "records provider evidence, prose/spec deltas, and the ranked-results schema gap from viamin/color_matching#113"
+          }
+        ]
+      }
+    }
+  ]
+}
