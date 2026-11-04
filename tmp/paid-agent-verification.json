@@ -1,0 +1,75 @@
+{
+  "status": "failed",
+  "summary": "Tests-only red phase: OpenAPI migration acceptance tests and contract-delta evidence are committed; Swift cannot run because this container has no Swift toolchain.",
+  "acceptance_criteria": [
+    {
+      "id": "AC-1",
+      "status": "failed",
+      "verification": {
+        "kind": "unit_or_service_test",
+        "references": [
+          {
+            "locator": "iOS/Tests/ColorMatchingLPSAppTests/OpenAPIIntegrationContractTests.swift:46",
+            "result": "red: package does not yet declare generator/runtime dependencies"
+          }
+        ]
+      }
+    },
+    {
+      "id": "AC-2",
+      "status": "failed",
+      "verification": {
+        "kind": "unit_or_service_test",
+        "references": [
+          {
+            "locator": "iOS/Tests/ColorMatchingLPSAppTests/OpenAPIIntegrationContractTests.swift:54",
+            "result": "red: pinned OpenAPI document is not yet vendored"
+          }
+        ]
+      }
+    },
+    {
+      "id": "AC-3",
+      "status": "failed",
+      "verification": {
+        "kind": "unit_or_service_test",
+        "references": [
+          {
+            "locator": "iOS/Tests/ColorMatchingLPSAppTests/OpenAPIIntegrationContractTests.swift:68",
+            "result": "red: API boundary still declares hand-written wire models"
+          }
+        ]
+      }
+    },
+    {
+      "id": "AC-4",
+      "status": "not_run",
+      "verification": {
+        "kind": "permanent_system_test",
+        "references": [
+          {
+            "locator": "iOS/Tests/ColorMatchingLPSAppTests/OpenAPIIntegrationContractTests.swift:6",
+            "result": "not run: swift executable is unavailable in this container"
+          },
+          {
+            "locator": "iOS/Tests/ColorMatchingLPSAppTests/APIClientTests.swift:13",
+            "result": "existing local-stub write-operation coverage retained"
+          }
+        ]
+      }
+    },
+    {
+      "id": "AC-5",
+      "status": "passed",
+      "verification": {
+        "kind": "human_or_external_evidence",
+        "references": [
+          {
+            "locator": "docs/issue-5-openapi-client-verification.md:15",
+            "result": "published-spec deltas and ranked-results schema review gap recorded"
+          }
+        ]
+      }
+    }
+  ]
+}
