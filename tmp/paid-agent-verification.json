@@ -1,0 +1,71 @@
+{
+  "status": "failed",
+  "summary": "Red-phase tests and contract-delta evidence are committed; implementation is intentionally deferred to the approved implementation run.",
+  "acceptance_criteria": [
+    {
+      "id": "AC-1",
+      "status": "failed",
+      "verification": {
+        "kind": "unit_or_service_test",
+        "references": [
+          {
+            "locator": "iOS/Tests/ColorMatchingLPSAppTests/OpenAPIDocumentContractTests.swift:5",
+            "result": "not_run: swift is unavailable; iOS/OpenAPI/openapi.json is absent at this PR head"
+          }
+        ]
+      }
+    },
+    {
+      "id": "AC-2",
+      "status": "failed",
+      "verification": {
+        "kind": "human_or_external_evidence",
+        "references": [
+          {
+            "locator": "iOS/Sources/ColorMatchingLPSAppCore/APIClient.swift:4",
+            "result": "hand-written API client and Codable API models remain pending the implementation phase"
+          }
+        ]
+      }
+    },
+    {
+      "id": "AC-3",
+      "status": "failed",
+      "verification": {
+        "kind": "unit_or_service_test",
+        "references": [
+          {
+            "locator": "iOS/Tests/ColorMatchingLPSAppTests/OpenAPIDocumentContractTests.swift:16",
+            "result": "not_run: vendored document is absent; test defines the required generated-client response fields"
+          }
+        ]
+      }
+    },
+    {
+      "id": "AC-4",
+      "status": "not_run",
+      "verification": {
+        "kind": "permanent_system_test",
+        "references": [
+          {
+            "locator": "docs/openapi-client-test-plan.md:14",
+            "result": "local-stub generated-client tests await generated operation names in the implementation phase"
+          }
+        ]
+      }
+    },
+    {
+      "id": "AC-5",
+      "status": "not_run",
+      "verification": {
+        "kind": "human_or_external_evidence",
+        "references": [
+          {
+            "locator": "docs/openapi-client-test-plan.md:15",
+            "result": "swift test --disable-sandbox could not run because swift is unavailable in this container"
+          }
+        ]
+      }
+    }
+  ]
+}
