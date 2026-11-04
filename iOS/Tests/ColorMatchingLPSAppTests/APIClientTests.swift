@@ -92,6 +92,73 @@ final class APIClientTests: XCTestCase {
         XCTAssertEqual((json["judgments"] as? [[String: Any]])?.first?["judgment"] as? String, "near_match")
     }
 
+    func testFetchesManifestFromLocalStub() async throws {
+        MockURLProtocol.handler = { request in
+            XCTAssertEqual(request.url?.path, "/api/v1/test_sheets/sheet_1/manifest")
+            return (
+                HTTPURLResponse(url: request.url!, statusCode: 200, httpVersion: nil, headerFields: nil)!,
+                Data(#"""
+                {
+                  "schema_version": "lps-sheet-manifest/v1",
+                  "sheet_version": "lps-letter-grid-v1",
+                  "sheet_id": "sheet_1",
+                  "manifest_url": "https://example.test/api/v1/test_sheets/sheet_1/manifest",
+                  "page": {"units": "mm", "width": 215.9, "height": 279.4},
+                  "registration_markers": [],
+                  "patches": [],
+                  "pairs": []
+                }
+                """#.utf8)
+            )
+        }
+
+        let manifest = try await client().fetchManifest(
+            baseURL: URL(string: "https://example.test")!,
+            sheetCode: "sheet_1"
+        )
+
+        XCTAssertEqual(manifest.sheetID, "sheet_1")
+        XCTAssertEqual(manifest.schemaVersion, "lps-sheet-manifest/v1")
+    }
+
+    func testFetchesRecentSheetsFromLocalStub() async throws {
+        MockURLProtocol.handler = { request in
+            XCTAssertEqual(request.url?.path, "/api/v1/test_sheets/recent")
+            return (
+                HTTPURLResponse(url: request.url!, statusCode: 200, httpVersion: nil, headerFields: nil)!,
+                Data(#"{"sheets":[{"sheet_id":"sheet_1","manifest_url":"https://example.test/api/v1/test_sheets/sheet_1/manifest","title":"October sheet"}]}"#.utf8)
+            )
+        }
+
+        let sheets = try await client().fetchRecentSheets(baseURL: URL(string: "https://example.test")!)
+
+        XCTAssertEqual(sheets.map(\.sheetID), ["sheet_1"])
+        XCTAssertEqual(sheets.first?.title, "October sheet")
+    }
+
+    func testVendoredOpenAPISpecDeclaresEveryCompanionOperation() throws {
+        let specURL = repositoryRoot()
+            .appending(path: "iOS/OpenAPI/color-matching-api.json")
+        let data = try XCTUnwrap(try? Data(contentsOf: specURL), "Vendor the OpenAPI document at \(specURL.path)")
+        let document = try XCTUnwrap(JSONSerialization.jsonObject(with: data) as? [String: Any])
+        let paths = try XCTUnwrap(document["paths"] as? [String: Any])
+
+        let expectedOperations = [
+            ("/api/v1/test_sheets/{sheet_id}/manifest", "get"),
+            ("/api/v1/test_sheets/recent", "get"),
+            ("/api/v1/test_sheets/{sheet_id}/captures", "post"),
+            ("/api/v1/captures/{capture_id}/measurements", "post"),
+            ("/api/v1/captures/{capture_id}/judgments", "post"),
+            ("/api/v1/test_sheets/{sheet_id}/ranked_results", "get")
+        ]
+
+        for (path, method) in expectedOperations {
+            let pathItem = try XCTUnwrap(paths[path] as? [String: Any], "Missing path: \(path)")
+            let operation = try XCTUnwrap(pathItem[method] as? [String: Any], "Missing \(method.uppercased()) operation for \(path)")
+            XCTAssertFalse((operation["operationId"] as? String ?? "").isEmpty, "Missing operationId for \(method.uppercased()) \(path)")
+        }
+    }
+
     private func client() -> APIClient {
         let configuration = URLSessionConfiguration.ephemeral
         configuration.protocolClasses = [MockURLProtocol.self]
@@ -116,6 +183,14 @@ final class APIClientTests: XCTestCase {
             }
         }
         return data
+    }
+
+    private func repositoryRoot() -> URL {
+        var directory = URL(fileURLWithPath: #filePath).deletingLastPathComponent()
+        while !FileManager.default.fileExists(atPath: directory.appending(path: ".git").path) {
+            directory.deleteLastPathComponent()
+        }
+        return directory
     }
 }
 
