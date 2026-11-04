@@ -46,6 +46,72 @@ final class APIClientTests: XCTestCase {
         XCTAssertEqual(quality["rejections"] as? [String], [])
     }
 
+    func testFetchManifestAndRecentSheetsDecodeStubbedResponses() async throws {
+        MockURLProtocol.handler = { request in
+            switch request.url?.path {
+            case "/api/v1/test_sheets/sheet_1/manifest":
+                return Self.response(
+                    request,
+                    status: 200,
+                    body: #"""
+                    {"schema_version":"lps-sheet-manifest/v1","sheet_version":"lps-letter-grid-v1","sheet_id":"sheet_1","manifest_url":"https://example.test/api/v1/test_sheets/sheet_1/manifest","page":{"units":"mm","width":215.9,"height":279.4},"registration_markers":[],"patches":[],"pairs":[]}
+                    """#
+                )
+            case "/api/v1/test_sheets/recent":
+                return Self.response(
+                    request,
+                    status: 200,
+                    body: #"{"sheets":[{"sheet_id":"sheet_1","manifest_url":"https://example.test/api/v1/test_sheets/sheet_1/manifest","title":null}]}"#
+                )
+            default:
+                throw URLError(.badURL)
+            }
+        }
+
+        let baseURL = URL(string: "https://example.test")!
+        let manifest = try await client().fetchManifest(baseURL: baseURL, sheetCode: "sheet_1")
+        let recentSheets = try await client().fetchRecentSheets(baseURL: baseURL)
+
+        XCTAssertEqual(manifest.sheetID, "sheet_1")
+        XCTAssertEqual(recentSheets.map(\.sheetID), ["sheet_1"])
+        XCTAssertNil(recentSheets.first?.title)
+    }
+
+    func testCaptureUploadFlowUsesStubbedResponses() async throws {
+        var requestedPaths: [String] = []
+        MockURLProtocol.handler = { request in
+            requestedPaths.append(request.url!.path)
+            switch request.url!.path {
+            case "/api/v1/test_sheets/sheet_1/captures":
+                return Self.response(request, status: 201, body: #"{"capture_id":"1"}"#)
+            case "/api/v1/captures/1/measurements", "/api/v1/captures/1/judgments":
+                return Self.response(request, status: 200, body: #"{}"#)
+            default:
+                throw URLError(.badURL)
+            }
+        }
+
+        let baseURL = URL(string: "https://example.test")!
+        let api = client()
+        let capture = try await api.createCapture(
+            sheetID: "sheet_1",
+            baseURL: baseURL,
+            metadata: Self.metadata(),
+            quality: CaptureQuality(detectedMarkerCount: 4, blurScore: 0.75, rejections: [])
+        )
+        try await api.uploadMeasurements(captureID: capture.captureID, baseURL: baseURL, measurements: [], scores: [])
+        try await api.uploadJudgments(captureID: capture.captureID, baseURL: baseURL, judgments: [])
+
+        XCTAssertEqual(
+            requestedPaths,
+            [
+                "/api/v1/test_sheets/sheet_1/captures",
+                "/api/v1/captures/1/measurements",
+                "/api/v1/captures/1/judgments"
+            ]
+        )
+    }
+
     func testUploadMeasurementsEncodesScoresWithAlgorithmVersion() async throws {
         var capturedBody: Data?
         MockURLProtocol.handler = { request in
@@ -92,10 +158,68 @@ final class APIClientTests: XCTestCase {
         XCTAssertEqual((json["judgments"] as? [[String: Any]])?.first?["judgment"] as? String, "near_match")
     }
 
+    func testOpenAPIArtifactsDescribeEveryRequiredSurface() throws {
+        let packageDirectory = Self.packageDirectory
+        let package = try String(contentsOf: packageDirectory.appending(path: "Package.swift"), encoding: .utf8)
+        let specification = try Data(contentsOf: packageDirectory.appending(path: "OpenAPI/color-matching.json"))
+        let root = try XCTUnwrap(try JSONSerialization.jsonObject(with: specification) as? [String: Any])
+        let paths = try XCTUnwrap(root["paths"] as? [String: Any])
+
+        XCTAssertTrue(package.contains("swift-openapi-generator"))
+        XCTAssertTrue(package.contains("swift-openapi-runtime"))
+        XCTAssertNotNil(paths["/api/v1/test_sheets/{sheet_id}/manifest"])
+        XCTAssertNotNil(paths["/api/v1/test_sheets/recent"])
+        XCTAssertNotNil(paths["/api/v1/test_sheets/{sheet_id}/captures"])
+        XCTAssertNotNil(paths["/api/v1/captures/{capture_id}/measurements"])
+        XCTAssertNotNil(paths["/api/v1/captures/{capture_id}/judgments"])
+        XCTAssertNotNil(paths["/api/v1/test_sheets/{sheet_id}/ranked_results"])
+    }
+
+    func testHandWrittenWireModelsAreReplacedByGeneratedTypes() throws {
+        let source = try String(
+            contentsOf: Self.packageDirectory.appending(path: "Sources/ColorMatchingLPSAppCore/APIClient.swift"),
+            encoding: .utf8
+        )
+
+        XCTAssertFalse(source.contains("private struct CreateCaptureRequest"))
+        XCTAssertFalse(source.contains("private struct MeasurementUploadRequest"))
+        XCTAssertFalse(source.contains("private struct JudgmentUploadRequest"))
+        XCTAssertTrue(source.contains("Client"), "APIClient should delegate HTTP serialization to the generated OpenAPI client")
+    }
+
     private func client() -> APIClient {
         let configuration = URLSessionConfiguration.ephemeral
         configuration.protocolClasses = [MockURLProtocol.self]
         return APIClient(token: "token", session: URLSession(configuration: configuration))
+    }
+
+    private static var packageDirectory: URL {
+        URL(fileURLWithPath: #filePath)
+            .deletingLastPathComponent()
+            .deletingLastPathComponent()
+            .deletingLastPathComponent()
+    }
+
+    private static func metadata() -> CaptureMetadata {
+        CaptureMetadata(
+            deviceModel: "iPhone",
+            lens: "wide",
+            exposureDurationSeconds: 0.01,
+            iso: 100,
+            focusLensPosition: 0.4,
+            whiteBalanceGains: WhiteBalanceGains(red: 1.1, green: 1.0, blue: 1.2),
+            imageWidth: 100,
+            imageHeight: 200,
+            appVersion: "0.1.0",
+            timestamp: Date(timeIntervalSince1970: 0)
+        )
+    }
+
+    private static func response(_ request: URLRequest, status: Int, body: String) -> (HTTPURLResponse, Data) {
+        (
+            HTTPURLResponse(url: request.url!, statusCode: status, httpVersion: nil, headerFields: nil)!,
+            Data(body.utf8)
+        )
     }
 
     private static func jsonObject(from data: Data?) throws -> Any {
