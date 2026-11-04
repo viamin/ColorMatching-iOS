@@ -1,0 +1,75 @@
+{
+  "status": "not_run",
+  "summary": "Tests-only red phase: local-stub tests and migration evidence were added, but Swift is unavailable in this container (swift: No such file or directory).",
+  "acceptance_criteria": [
+    {
+      "id": "AC-1",
+      "status": "not_run",
+      "verification": {
+        "kind": "unit_or_service_test",
+        "references": [
+          {
+            "locator": "iOS/Tests/ColorMatchingLPSAppTests/APIClientTests.swift:testPackageConfiguresGeneratedClientAndPinnedOpenAPISpecification",
+            "result": "Not run: expected red until the implementation adds SPM dependencies, generator plugin, and OpenAPI/color-matching.json; Swift is unavailable in this container."
+          }
+        ]
+      }
+    },
+    {
+      "id": "AC-2",
+      "status": "not_run",
+      "verification": {
+        "kind": "unit_or_service_test",
+        "references": [
+          {
+            "locator": "iOS/Tests/ColorMatchingLPSAppTests/APIClientTests.swift:testFetchManifestDecodesLocalStubResponse",
+            "result": "Not run: local stub coverage added."
+          },
+          {
+            "locator": "iOS/Tests/ColorMatchingLPSAppTests/APIClientTests.swift:testFetchRecentSheetsDecodesLocalStubResponse",
+            "result": "Not run: local stub coverage added; ranked-results coverage awaits generated operation type."
+          }
+        ]
+      }
+    },
+    {
+      "id": "AC-3",
+      "status": "skipped",
+      "verification": {
+        "kind": "human_or_external_evidence",
+        "references": [
+          {
+            "locator": "docs/openapi-client-migration-pr-notes.md",
+            "result": "Requires implementation code review and compilation against generated types."
+          }
+        ]
+      }
+    },
+    {
+      "id": "AC-4",
+      "status": "not_run",
+      "verification": {
+        "kind": "unit_or_service_test",
+        "references": [
+          {
+            "locator": "iOS/Tests/ColorMatchingLPSAppTests/APIClientTests.swift:testCaptureUploadFlowUsesOnlyLocalStubbedAPIResponses",
+            "result": "Not run: full capture/upload flow uses only local stubs; Swift toolchain unavailable."
+          }
+        ]
+      }
+    },
+    {
+      "id": "AC-5",
+      "status": "skipped",
+      "verification": {
+        "kind": "human_or_external_evidence",
+        "references": [
+          {
+            "locator": "docs/openapi-client-migration-pr-notes.md",
+            "result": "Server dependency and known ranked-results gap documented; field-level comparison requires the pinned published document."
+          }
+        ]
+      }
+    }
+  ]
+}
