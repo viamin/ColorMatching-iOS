@@ -46,6 +46,35 @@ final class APIClientTests: XCTestCase {
         XCTAssertEqual(quality["rejections"] as? [String], [])
     }
 
+    func testFetchesManifestAndRecentSheetsFromLocalStubbedResponses() async throws {
+        var requestedPaths = [String]()
+        MockURLProtocol.handler = { request in
+            requestedPaths.append(request.url!.path)
+            let response = HTTPURLResponse(url: request.url!, statusCode: 200, httpVersion: nil, headerFields: nil)!
+
+            switch request.url!.path {
+            case "/api/v1/test_sheets/sheet_1/manifest":
+                return (response, Data(Self.manifestJSON.utf8))
+            case "/api/v1/test_sheets/recent":
+                return (response, Data(Self.recentSheetsJSON.utf8))
+            default:
+                throw URLError(.badURL)
+            }
+        }
+
+        let baseURL = URL(string: "https://example.test")!
+        let manifest = try await client().fetchManifest(baseURL: baseURL, sheetCode: "sheet_1")
+        let recentSheets = try await client().fetchRecentSheets(baseURL: baseURL)
+
+        XCTAssertEqual(manifest.sheetID, "sheet_1")
+        XCTAssertEqual(manifest.patches.map(\.id), ["patch_1"])
+        XCTAssertEqual(recentSheets.map(\.sheetID), ["sheet_1"])
+        XCTAssertEqual(requestedPaths, [
+            "/api/v1/test_sheets/sheet_1/manifest",
+            "/api/v1/test_sheets/recent"
+        ])
+    }
+
     func testUploadMeasurementsEncodesScoresWithAlgorithmVersion() async throws {
         var capturedBody: Data?
         MockURLProtocol.handler = { request in
@@ -117,6 +146,45 @@ final class APIClientTests: XCTestCase {
         }
         return data
     }
+
+    private static let manifestJSON = #"""
+    {
+      "schema_version": "lps-sheet-manifest/v1",
+      "sheet_version": "lps-letter-grid-v1",
+      "sheet_id": "sheet_1",
+      "manifest_url": "https://example.test/api/v1/test_sheets/sheet_1/manifest",
+      "page": {"units": "mm", "width": 215.9, "height": 279.4},
+      "registration_markers": [],
+      "patches": [{
+        "id": "patch_1",
+        "role": "pair_color",
+        "pair_id": "pair_1",
+        "pair_side": "first",
+        "reference_role": null,
+        "source_color": "#FF0000",
+        "safe_inset_mm": 1.5,
+        "rect": {"x": 16, "y": 38, "width": 16, "height": 10}
+      }],
+      "pairs": [{
+        "id": "pair_1",
+        "first_patch_id": "patch_1",
+        "second_patch_id": "patch_2",
+        "source_colors": ["#FF0000", "#00FF00"],
+        "grid_row": 0,
+        "grid_col": 1
+      }]
+    }
+    """#
+
+    private static let recentSheetsJSON = #"""
+    {
+      "sheets": [{
+        "sheet_id": "sheet_1",
+        "manifest_url": "https://example.test/api/v1/test_sheets/sheet_1/manifest",
+        "title": "LPS comparison sheet"
+      }]
+    }
+    """#
 }
 
 private final class MockURLProtocol: URLProtocol {
