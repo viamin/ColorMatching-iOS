@@ -1,0 +1,71 @@
+{
+  "status": "not_run",
+  "summary": "Test-writing phase: local-stub and configuration tests were added. Swift is unavailable in this container, so swift test --disable-sandbox could not run.",
+  "acceptance_criteria": [
+    {
+      "id": "AC-1",
+      "status": "not_run",
+      "verification": {
+        "kind": "unit_or_service_test",
+        "references": [
+          {
+            "locator": "iOS/Tests/ColorMatchingLPSAppTests/OpenAPIClientConfigurationTests.swift:5",
+            "result": "Red-phase test requires the vendored OpenAPI document and swift-openapi packages; not run because swift is unavailable."
+          }
+        ]
+      }
+    },
+    {
+      "id": "AC-2",
+      "status": "not_run",
+      "verification": {
+        "kind": "permanent_system_test",
+        "references": [
+          {
+            "locator": "iOS/Tests/ColorMatchingLPSAppTests/APIClientTests.swift:49",
+            "result": "Local URLProtocol manifest/recent-sheet tests added; ranked-results generated wrapper remains for implementation; not run because swift is unavailable."
+          }
+        ]
+      }
+    },
+    {
+      "id": "AC-3",
+      "status": "not_run",
+      "verification": {
+        "kind": "human_or_external_evidence",
+        "references": [
+          {
+            "locator": "docs/issue-5-openapi-client-verification-plan.md:11",
+            "result": "Requires implementation source review and compiler type-check after generated types are wired."
+          }
+        ]
+      }
+    },
+    {
+      "id": "AC-4",
+      "status": "not_run",
+      "verification": {
+        "kind": "permanent_system_test",
+        "references": [
+          {
+            "locator": "iOS/Tests/ColorMatchingLPSAppTests/APIClientTests.swift:49",
+            "result": "Tests use MockURLProtocol only; not run because swift is unavailable."
+          }
+        ]
+      }
+    },
+    {
+      "id": "AC-5",
+      "status": "not_run",
+      "verification": {
+        "kind": "human_or_external_evidence",
+        "references": [
+          {
+            "locator": "docs/issue-5-openapi-client-verification-plan.md:19",
+            "result": "Upstream source comparison recorded for transfer into the implementation PR description."
+          }
+        ]
+      }
+    }
+  ]
+}
