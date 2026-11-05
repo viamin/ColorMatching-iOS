@@ -1,0 +1,88 @@
+{
+  "status": "failed",
+  "summary": "Red-phase tests and migration evidence were added. Swift tests could not run because the container has no swift executable, and the ranked-results acceptance test is intentionally failing until the generated client is implemented.",
+  "acceptance_criteria": [
+    {
+      "id": "AC-1",
+      "status": "not_run",
+      "verification": {
+        "kind": "unit_or_service_test",
+        "references": [
+          {
+            "locator": "iOS/Tests/ColorMatchingLPSAppTests/APIClientTests.swift:49",
+            "result": "not run: swift executable unavailable in container"
+          }
+        ]
+      }
+    },
+    {
+      "id": "AC-2",
+      "status": "not_run",
+      "verification": {
+        "kind": "unit_or_service_test",
+        "references": [
+          {
+            "locator": "iOS/Tests/ColorMatchingLPSAppTests/APIClientTests.swift:67",
+            "result": "not run: swift executable unavailable in container"
+          }
+        ]
+      }
+    },
+    {
+      "id": "AC-3",
+      "status": "not_run",
+      "verification": {
+        "kind": "unit_or_service_test",
+        "references": [
+          {
+            "locator": "iOS/Tests/ColorMatchingLPSAppTests/APIClientTests.swift:12",
+            "result": "not run: swift executable unavailable in container"
+          },
+          {
+            "locator": "iOS/Tests/ColorMatchingLPSAppTests/APIClientTests.swift:89",
+            "result": "not run: swift executable unavailable in container"
+          }
+        ]
+      }
+    },
+    {
+      "id": "AC-4",
+      "status": "failed",
+      "verification": {
+        "kind": "unit_or_service_test",
+        "references": [
+          {
+            "locator": "iOS/Tests/ColorMatchingLPSAppTests/APIClientTests.swift:76",
+            "result": "intentional red assertion: no typed ranked-results operation exists"
+          }
+        ]
+      }
+    },
+    {
+      "id": "AC-5",
+      "status": "not_run",
+      "verification": {
+        "kind": "human_or_external_evidence",
+        "references": [
+          {
+            "locator": "docs/openapi-client-migration-plan.md:3",
+            "result": "the generated dependency and vendored specification are implementation-phase work"
+          }
+        ]
+      }
+    },
+    {
+      "id": "AC-6",
+      "status": "not_run",
+      "verification": {
+        "kind": "human_or_external_evidence",
+        "references": [
+          {
+            "locator": "docs/openapi-client-migration-plan.md:7",
+            "result": "requires implementation diff inspection"
+          }
+        ]
+      }
+    }
+  ]
+}
