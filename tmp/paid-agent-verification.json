@@ -1,0 +1,84 @@
+{
+  "status": "failed",
+  "summary": "Red-phase test-writing change: local-stub coverage and an implementation-blocking ranked-results test were added, but Swift is unavailable in this container and generated-client implementation is intentionally deferred.",
+  "acceptance_criteria": [
+    {
+      "id": "AC-1",
+      "status": "not_run",
+      "verification": {
+        "kind": "unit_or_service_test",
+        "references": [
+          {
+            "locator": "docs/issue-5-openapi-client-test-plan.md:7",
+            "result": "Package dependency and generated-target compilation are deferred to the implementation run."
+          }
+        ]
+      }
+    },
+    {
+      "id": "AC-2",
+      "status": "failed",
+      "verification": {
+        "kind": "unit_or_service_test",
+        "references": [
+          {
+            "locator": "iOS/Tests/ColorMatchingLPSAppTests/APIClientTests.swift:45",
+            "result": "Intentional red test identifies the missing generated ranked-results operation."
+          }
+        ]
+      }
+    },
+    {
+      "id": "AC-3",
+      "status": "not_run",
+      "verification": {
+        "kind": "unit_or_service_test",
+        "references": [
+          {
+            "locator": "docs/issue-5-openapi-client-test-plan.md:9",
+            "result": "Replacement of transport models is outside this test-writing run."
+          }
+        ]
+      }
+    },
+    {
+      "id": "AC-4",
+      "status": "not_run",
+      "verification": {
+        "kind": "unit_or_service_test",
+        "references": [
+          {
+            "locator": "iOS/Tests/ColorMatchingLPSAppTests/APIClientTests.swift:12",
+            "result": "Manifest and recent-sheet tests use MockURLProtocol local stubs; they could not run because Swift is unavailable."
+          }
+        ]
+      }
+    },
+    {
+      "id": "AC-5",
+      "status": "passed",
+      "verification": {
+        "kind": "human_or_external_evidence",
+        "references": [
+          {
+            "locator": "docs/issue-5-openapi-client-test-plan.md:18",
+            "result": "Published-contract deltas and endpoint gaps are recorded from viamin/color_matching#113; final PR description still requires human review."
+          }
+        ]
+      }
+    },
+    {
+      "id": "AC-6",
+      "status": "not_run",
+      "verification": {
+        "kind": "unit_or_service_test",
+        "references": [
+          {
+            "locator": "docs/issue-5-openapi-client-test-plan.md:12",
+            "result": "swift test --disable-sandbox could not run because the Swift toolchain is absent."
+          }
+        ]
+      }
+    }
+  ]
+}
