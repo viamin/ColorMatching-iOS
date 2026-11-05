@@ -1,0 +1,75 @@
+{
+  "status": "not_run",
+  "summary": "Test-writing phase added permanent local-stub coverage for the published ranked-results minimum response. Swift is unavailable in this container, and implementation changes are prohibited in this phase.",
+  "acceptance_criteria": [
+    {
+      "id": "AC-1",
+      "status": "not_run",
+      "verification": {
+        "kind": "human_or_external_evidence",
+        "references": [
+          {
+            "locator": "docs/openapi-client-migration-plan.md:5",
+            "result": "not_run: package and vendored-spec changes are implementation-phase work"
+          }
+        ]
+      }
+    },
+    {
+      "id": "AC-2",
+      "status": "not_run",
+      "verification": {
+        "kind": "permanent_system_test",
+        "references": [
+          {
+            "locator": "iOS/Tests/ColorMatchingLPSAppTests/APIClientTests.swift:92",
+            "result": "not_run: expected red test requires the missing generated ranked-results operation"
+          },
+          {
+            "locator": "iOS/Tests/ColorMatchingLPSAppTests/APIClientTests.swift:12",
+            "result": "not_run: existing local-stub coverage for the other five used API surfaces"
+          }
+        ]
+      }
+    },
+    {
+      "id": "AC-3",
+      "status": "not_run",
+      "verification": {
+        "kind": "unit_or_service_test",
+        "references": [
+          {
+            "locator": "docs/openapi-client-migration-plan.md:7",
+            "result": "not_run: replacing server DTOs is implementation-phase work"
+          }
+        ]
+      }
+    },
+    {
+      "id": "AC-4",
+      "status": "not_run",
+      "verification": {
+        "kind": "permanent_system_test",
+        "references": [
+          {
+            "locator": "iOS/Tests/ColorMatchingLPSAppTests/APIClientTests.swift:92",
+            "result": "not_run: Swift is unavailable; all requests are intercepted by MockURLProtocol and need no live server"
+          }
+        ]
+      }
+    },
+    {
+      "id": "AC-5",
+      "status": "passed",
+      "verification": {
+        "kind": "human_or_external_evidence",
+        "references": [
+          {
+            "locator": "docs/openapi-client-migration-plan.md:13",
+            "result": "passed: upstream route, contract deltas, and endpoint schema gaps are recorded with upstream references"
+          }
+        ]
+      }
+    }
+  ]
+}
