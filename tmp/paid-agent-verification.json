@@ -1,0 +1,71 @@
+{
+  "status": "not_run",
+  "summary": "Tests-only phase: focused red tests and contract-delta evidence were added. Swift is unavailable in this container, so swift test --disable-sandbox could not run.",
+  "acceptance_criteria": [
+    {
+      "id": "AC-1",
+      "status": "failed",
+      "verification": {
+        "kind": "unit_or_service_test",
+        "references": [
+          {
+            "locator": "iOS/Tests/ColorMatchingLPSAppTests/OpenAPIClientAdoptionTests.swift:testGeneratedClientInputsAreTrackedInThePackage",
+            "result": "Intentionally red: package dependencies, generator plugin, vendored OpenAPI document, and generator configuration are absent."
+          }
+        ]
+      }
+    },
+    {
+      "id": "AC-2",
+      "status": "failed",
+      "verification": {
+        "kind": "unit_or_service_test",
+        "references": [
+          {
+            "locator": "iOS/Tests/ColorMatchingLPSAppTests/OpenAPIClientAdoptionTests.swift:testGeneratedClientSpecificationContainsEveryCompanionOperation",
+            "result": "Intentionally red: the vendored OpenAPI input is absent; the test requires all six app-used operations."
+          }
+        ]
+      }
+    },
+    {
+      "id": "AC-3",
+      "status": "not_run",
+      "verification": {
+        "kind": "unit_or_service_test",
+        "references": [
+          {
+            "locator": "docs/issue-5-openapi-client-plan.md:Criterion map",
+            "result": "Blocked pending implementation and a Swift toolchain; provider schema gaps are recorded in the same document."
+          }
+        ]
+      }
+    },
+    {
+      "id": "AC-4",
+      "status": "not_run",
+      "verification": {
+        "kind": "unit_or_service_test",
+        "references": [
+          {
+            "locator": "iOS/Tests/ColorMatchingLPSAppTests/APIClientTests.swift:testFetchesManifestAndRecentSheetsFromStubbedResponses",
+            "result": "Local URLProtocol stub test added but not executed because swift is not installed. Existing stubs cover capture and upload requests."
+          }
+        ]
+      }
+    },
+    {
+      "id": "AC-5",
+      "status": "passed",
+      "verification": {
+        "kind": "human_or_external_evidence",
+        "references": [
+          {
+            "locator": "docs/issue-5-openapi-client-plan.md:Observed contract deltas",
+            "result": "Documents comparison with local prose contract and upstream viamin/color_matching PR #113."
+          }
+        ]
+      }
+    }
+  ]
+}
