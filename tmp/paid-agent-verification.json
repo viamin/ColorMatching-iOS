@@ -1,0 +1,71 @@
+{
+  "status": "failed",
+  "summary": "Test-writing phase completed. Permanent local-stub tests and red OpenAPI contract guards were added; implementation is not permitted in this phase and the Swift toolchain is unavailable in this container.",
+  "acceptance_criteria": [
+    {
+      "id": "AC-1",
+      "status": "failed",
+      "verification": {
+        "kind": "unit_or_service_test",
+        "references": [
+          {
+            "locator": "iOS/Tests/ColorMatchingLPSAppTests/OpenAPIContractTests.swift:5",
+            "result": "Red: Package.swift has neither swift-openapi-generator nor swift-openapi-runtime, and no vendored OpenAPI document exists."
+          }
+        ]
+      }
+    },
+    {
+      "id": "AC-2",
+      "status": "failed",
+      "verification": {
+        "kind": "unit_or_service_test",
+        "references": [
+          {
+            "locator": "iOS/Tests/ColorMatchingLPSAppTests/OpenAPIContractTests.swift:15",
+            "result": "Red: the required generated-client operations cannot be verified until the vendored specification exists."
+          }
+        ]
+      }
+    },
+    {
+      "id": "AC-3",
+      "status": "failed",
+      "verification": {
+        "kind": "human_or_external_evidence",
+        "references": [
+          {
+            "locator": "iOS/Sources/ColorMatchingLPSAppCore/APIClient.swift:87",
+            "result": "Current transport models are hand-written; implementation is deferred to the approved implementation phase."
+          }
+        ]
+      }
+    },
+    {
+      "id": "AC-4",
+      "status": "not_run",
+      "verification": {
+        "kind": "unit_or_service_test",
+        "references": [
+          {
+            "locator": "iOS/Tests/ColorMatchingLPSAppTests/APIClientTests.swift:8",
+            "result": "Local MockURLProtocol coverage was written, but swift test --disable-sandbox could not run because no Swift executable is installed."
+          }
+        ]
+      }
+    },
+    {
+      "id": "AC-5",
+      "status": "passed",
+      "verification": {
+        "kind": "human_or_external_evidence",
+        "references": [
+          {
+            "locator": "docs/openapi-client-adoption-plan.md:19",
+            "result": "Documents upstream issue #110 / merged PR #113 and the concrete prose-versus-spec deltas for the eventual PR description."
+          }
+        ]
+      }
+    }
+  ]
+}
