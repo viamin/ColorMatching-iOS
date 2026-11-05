@@ -1,0 +1,79 @@
+{
+  "status": "not_run",
+  "summary": "Tests and contract-delta evidence were prepared for the generated-client implementation. The Swift toolchain is unavailable in this container, so swift test --disable-sandbox could not run.",
+  "acceptance_criteria": [
+    {
+      "id": "AC-1",
+      "status": "not_run",
+      "verification": {
+        "kind": "human_or_external_evidence",
+        "references": [
+          {
+            "locator": "docs/issue-5-generated-openapi-client-test-plan.md",
+            "result": "Implementation-phase dependency and generated-source review is pending."
+          }
+        ]
+      }
+    },
+    {
+      "id": "AC-2",
+      "status": "not_run",
+      "verification": {
+        "kind": "unit_or_service_test",
+        "references": [
+          {
+            "locator": "iOS/Tests/ColorMatchingLPSAppTests/APIClientTests.swift:testFetchManifestDecodesPublishedSheetFields",
+            "result": "Prepared; not run because swift is unavailable."
+          },
+          {
+            "locator": "iOS/Tests/ColorMatchingLPSAppTests/APIClientTests.swift:testFetchRecentSheetsDecodesNullableTitles",
+            "result": "Prepared; not run because swift is unavailable."
+          },
+          {
+            "locator": "docs/issue-5-generated-openapi-client-test-plan.md#endpoint-gap",
+            "result": "Ranked-results test blocked by missing response fields in the upstream OpenAPI schema."
+          }
+        ]
+      }
+    },
+    {
+      "id": "AC-3",
+      "status": "not_run",
+      "verification": {
+        "kind": "human_or_external_evidence",
+        "references": [
+          {
+            "locator": "docs/issue-5-generated-openapi-client-test-plan.md",
+            "result": "Hand-written-model replacement is implementation-phase work."
+          }
+        ]
+      }
+    },
+    {
+      "id": "AC-4",
+      "status": "not_run",
+      "verification": {
+        "kind": "unit_or_service_test",
+        "references": [
+          {
+            "locator": "iOS/Tests/ColorMatchingLPSAppTests/APIClientTests.swift",
+            "result": "MockURLProtocol supplies local stubbed responses; execution is pending Swift availability."
+          }
+        ]
+      }
+    },
+    {
+      "id": "AC-5",
+      "status": "passed",
+      "verification": {
+        "kind": "human_or_external_evidence",
+        "references": [
+          {
+            "locator": "docs/issue-5-generated-openapi-client-test-plan.md#published-spec-deltas-from-the-prose-contract",
+            "result": "Published-spec deltas and the ranked-results endpoint gap are recorded for the PR description."
+          }
+        ]
+      }
+    }
+  ]
+}
