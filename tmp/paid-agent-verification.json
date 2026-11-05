@@ -1,0 +1,71 @@
+{
+  "status": "not_run",
+  "summary": "Red-phase tests and implementation plan added; Swift is unavailable in the container, and generated-client integration has not been implemented in this tests-only run.",
+  "acceptance_criteria": [
+    {
+      "id": "AC-1",
+      "status": "failed",
+      "verification": {
+        "kind": "unit_or_service_test",
+        "references": [
+          {
+            "locator": "iOS/Tests/ColorMatchingLPSAppTests/OpenAPIClientIntegrationTests.swift:5",
+            "result": "red: Package.swift does not yet declare the generator/runtime and the vendored OpenAPI document is absent"
+          }
+        ]
+      }
+    },
+    {
+      "id": "AC-2",
+      "status": "not_run",
+      "verification": {
+        "kind": "permanent_system_test",
+        "references": [
+          {
+            "locator": "docs/issue-5-openapi-client-plan.md:16",
+            "result": "ranked-results wrapper and generated client are not yet implemented"
+          }
+        ]
+      }
+    },
+    {
+      "id": "AC-3",
+      "status": "not_run",
+      "verification": {
+        "kind": "unit_or_service_test",
+        "references": [
+          {
+            "locator": "iOS/Sources/ColorMatchingLPSAppCore/APIClient.swift:77",
+            "result": "hand-written API Codable models remain in the test-writing phase"
+          }
+        ]
+      }
+    },
+    {
+      "id": "AC-4",
+      "status": "not_run",
+      "verification": {
+        "kind": "permanent_system_test",
+        "references": [
+          {
+            "locator": "iOS/Tests/ColorMatchingLPSAppTests/APIClientTests.swift:49",
+            "result": "local URLProtocol stubs added, but swift test could not run because Swift is unavailable"
+          }
+        ]
+      }
+    },
+    {
+      "id": "AC-5",
+      "status": "passed",
+      "verification": {
+        "kind": "human_or_external_evidence",
+        "references": [
+          {
+            "locator": "docs/issue-5-openapi-client-plan.md:25",
+            "result": "records deltas and confirms endpoint coverage from viamin/color_matching#110"
+          }
+        ]
+      }
+    }
+  ]
+}
