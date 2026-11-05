@@ -46,6 +46,46 @@ final class APIClientTests: XCTestCase {
         XCTAssertEqual(quality["rejections"] as? [String], [])
     }
 
+    func testFetchesManifestAndRecentSheetsFromStubbedResponses() async throws {
+        MockURLProtocol.handler = { request in
+            let body: String
+            switch request.url?.path {
+            case "/api/v1/test_sheets/sheet_1/manifest":
+                body = Self.manifestResponse
+            case "/api/v1/test_sheets/recent":
+                body = #"{"sheets":[{"sheet_id":"sheet_1","manifest_url":"https://example.test/api/v1/test_sheets/sheet_1/manifest","title":"October sheet"}]}"#
+            default:
+                throw URLError(.badURL)
+            }
+            return (HTTPURLResponse(url: try XCTUnwrap(request.url), statusCode: 200, httpVersion: nil, headerFields: nil)!, Data(body.utf8))
+        }
+
+        let baseURL = URL(string: "https://example.test")!
+        let manifest = try await client().fetchManifest(baseURL: baseURL, sheetCode: "sheet_1")
+        let recentSheets = try await client().fetchRecentSheets(baseURL: baseURL)
+
+        XCTAssertEqual(manifest.sheetID, "sheet_1")
+        XCTAssertEqual(manifest.registrationMarkers.count, 1)
+        XCTAssertEqual(recentSheets.map(\.sheetID), ["sheet_1"])
+        XCTAssertEqual(recentSheets.first?.title, "October sheet")
+    }
+
+    func testGeneratedClientArtifactsCoverEveryUsedOperation() throws {
+        let package = try String(contentsOf: packageRoot.appending(path: "Package.swift"), encoding: .utf8)
+        XCTAssertTrue(package.contains("swift-openapi-generator"), "Package.swift must declare swift-openapi-generator.")
+        XCTAssertTrue(package.contains("swift-openapi-runtime"), "Package.swift must declare swift-openapi-runtime.")
+
+        let generatedClient = packageRoot.appending(path: "Sources/ColorMatchingLPSAppCore/Generated/OpenAPIClient.swift")
+        guard FileManager.default.fileExists(atPath: generatedClient.path) else {
+            XCTFail("Check in the generated OpenAPI client so regeneration changes are reviewable.")
+            return
+        }
+        let source = try String(contentsOf: generatedClient, encoding: .utf8)
+        ["manifest", "recent", "captures", "measurements", "judgments", "ranked_results"].forEach {
+            XCTAssertTrue(source.contains($0), "Generated client is missing the \($0) operation used by the app.")
+        }
+    }
+
     func testUploadMeasurementsEncodesScoresWithAlgorithmVersion() async throws {
         var capturedBody: Data?
         MockURLProtocol.handler = { request in
@@ -117,6 +157,26 @@ final class APIClientTests: XCTestCase {
         }
         return data
     }
+
+    private var packageRoot: URL {
+        URL(fileURLWithPath: #filePath)
+            .deletingLastPathComponent()
+            .deletingLastPathComponent()
+            .deletingLastPathComponent()
+    }
+
+    private static let manifestResponse = #"""
+    {
+      "schema_version":"lps-sheet-manifest/v1",
+      "sheet_version":"lps-letter-grid-v1",
+      "sheet_id":"sheet_1",
+      "manifest_url":"https://example.test/api/v1/test_sheets/sheet_1/manifest",
+      "page":{"units":"mm","width":215.9,"height":279.4},
+      "registration_markers":[{"role":"top_left","shape":"solid_square","rect":{"x":12,"y":12,"width":8,"height":8}}],
+      "patches":[],
+      "pairs":[]
+    }
+    """
 }
 
 private final class MockURLProtocol: URLProtocol {
