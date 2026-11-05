@@ -1,0 +1,79 @@
+{
+  "status": "not_run",
+  "summary": "Tests and verification plan added during the tests-only phase. swift is not installed in this container, so the Swift suite could not be executed.",
+  "acceptance_criteria": [
+    {
+      "id": "AC-1",
+      "status": "not_run",
+      "verification": {
+        "kind": "unit_or_service_test",
+        "references": [
+          {
+            "locator": "iOS/Tests/ColorMatchingLPSAppTests/APIClientTests.swift:130",
+            "result": "not_run: requires swift-openapi-generator, swift-openapi-runtime, and iOS/OpenAPI/color-matching-api-v1.json; swift is unavailable in this container"
+          }
+        ]
+      }
+    },
+    {
+      "id": "AC-2",
+      "status": "not_run",
+      "verification": {
+        "kind": "unit_or_service_test",
+        "references": [
+          {
+            "locator": "iOS/Tests/ColorMatchingLPSAppTests/APIClientTests.swift:12",
+            "result": "not_run: local capture stub coverage requires the unavailable Swift toolchain"
+          },
+          {
+            "locator": "iOS/Tests/ColorMatchingLPSAppTests/APIClientTests.swift:95",
+            "result": "not_run: local manifest/recent-sheet stub coverage requires the unavailable Swift toolchain"
+          },
+          {
+            "locator": "iOS/Tests/ColorMatchingLPSAppTests/APIClientTests.swift:141",
+            "result": "deliberately red until ranked-results support is implemented"
+          }
+        ]
+      }
+    },
+    {
+      "id": "AC-3",
+      "status": "not_run",
+      "verification": {
+        "kind": "human_or_external_evidence",
+        "references": [
+          {
+            "locator": "docs/issue-5-openapi-client-test-plan.md:13",
+            "result": "tests-only phase; generated-type replacement awaits implementation"
+          }
+        ]
+      }
+    },
+    {
+      "id": "AC-4",
+      "status": "not_run",
+      "verification": {
+        "kind": "unit_or_service_test",
+        "references": [
+          {
+            "locator": "iOS/Tests/ColorMatchingLPSAppTests/APIClientTests.swift:95",
+            "result": "local MockURLProtocol stubs added; not executable without swift"
+          }
+        ]
+      }
+    },
+    {
+      "id": "AC-5",
+      "status": "skipped",
+      "verification": {
+        "kind": "human_or_external_evidence",
+        "references": [
+          {
+            "locator": "docs/issue-5-openapi-client-test-plan.md:17",
+            "result": "requires the fetched, vendored published OpenAPI document before contract deltas can be inspected"
+          }
+        ]
+      }
+    }
+  ]
+}
