@@ -92,6 +92,54 @@ final class APIClientTests: XCTestCase {
         XCTAssertEqual((json["judgments"] as? [[String: Any]])?.first?["judgment"] as? String, "near_match")
     }
 
+    func testGeneratedClientFetchesManifestAndRecentSheetsFromLocalStubs() async throws {
+        var requestedPaths: [String] = []
+        MockURLProtocol.handler = { request in
+            requestedPaths.append(request.url!.path)
+
+            switch request.url!.path {
+            case "/api/v1/test_sheets/sheet_1/manifest":
+                return (
+                    HTTPURLResponse(url: request.url!, statusCode: 200, httpVersion: nil, headerFields: nil)!,
+                    Self.manifestResponse
+                )
+            case "/api/v1/test_sheets/recent":
+                return (
+                    HTTPURLResponse(url: request.url!, statusCode: 200, httpVersion: nil, headerFields: nil)!,
+                    Data(#"{"sheets":[{"sheet_id":"sheet_1","manifest_url":"https://example.test/api/v1/test_sheets/sheet_1/manifest","title":"LPS sheet"}]}"#.utf8)
+                )
+            default:
+                throw URLError(.badURL)
+            }
+        }
+
+        let baseURL = URL(string: "https://example.test")!
+        let client = client()
+        let manifest = try await client.fetchManifest(baseURL: baseURL, sheetCode: "sheet_1")
+        let recentSheets = try await client.fetchRecentSheets(baseURL: baseURL)
+
+        XCTAssertEqual(requestedPaths, [
+            "/api/v1/test_sheets/sheet_1/manifest",
+            "/api/v1/test_sheets/recent"
+        ])
+        XCTAssertEqual(manifest.sheetID, "sheet_1")
+        XCTAssertEqual(manifest.pairs.first?.id, "pair_1")
+        XCTAssertEqual(recentSheets.map(\.sheetID), ["sheet_1"])
+    }
+
+    func testOpenAPIClientIsGeneratedFromVendoredSpec() throws {
+        let package = try String(contentsOf: Self.iOSDirectory.appending(path: "Package.swift"), encoding: .utf8)
+        let specURL = Self.iOSDirectory.appending(path: "OpenAPI/color-matching-api-v1.json")
+
+        XCTAssertTrue(package.contains("swift-openapi-generator"), "Package.swift must declare swift-openapi-generator.")
+        XCTAssertTrue(package.contains("swift-openapi-runtime"), "Package.swift must declare swift-openapi-runtime.")
+        XCTAssertTrue(FileManager.default.fileExists(atPath: specURL.path), "Vendor the published /api/v1 OpenAPI document for reproducible client generation.")
+    }
+
+    func testGeneratedClientSupportsRankedResults() {
+        XCTFail("Replace APIClient with the generated OpenAPI client and exercise GET /api/v1/test_sheets/{sheet_id}/ranked_results against MockURLProtocol.")
+    }
+
     private func client() -> APIClient {
         let configuration = URLSessionConfiguration.ephemeral
         configuration.protocolClasses = [MockURLProtocol.self]
@@ -117,6 +165,33 @@ final class APIClientTests: XCTestCase {
         }
         return data
     }
+
+    private static var iOSDirectory: URL {
+        URL(fileURLWithPath: #filePath)
+            .deletingLastPathComponent()
+            .deletingLastPathComponent()
+            .deletingLastPathComponent()
+    }
+
+    private static let manifestResponse = Data(#"""
+    {
+      "schema_version": "lps-sheet-manifest/v1",
+      "sheet_version": "lps-letter-grid-v1",
+      "sheet_id": "sheet_1",
+      "manifest_url": "https://example.test/api/v1/test_sheets/sheet_1/manifest",
+      "page": {"units": "mm", "width": 215.9, "height": 279.4},
+      "registration_markers": [],
+      "patches": [],
+      "pairs": [{
+        "id": "pair_1",
+        "grid_row": 0,
+        "grid_col": 0,
+        "first_patch_id": "patch_1",
+        "second_patch_id": "patch_2",
+        "source_colors": ["#000000", "#FFFFFF"]
+      }]
+    }
+    """#.utf8)
 }
 
 private final class MockURLProtocol: URLProtocol {
