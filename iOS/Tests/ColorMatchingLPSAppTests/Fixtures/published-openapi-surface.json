@@ -1,0 +1,16 @@
+{
+  "openapi": "3.0.0",
+  "info": {
+    "title": "Color Matching API",
+    "version": "v1",
+    "description": "Focused fixture transcribed from viamin/color_matching main at 05062f5381a6f76413cc2bdf1cb2cc08a1b70ff7 (PR #113)."
+  },
+  "paths": {
+    "/api/v1/test_sheets/{sheet_id}/manifest": { "get": { "operationId": "fetchTestSheetManifest" } },
+    "/api/v1/test_sheets/recent": { "get": { "operationId": "listRecentTestSheets" } },
+    "/api/v1/test_sheets/{sheet_id}/captures": { "post": { "operationId": "createCapture" } },
+    "/api/v1/captures/{capture_id}/measurements": { "post": { "operationId": "uploadCaptureMeasurements" } },
+    "/api/v1/captures/{capture_id}/judgments": { "post": { "operationId": "uploadCaptureJudgments" } },
+    "/api/v1/test_sheets/{sheet_id}/ranked_results": { "get": { "operationId": "fetchRankedResults" } }
+  }
+}
