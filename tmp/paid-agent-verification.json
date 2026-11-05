@@ -1,0 +1,71 @@
+{
+  "status": "not_run",
+  "summary": "Tests-only red phase for issue #5. Swift is not installed in this container, so the suite could not be executed; configuration tests intentionally remain red until the implementation run vendors the provider OpenAPI document and adds generated-client dependencies.",
+  "acceptance_criteria": [
+    {
+      "id": "AC-1",
+      "status": "not_run",
+      "verification": {
+        "kind": "unit_or_service_test",
+        "references": [
+          {
+            "locator": "iOS/Tests/ColorMatchingLPSAppTests/OpenAPIGenerationConfigurationTests.swift:5",
+            "result": "not run: Swift toolchain unavailable; expected red before implementation"
+          }
+        ]
+      }
+    },
+    {
+      "id": "AC-2",
+      "status": "not_run",
+      "verification": {
+        "kind": "unit_or_service_test",
+        "references": [
+          {
+            "locator": "iOS/Tests/ColorMatchingLPSAppTests/OpenAPIGenerationConfigurationTests.swift:14",
+            "result": "not run: Swift toolchain unavailable; expected red before implementation"
+          }
+        ]
+      }
+    },
+    {
+      "id": "AC-3",
+      "status": "not_run",
+      "verification": {
+        "kind": "unit_or_service_test",
+        "references": [
+          {
+            "locator": "iOS/Tests/ColorMatchingLPSAppTests/APIClientTests.swift:34",
+            "result": "not run: Swift toolchain unavailable"
+          }
+        ]
+      }
+    },
+    {
+      "id": "AC-4",
+      "status": "not_run",
+      "verification": {
+        "kind": "human_or_external_evidence",
+        "references": [
+          {
+            "locator": "docs/issue-5-openapi-client-pr-notes.md:10",
+            "result": "implementation diff review required"
+          }
+        ]
+      }
+    },
+    {
+      "id": "AC-5",
+      "status": "passed",
+      "verification": {
+        "kind": "human_or_external_evidence",
+        "references": [
+          {
+            "locator": "docs/issue-5-openapi-client-pr-notes.md:16",
+            "result": "published-contract comparison recorded"
+          }
+        ]
+      }
+    }
+  ]
+}
