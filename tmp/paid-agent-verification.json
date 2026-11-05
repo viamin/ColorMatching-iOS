@@ -1,0 +1,70 @@
+{
+  "status": "failed",
+  "summary": "Red-phase tests and implementation handoff for the generated OpenAPI client are recorded; Swift is unavailable in this container, and the required package/spec assertions correctly remain red until the implementation run.",
+  "acceptance_criteria": [
+    {
+      "id": "AC-1",
+      "status": "not_run",
+      "verification": {
+        "kind": "unit_or_service_test",
+        "references": [
+          {
+            "locator": "iOS/Tests/ColorMatchingLPSAppTests/APIClientTests.swift:testOpenAPIClientDependenciesAreDeclaredInPackageManifest",
+            "result": "not_run: swift executable is unavailable; assertion is intentionally red until generator/runtime dependencies are added"
+          },
+          {
+            "locator": "iOS/Tests/ColorMatchingLPSAppTests/APIClientTests.swift:testVendoredOpenAPISpecCoversEveryAppEndpoint",
+            "result": "not_run: swift executable is unavailable; assertion is intentionally red until the resolved provider document is vendored"
+          }
+        ]
+      }
+    },
+    {
+      "id": "AC-2",
+      "status": "not_run",
+      "verification": {
+        "kind": "unit_or_service_test",
+        "references": [
+          {
+            "locator": "iOS/Tests/ColorMatchingLPSAppTests/APIClientTests.swift:testFetchManifestDecodesLocalStub",
+            "result": "not_run: swift executable is unavailable"
+          },
+          {
+            "locator": "iOS/Tests/ColorMatchingLPSAppTests/APIClientTests.swift:testFetchRecentSheetsDecodesLocalStub",
+            "result": "not_run: swift executable is unavailable"
+          },
+          {
+            "locator": "docs/openapi-client-verification-plan.md",
+            "result": "ranked-results generated-client stub remains an implementation-run requirement because no such operation exists in the handwritten client"
+          }
+        ]
+      }
+    },
+    {
+      "id": "AC-3",
+      "status": "not_run",
+      "verification": {
+        "kind": "unit_or_service_test",
+        "references": [
+          {
+            "locator": "docs/openapi-client-verification-plan.md",
+            "result": "requires implementation-run compile evidence after generated types replace transport models"
+          }
+        ]
+      }
+    },
+    {
+      "id": "AC-4",
+      "status": "passed",
+      "verification": {
+        "kind": "human_or_external_evidence",
+        "references": [
+          {
+            "locator": "docs/openapi-client-verification-plan.md",
+            "result": "documents deltas found from upstream issue #110 commit 094bd6d3443ddacbda7e63354299867eb5bdfa9f and the required PR disclosure"
+          }
+        ]
+      }
+    }
+  ]
+}
