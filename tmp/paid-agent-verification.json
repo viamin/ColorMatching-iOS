@@ -1,0 +1,61 @@
+{
+  "status": "failed",
+  "summary": "Tests-only red phase for issue #5: local HTTP stubs cover manifest and recent sheets alongside the existing capture, measurement, and judgment stubs. The generated-client dependency/spec test is intentionally red until viamin/color_matching#110 is available. Swift is not installed in this container, so the suite could not be executed.",
+  "acceptance_criteria": [
+    {
+      "id": "AC-1",
+      "status": "failed",
+      "verification": {
+        "kind": "unit_or_service_test",
+        "references": [
+          {
+            "locator": "iOS/Tests/ColorMatchingLPSAppTests/APIClientTests.swift:testPackageDeclaresOpenAPIGeneratedClientInputs",
+            "result": "red by design: Package.swift lacks swift-openapi-generator/swift-openapi-runtime and iOS/OpenAPI/color_matching.openapi.yaml is absent"
+          }
+        ]
+      }
+    },
+    {
+      "id": "AC-2",
+      "status": "not_run",
+      "verification": {
+        "kind": "unit_or_service_test",
+        "references": [
+          {
+            "locator": "iOS/Tests/ColorMatchingLPSAppTests/APIClientTests.swift:testFetchManifestDecodesStubbedResponse",
+            "result": "not run: swift executable is unavailable"
+          },
+          {
+            "locator": "iOS/Tests/ColorMatchingLPSAppTests/APIClientTests.swift:testFetchRecentSheetsDecodesStubbedResponse",
+            "result": "not run: swift executable is unavailable"
+          },
+          {
+            "locator": "iOS/Tests/ColorMatchingLPSAppTests/APIClientTests.swift:testCreateCaptureEncodesMetadataAndQuality",
+            "result": "not run: swift executable is unavailable"
+          },
+          {
+            "locator": "iOS/Tests/ColorMatchingLPSAppTests/APIClientTests.swift:testUploadMeasurementsEncodesScoresWithAlgorithmVersion",
+            "result": "not run: swift executable is unavailable"
+          },
+          {
+            "locator": "iOS/Tests/ColorMatchingLPSAppTests/APIClientTests.swift:testUploadJudgmentsEncodesPathAndPayload",
+            "result": "not run: swift executable is unavailable"
+          }
+        ]
+      }
+    },
+    {
+      "id": "AC-3",
+      "status": "skipped",
+      "verification": {
+        "kind": "human_or_external_evidence",
+        "references": [
+          {
+            "locator": "docs/issue-5-openapi-client-test-plan.md",
+            "result": "blocked pending published viamin/color_matching#110 OpenAPI document; ranked-results response schema is absent from the prose contract"
+          }
+        ]
+      }
+    }
+  ]
+}
