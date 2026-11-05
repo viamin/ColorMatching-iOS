@@ -46,11 +46,48 @@ final class APIClientTests: XCTestCase {
         XCTAssertEqual(quality["rejections"] as? [String], [])
     }
 
+    func testFetchManifestDecodesPublishedManifestResponse() async throws {
+        MockURLProtocol.handler = { request in
+            XCTAssertEqual(request.httpMethod, "GET")
+            XCTAssertEqual(request.value(forHTTPHeaderField: "Authorization"), "Bearer token")
+            XCTAssertEqual(request.url?.path, "/api/v1/test_sheets/SHEET-1234/manifest")
+
+            return (Self.response(for: request), Data(Self.manifestJSON.utf8))
+        }
+
+        let manifest = try await client().fetchManifest(
+            baseURL: URL(string: "https://example.test")!,
+            sheetCode: "SHEET-1234"
+        )
+
+        XCTAssertEqual(manifest.schemaVersion, "lps-sheet-manifest/v1")
+        XCTAssertEqual(manifest.sheetID, "SHEET-1234")
+        XCTAssertEqual(manifest.patches.map(\.id), ["pair_1#first", "pair_1#second"])
+        XCTAssertEqual(manifest.pairs.first?.sourceColors, ["#FF0000", "#00FFFF"])
+    }
+
+    func testFetchRecentSheetsDecodesNullableTitleFromPublishedResponse() async throws {
+        MockURLProtocol.handler = { request in
+            XCTAssertEqual(request.httpMethod, "GET")
+            XCTAssertEqual(request.url?.path, "/api/v1/test_sheets/recent")
+
+            return (
+                Self.response(for: request),
+                Data(#"{"sheets":[{"sheet_id":"SHEET-1234","manifest_url":"https://example.test/api/v1/test_sheets/SHEET-1234/manifest","title":null}]}"#.utf8)
+            )
+        }
+
+        let sheets = try await client().fetchRecentSheets(baseURL: URL(string: "https://example.test")!)
+
+        XCTAssertEqual(sheets.map(\.sheetID), ["SHEET-1234"])
+        XCTAssertNil(sheets.first?.title)
+    }
+
     func testUploadMeasurementsEncodesScoresWithAlgorithmVersion() async throws {
         var capturedBody: Data?
         MockURLProtocol.handler = { request in
             capturedBody = request.httpBodyStream.flatMap(Self.readBody) ?? request.httpBody
-            return (HTTPURLResponse(url: request.url!, statusCode: 204, httpVersion: nil, headerFields: nil)!, Data())
+            return (Self.response(for: request), Data(#"{"capture_id":"cap_1","measurement_count":1,"pair_score_count":1}"#.utf8))
         }
 
         let rgb = RGB(r: 0.2, g: 0.3, b: 0.4)
@@ -77,7 +114,7 @@ final class APIClientTests: XCTestCase {
         MockURLProtocol.handler = { request in
             capturedRequest = request
             capturedBody = request.httpBodyStream.flatMap(Self.readBody) ?? request.httpBody
-            return (HTTPURLResponse(url: request.url!, statusCode: 204, httpVersion: nil, headerFields: nil)!, Data())
+            return (Self.response(for: request), Data(#"{"capture_id":"cap_1","judgment_count":1}"#.utf8))
         }
 
         try await client().uploadJudgments(
@@ -92,6 +129,18 @@ final class APIClientTests: XCTestCase {
         XCTAssertEqual((json["judgments"] as? [[String: Any]])?.first?["judgment"] as? String, "near_match")
     }
 
+    func testVendoredOpenAPIDocumentIncludesEveryAppEndpoint() throws {
+        let document = try JSONSerialization.jsonObject(with: Data(contentsOf: Self.openAPIDocumentURL))
+        let paths = try XCTUnwrap((document as? [String: Any])?["paths"] as? [String: Any])
+
+        XCTAssertNotNil(paths["/api/v1/test_sheets/{sheet_id}/manifest"])
+        XCTAssertNotNil(paths["/api/v1/test_sheets/recent"])
+        XCTAssertNotNil(paths["/api/v1/test_sheets/{sheet_id}/captures"])
+        XCTAssertNotNil(paths["/api/v1/captures/{capture_id}/measurements"])
+        XCTAssertNotNil(paths["/api/v1/captures/{capture_id}/judgments"])
+        XCTAssertNotNil(paths["/api/v1/test_sheets/{sheet_id}/ranked_results"])
+    }
+
     private func client() -> APIClient {
         let configuration = URLSessionConfiguration.ephemeral
         configuration.protocolClasses = [MockURLProtocol.self]
@@ -101,6 +150,34 @@ final class APIClientTests: XCTestCase {
     private static func jsonObject(from data: Data?) throws -> Any {
         try JSONSerialization.jsonObject(with: XCTUnwrap(data))
     }
+
+    private static func response(for request: URLRequest, statusCode: Int = 200) -> HTTPURLResponse {
+        HTTPURLResponse(url: XCTUnwrap(request.url), statusCode: statusCode, httpVersion: nil, headerFields: nil)!
+    }
+
+    private static var openAPIDocumentURL: URL {
+        URL(fileURLWithPath: #filePath)
+            .deletingLastPathComponent()
+            .deletingLastPathComponent()
+            .deletingLastPathComponent()
+            .appending(path: "Sources/ColorMatchingAPI/openapi.json")
+    }
+
+    private static let manifestJSON = #"""
+    {
+      "schema_version": "lps-sheet-manifest/v1",
+      "sheet_version": "lps-letter-grid-v1",
+      "sheet_id": "SHEET-1234",
+      "manifest_url": "https://example.test/api/v1/test_sheets/SHEET-1234/manifest",
+      "page": {"units": "mm", "width": 215.9, "height": 279.4},
+      "registration_markers": [],
+      "patches": [
+        {"id": "pair_1#first", "role": "pair_color", "pair_id": "pair_1", "pair_side": "first", "reference_role": null, "source_color": "#FF0000", "safe_inset_mm": 1.5, "rect": {"x": 16, "y": 38, "width": 16, "height": 10}},
+        {"id": "pair_1#second", "role": "pair_color", "pair_id": "pair_1", "pair_side": "second", "reference_role": null, "source_color": "#00FFFF", "safe_inset_mm": 1.5, "rect": {"x": 34, "y": 38, "width": 16, "height": 10}}
+      ],
+      "pairs": [{"id": "pair_1", "first_patch_id": "pair_1#first", "second_patch_id": "pair_1#second", "source_colors": ["#FF0000", "#00FFFF"], "grid_row": 0, "grid_col": 1}]
+    }
+    """
 
     private static func readBody(_ stream: InputStream) -> Data {
         stream.open()
