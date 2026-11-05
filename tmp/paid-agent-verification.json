@@ -1,0 +1,75 @@
+{
+  "status": "failed",
+  "summary": "Tests-only red phase: local URLProtocol stubs cover manifest and recent-sheet reads; ranked-results integration is deliberately failing until the generated client is wired in.",
+  "acceptance_criteria": [
+    {
+      "id": "AC-1",
+      "status": "not_run",
+      "verification": {
+        "kind": "human_or_external_evidence",
+        "references": [
+          {
+            "locator": "https://github.com/viamin/color_matching/pull/113",
+            "result": "Provider OpenAPI endpoint is served dynamically; package dependency and vendored-spec work remains for implementation."
+          }
+        ]
+      }
+    },
+    {
+      "id": "AC-2",
+      "status": "failed",
+      "verification": {
+        "kind": "unit_or_service_test",
+        "references": [
+          {
+            "locator": "iOS/Tests/ColorMatchingLPSAppTests/APIClientTests.swift:49",
+            "result": "Manifest and recent-sheet local-stub coverage added; ranked-results assertion remains intentionally red."
+          },
+          {
+            "locator": "iOS/Tests/ColorMatchingLPSAppTests/APIClientTests.swift:129",
+            "result": "Expected assertion failure until fetchRankedResults is generated and wired."
+          }
+        ]
+      }
+    },
+    {
+      "id": "AC-3",
+      "status": "not_run",
+      "verification": {
+        "kind": "human_or_external_evidence",
+        "references": [
+          {
+            "locator": "docs/issue-5-openapi-client-plan.md",
+            "result": "Replacement boundary and client-only model retention are planned for implementation."
+          }
+        ]
+      }
+    },
+    {
+      "id": "AC-4",
+      "status": "not_run",
+      "verification": {
+        "kind": "unit_or_service_test",
+        "references": [
+          {
+            "locator": "iOS/Tests/ColorMatchingLPSAppTests/APIClientTests.swift",
+            "result": "Local URLProtocol test coverage exists, but swift is unavailable in this container."
+          }
+        ]
+      }
+    },
+    {
+      "id": "AC-5",
+      "status": "not_run",
+      "verification": {
+        "kind": "human_or_external_evidence",
+        "references": [
+          {
+            "locator": "docs/issue-5-openapi-client-plan.md:20",
+            "result": "Inspectable provider-contract delta and endpoint gap are ready to be copied into the implementation PR description."
+          }
+        ]
+      }
+    }
+  ]
+}
