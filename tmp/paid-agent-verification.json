@@ -1,0 +1,71 @@
+{
+  "status": "not_run",
+  "summary": "Test-writing PR: focused OpenAPI configuration coverage is intentionally red; Swift is unavailable in this container, so the Swift suite could not run.",
+  "acceptance_criteria": [
+    {
+      "id": "AC-1",
+      "status": "not_run",
+      "verification": {
+        "kind": "unit_or_service_test",
+        "references": [
+          {
+            "locator": "iOS/Tests/ColorMatchingLPSAppTests/OpenAPIClientConfigurationTests.swift:5",
+            "result": "not_run: requires generator dependencies, plugin, runtime, and vendored OpenAPI files; Swift toolchain unavailable"
+          }
+        ]
+      }
+    },
+    {
+      "id": "AC-2",
+      "status": "not_run",
+      "verification": {
+        "kind": "permanent_system_test",
+        "references": [
+          {
+            "locator": "iOS/Tests/ColorMatchingLPSAppTests/APIClientTests.swift:49",
+            "result": "not_run: local stub coverage for manifest and recent sheets added; capture/measurement/judgment tests already exist; ranked-results test awaits generated operation"
+          }
+        ]
+      }
+    },
+    {
+      "id": "AC-3",
+      "status": "not_run",
+      "verification": {
+        "kind": "unit_or_service_test",
+        "references": [
+          {
+            "locator": "iOS/Tests/ColorMatchingLPSAppTests/OpenAPIClientConfigurationTests.swift:5",
+            "result": "not_run: implementation must compile after replacing hand-written API types"
+          }
+        ]
+      }
+    },
+    {
+      "id": "AC-4",
+      "status": "not_run",
+      "verification": {
+        "kind": "permanent_system_test",
+        "references": [
+          {
+            "locator": "iOS/Tests/ColorMatchingLPSAppTests/APIClientTests.swift:12",
+            "result": "not_run: MockURLProtocol fixtures require no live server"
+          }
+        ]
+      }
+    },
+    {
+      "id": "AC-5",
+      "status": "not_run",
+      "verification": {
+        "kind": "human_or_external_evidence",
+        "references": [
+          {
+            "locator": "docs/issue-5-openapi-client-test-plan.md:27",
+            "result": "not_run: implementation PR description must contain the documented contract deltas and endpoint-gap finding"
+          }
+        ]
+      }
+    }
+  ]
+}
