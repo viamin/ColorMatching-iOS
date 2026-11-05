@@ -1,0 +1,71 @@
+{
+  "status": "not_run",
+  "summary": "Test-writing run added local-stub API facade coverage and a red vendored-OpenAPI contract test. The Swift toolchain is unavailable in this container, so swift test could not run.",
+  "acceptance_criteria": [
+    {
+      "id": "AC-1",
+      "status": "not_run",
+      "verification": {
+        "kind": "unit_or_service_test",
+        "references": [
+          {
+            "locator": "iOS/Tests/ColorMatchingLPSAppTests/APIClientTests.swift:129",
+            "result": "Not run: swift executable is unavailable. This test is intentionally red until iOS/Sources/ColorMatchingAPI/openapi.json is vendored."
+          }
+        ]
+      }
+    },
+    {
+      "id": "AC-2",
+      "status": "not_run",
+      "verification": {
+        "kind": "unit_or_service_test",
+        "references": [
+          {
+            "locator": "iOS/Tests/ColorMatchingLPSAppTests/APIClientTests.swift:129",
+            "result": "Not run: validates all six required generated-client operations are present in the vendored OpenAPI document."
+          }
+        ]
+      }
+    },
+    {
+      "id": "AC-3",
+      "status": "not_run",
+      "verification": {
+        "kind": "unit_or_service_test",
+        "references": [
+          {
+            "locator": "iOS/Tests/ColorMatchingLPSAppTests/APIClientTests.swift:49",
+            "result": "Not run: local-stub tests preserve the manifest and recent-sheets app facade while implementation replaces transport models."
+          }
+        ]
+      }
+    },
+    {
+      "id": "AC-4",
+      "status": "not_run",
+      "verification": {
+        "kind": "unit_or_service_test",
+        "references": [
+          {
+            "locator": "iOS/Tests/ColorMatchingLPSAppTests/APIClientTests.swift:12",
+            "result": "Not run: URLProtocol stubs cover capture creation and upload request/response handling without a live server."
+          }
+        ]
+      }
+    },
+    {
+      "id": "AC-5",
+      "status": "passed",
+      "verification": {
+        "kind": "human_or_external_evidence",
+        "references": [
+          {
+            "locator": "docs/openapi-client-generation-plan.md:20",
+            "result": "Published-spec versus prose-contract deltas and the ranked-results adoption decision are documented for the implementation PR."
+          }
+        ]
+      }
+    }
+  ]
+}
