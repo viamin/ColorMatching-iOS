@@ -46,6 +46,42 @@ final class APIClientTests: XCTestCase {
         XCTAssertEqual(quality["rejections"] as? [String], [])
     }
 
+    func testFetchManifestDecodesStubbedResponse() async throws {
+        MockURLProtocol.handler = { request in
+            XCTAssertEqual(request.httpMethod, "GET")
+            XCTAssertEqual(request.url?.path, "/api/v1/test_sheets/sheet_1/manifest")
+            XCTAssertEqual(request.value(forHTTPHeaderField: "Authorization"), "Bearer token")
+            return (
+                HTTPURLResponse(url: request.url!, statusCode: 200, httpVersion: nil, headerFields: nil)!,
+                Data(Self.manifestResponse.utf8)
+            )
+        }
+
+        let manifest = try await client().fetchManifest(
+            baseURL: URL(string: "https://example.test")!,
+            sheetCode: "sheet_1"
+        )
+
+        XCTAssertEqual(manifest.sheetID, "sheet_1")
+        XCTAssertEqual(manifest.schemaVersion, "lps-sheet-manifest/v1")
+    }
+
+    func testFetchRecentSheetsDecodesStubbedResponse() async throws {
+        MockURLProtocol.handler = { request in
+            XCTAssertEqual(request.httpMethod, "GET")
+            XCTAssertEqual(request.url?.path, "/api/v1/test_sheets/recent")
+            return (
+                HTTPURLResponse(url: request.url!, statusCode: 200, httpVersion: nil, headerFields: nil)!,
+                Data(#"{"sheets":[{"sheet_id":"sheet_1","manifest_url":"https://example.test/api/v1/test_sheets/sheet_1/manifest","title":null}]}"#.utf8)
+            )
+        }
+
+        let sheets = try await client().fetchRecentSheets(baseURL: URL(string: "https://example.test")!)
+
+        XCTAssertEqual(sheets.map(\.sheetID), ["sheet_1"])
+        XCTAssertNil(sheets.first?.title)
+    }
+
     func testUploadMeasurementsEncodesScoresWithAlgorithmVersion() async throws {
         var capturedBody: Data?
         MockURLProtocol.handler = { request in
@@ -116,6 +152,59 @@ final class APIClientTests: XCTestCase {
             }
         }
         return data
+    }
+
+    private static let manifestResponse = #"""
+    {
+      "schema_version": "lps-sheet-manifest/v1",
+      "sheet_version": "lps-letter-grid-v1",
+      "sheet_id": "sheet_1",
+      "manifest_url": "https://example.test/api/v1/test_sheets/sheet_1/manifest",
+      "page": {"units": "mm", "width": 215.9, "height": 279.4},
+      "registration_markers": [],
+      "patches": [],
+      "pairs": []
+    }
+    """#
+}
+
+final class OpenAPIGenerationContractTests: XCTestCase {
+    func testVendoredSpecDeclaresEveryIOSOperation() throws {
+        let specURL = repositoryRoot.appending(path: "iOS/OpenAPI/color-matching.json")
+        let data = try Data(contentsOf: specURL)
+        let document = try XCTUnwrap(JSONSerialization.jsonObject(with: data) as? [String: Any])
+        let paths = try XCTUnwrap(document["paths"] as? [String: Any])
+
+        XCTAssertEqual(
+            Set(paths.keys).intersection(Self.requiredOperationPaths),
+            Self.requiredOperationPaths,
+            "The vendored OpenAPI document must cover every operation used by the iOS companion."
+        )
+    }
+
+    func testPackageDeclaresOpenAPIGeneratorAndRuntime() throws {
+        let packageURL = repositoryRoot.appending(path: "iOS/Package.swift")
+        let package = try String(contentsOf: packageURL, encoding: .utf8)
+
+        XCTAssertTrue(package.contains("swift-openapi-generator"))
+        XCTAssertTrue(package.contains("swift-openapi-runtime"))
+    }
+
+    private static let requiredOperationPaths: Set<String> = [
+        "/api/v1/test_sheets/{sheet_id}/manifest",
+        "/api/v1/test_sheets/recent",
+        "/api/v1/test_sheets/{sheet_id}/captures",
+        "/api/v1/captures/{capture_id}/measurements",
+        "/api/v1/captures/{capture_id}/judgments",
+        "/api/v1/test_sheets/{sheet_id}/ranked_results"
+    ]
+
+    private var repositoryRoot: URL {
+        var url = URL(fileURLWithPath: #filePath)
+        for _ in 0..<4 {
+            url.deleteLastPathComponent()
+        }
+        return url
     }
 }
 
