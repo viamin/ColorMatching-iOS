@@ -1,0 +1,71 @@
+{
+  "status": "failed",
+  "summary": "Test-writing run: red tests and implementation-ready contract-delta evidence added; Swift is not installed in this container, so the suite could not execute.",
+  "acceptance_criteria": [
+    {
+      "id": "AC-1",
+      "status": "failed",
+      "verification": {
+        "kind": "unit_or_service_test",
+        "references": [
+          {
+            "locator": "iOS/Tests/ColorMatchingLPSAppTests/OpenAPIClientGenerationTests.swift:13",
+            "result": "not_run: Swift toolchain is unavailable; test is red by inspection because iOS/Package.swift has neither OpenAPI package."
+          }
+        ]
+      }
+    },
+    {
+      "id": "AC-2",
+      "status": "failed",
+      "verification": {
+        "kind": "unit_or_service_test",
+        "references": [
+          {
+            "locator": "iOS/Tests/ColorMatchingLPSAppTests/OpenAPIClientGenerationTests.swift:22",
+            "result": "not_run: vendored OpenAPI document is absent; test enumerates all six required operations."
+          }
+        ]
+      }
+    },
+    {
+      "id": "AC-3",
+      "status": "failed",
+      "verification": {
+        "kind": "unit_or_service_test",
+        "references": [
+          {
+            "locator": "iOS/Tests/ColorMatchingLPSAppTests/OpenAPIClientGenerationTests.swift:34",
+            "result": "not_run: hand-written API transport models remain in iOS/Sources/ColorMatchingLPSAppCore/APIClient.swift."
+          }
+        ]
+      }
+    },
+    {
+      "id": "AC-4",
+      "status": "not_run",
+      "verification": {
+        "kind": "unit_or_service_test",
+        "references": [
+          {
+            "locator": "iOS/Tests/ColorMatchingLPSAppTests/APIClientTests.swift:49",
+            "result": "not_run: local URLProtocol tests cover manifest/recent/capture/measurement/judgment without a live server; generated wiring and ranked-results coverage remain red-phase work."
+          }
+        ]
+      }
+    },
+    {
+      "id": "AC-5",
+      "status": "passed",
+      "verification": {
+        "kind": "human_or_external_evidence",
+        "references": [
+          {
+            "locator": "docs/issue-5-openapi-client-verification.md:20",
+            "result": "Upstream spec comparison and endpoint gap are recorded from viamin/color_matching main; implementation PR must copy the verified deltas into its description."
+          }
+        ]
+      }
+    }
+  ]
+}
