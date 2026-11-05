@@ -1,0 +1,70 @@
+{
+  "status": "not_run",
+  "summary": "Test-writing-phase coverage and migration evidence were added. The Swift toolchain is not installed in this container, so swift test --disable-sandbox could not run.",
+  "acceptance_criteria": [
+    {
+      "id": "AC-1",
+      "status": "not_run",
+      "verification": {
+        "kind": "unit_or_service_test",
+        "references": [
+          {
+            "locator": "iOS/Tests/ColorMatchingLPSAppTests/APIClientTests.swift:testFetchesManifestAndRecentSheetsFromOpenAPISurface",
+            "result": "not_run: swift executable is unavailable"
+          },
+          {
+            "locator": "iOS/Tests/ColorMatchingLPSAppTests/APIClientTests.swift:testCreateCaptureEncodesMetadataAndQuality",
+            "result": "not_run: swift executable is unavailable"
+          },
+          {
+            "locator": "iOS/Tests/ColorMatchingLPSAppTests/APIClientTests.swift:testUploadMeasurementsEncodesScoresWithAlgorithmVersion",
+            "result": "not_run: swift executable is unavailable"
+          },
+          {
+            "locator": "iOS/Tests/ColorMatchingLPSAppTests/APIClientTests.swift:testUploadJudgmentsEncodesPathAndPayload",
+            "result": "not_run: swift executable is unavailable"
+          }
+        ]
+      }
+    },
+    {
+      "id": "AC-2",
+      "status": "not_run",
+      "verification": {
+        "kind": "unit_or_service_test",
+        "references": [
+          {
+            "locator": "docs/openapi-client-migration-evidence.md",
+            "result": "ranked-results generated client operation remains an implementation-phase gap"
+          }
+        ]
+      }
+    },
+    {
+      "id": "AC-3",
+      "status": "not_run",
+      "verification": {
+        "kind": "unit_or_service_test",
+        "references": [
+          {
+            "locator": "iOS/Package.swift",
+            "result": "generated dependencies are implementation-phase work and have not been added during the tests-only phase"
+          }
+        ]
+      }
+    },
+    {
+      "id": "AC-4",
+      "status": "not_run",
+      "verification": {
+        "kind": "human_or_external_evidence",
+        "references": [
+          {
+            "locator": "docs/openapi-client-migration-evidence.md",
+            "result": "contract deltas and endpoint gap are recorded for the eventual PR description"
+          }
+        ]
+      }
+    }
+  ]
+}
