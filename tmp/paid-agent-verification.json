@@ -1,0 +1,36 @@
+{
+  "status": "not_run",
+  "summary": "Test-writing phase added local-stub coverage and a criterion-level plan. Swift is unavailable in this container, so swift test --disable-sandbox could not run. Production OpenAPI generation is intentionally deferred to the implementation phase.",
+  "acceptance_criteria": [
+    {
+      "id": "AC-1",
+      "status": "not_run",
+      "verification": {
+        "kind": "unit_or_service_test",
+        "references": [
+          {
+            "locator": "iOS/Tests/ColorMatchingLPSAppTests/APIClientTests.swift:12",
+            "result": "Existing local-stub coverage for capture creation, measurement upload, and judgment upload; not executed because swift is unavailable."
+          },
+          {
+            "locator": "iOS/Tests/ColorMatchingLPSAppTests/APIClientTests.swift:49",
+            "result": "Added local-stub coverage for manifest and recent-sheet reads; not executed because swift is unavailable."
+          }
+        ]
+      }
+    },
+    {
+      "id": "AC-2",
+      "status": "not_run",
+      "verification": {
+        "kind": "human_or_external_evidence",
+        "references": [
+          {
+            "locator": "docs/openapi-client-test-plan.md:19",
+            "result": "Upstream source inspection identifies schema gaps that must be resolved before lossless generation."
+          }
+        ]
+      }
+    }
+  ]
+}
