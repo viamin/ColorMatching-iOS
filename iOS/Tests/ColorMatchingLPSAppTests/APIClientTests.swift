@@ -46,6 +46,59 @@ final class APIClientTests: XCTestCase {
         XCTAssertEqual(quality["rejections"] as? [String], [])
     }
 
+    func testFetchesManifestAndRecentSheetsFromLocalStubs() async throws {
+        var requestedPaths: [String] = []
+        MockURLProtocol.handler = { request in
+            requestedPaths.append(request.url!.path)
+            let body: Data
+            switch request.url!.path {
+            case "/api/v1/test_sheets/sheet_1/manifest":
+                body = Data(Self.manifestResponse.utf8)
+            case "/api/v1/test_sheets/recent":
+                body = Data(#"{"sheets":[{"sheet_id":"sheet_1","manifest_url":"https://example.test/api/v1/test_sheets/sheet_1/manifest","title":"LPS sheet"}]}"#.utf8)
+            default:
+                throw URLError(.badURL)
+            }
+            return (HTTPURLResponse(url: request.url!, statusCode: 200, httpVersion: nil, headerFields: nil)!, body)
+        }
+
+        let api = client()
+        let baseURL = URL(string: "https://example.test")!
+        let manifest = try await api.fetchManifest(baseURL: baseURL, sheetCode: "sheet_1")
+        let recentSheets = try await api.fetchRecentSheets(baseURL: baseURL)
+
+        XCTAssertEqual(manifest.sheetID, "sheet_1")
+        XCTAssertEqual(recentSheets.map(\.sheetID), ["sheet_1"])
+        XCTAssertEqual(requestedPaths, [
+            "/api/v1/test_sheets/sheet_1/manifest",
+            "/api/v1/test_sheets/recent"
+        ])
+    }
+
+    func testOpenAPIClientPackageAndVendoredSpecCoverUsedEndpoints() throws {
+        let iOSRoot = URL(fileURLWithPath: #filePath)
+            .deletingLastPathComponent()
+            .deletingLastPathComponent()
+        let package = try String(contentsOf: iOSRoot.appendingPathComponent("Package.swift"))
+
+        XCTAssertTrue(package.contains("swift-openapi-generator"))
+        XCTAssertTrue(package.contains("swift-openapi-runtime"))
+
+        let specification = try Data(contentsOf: iOSRoot.appendingPathComponent("OpenAPI/openapi.json"))
+        let document = try XCTUnwrap(JSONSerialization.jsonObject(with: specification) as? [String: Any])
+        let paths = try XCTUnwrap(document["paths"] as? [String: Any])
+        XCTAssertTrue(
+            Set([
+                "/api/v1/test_sheets/{sheet_id}/manifest",
+                "/api/v1/test_sheets/recent",
+                "/api/v1/test_sheets/{sheet_id}/captures",
+                "/api/v1/captures/{capture_id}/measurements",
+                "/api/v1/captures/{capture_id}/judgments",
+                "/api/v1/test_sheets/{sheet_id}/ranked_results"
+            ]).isSubset(of: Set(paths.keys))
+        )
+    }
+
     func testUploadMeasurementsEncodesScoresWithAlgorithmVersion() async throws {
         var capturedBody: Data?
         MockURLProtocol.handler = { request in
@@ -117,6 +170,19 @@ final class APIClientTests: XCTestCase {
         }
         return data
     }
+
+    private static let manifestResponse = #"""
+    {
+      "schema_version": "lps-sheet-manifest/v1",
+      "sheet_version": "lps-letter-grid-v1",
+      "sheet_id": "sheet_1",
+      "manifest_url": "https://example.test/api/v1/test_sheets/sheet_1/manifest",
+      "page": {"units": "mm", "width": 215.9, "height": 279.4},
+      "registration_markers": [],
+      "patches": [],
+      "pairs": []
+    }
+    ""#
 }
 
 private final class MockURLProtocol: URLProtocol {
