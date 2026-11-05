@@ -1,0 +1,58 @@
+{
+  "status": "not_run",
+  "summary": "Tests-only red phase for issue #5: local-stub coverage was added and the vendored-spec acceptance test intentionally fails until the implementation run vendors the upstream OpenAPI document.",
+  "acceptance_criteria": [
+    {
+      "id": "AC-1",
+      "status": "failed",
+      "verification": {
+        "kind": "unit_or_service_test",
+        "references": [
+          {
+            "locator": "iOS/Tests/ColorMatchingLPSAppTests/APIClientTests.swift:testVendoredOpenAPISpecDefinesEveryAppConsumedOperation",
+            "result": "expected red: iOS/OpenAPI/color-matching-v1.json is not yet vendored"
+          }
+        ]
+      }
+    },
+    {
+      "id": "AC-2",
+      "status": "not_run",
+      "verification": {
+        "kind": "unit_or_service_test",
+        "references": [
+          {
+            "locator": "docs/issue-5-openapi-client-pr-notes.md",
+            "result": "generated dependency and model replacement require the implementation run"
+          }
+        ]
+      }
+    },
+    {
+      "id": "AC-3",
+      "status": "not_run",
+      "verification": {
+        "kind": "unit_or_service_test",
+        "references": [
+          {
+            "locator": "iOS/Tests/ColorMatchingLPSAppTests/APIClientTests.swift",
+            "result": "local-stub test harness exists; full generated-client verification awaits implementation"
+          }
+        ]
+      }
+    },
+    {
+      "id": "AC-4",
+      "status": "not_run",
+      "verification": {
+        "kind": "human_or_external_evidence",
+        "references": [
+          {
+            "locator": "docs/issue-5-openapi-client-pr-notes.md",
+            "result": "PR description cannot be inspected because this tests-only run does not push or open a PR; PR-ready notes are recorded here"
+          }
+        ]
+      }
+    }
+  ]
+}
