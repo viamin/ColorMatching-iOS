@@ -1,0 +1,71 @@
+{
+  "status": "not_run",
+  "summary": "Test-writing red phase for issue #5. Focused local-stub tests and the contract-delta evidence plan are committed; Swift is unavailable in this container, and implementation is intentionally deferred to the approved implementation run.",
+  "acceptance_criteria": [
+    {
+      "id": "AC-1",
+      "status": "failed",
+      "verification": {
+        "kind": "unit_or_service_test",
+        "references": [
+          {
+            "locator": "iOS/Tests/ColorMatchingLPSAppTests/APIClientTests.swift:testVendoredOpenAPISpecDeclaresEveryAppOperation",
+            "result": "red: the vendored OpenAPI document is not present yet"
+          }
+        ]
+      }
+    },
+    {
+      "id": "AC-2",
+      "status": "not_run",
+      "verification": {
+        "kind": "permanent_system_test",
+        "references": [
+          {
+            "locator": "iOS/Tests/ColorMatchingLPSAppTests/APIClientTests.swift",
+            "result": "not run: swift executable is unavailable in the container"
+          }
+        ]
+      }
+    },
+    {
+      "id": "AC-3",
+      "status": "not_run",
+      "verification": {
+        "kind": "human_or_external_evidence",
+        "references": [
+          {
+            "locator": "docs/issue-5-openapi-client-verification.md",
+            "result": "implementation review is deferred to the generated-client implementation run"
+          }
+        ]
+      }
+    },
+    {
+      "id": "AC-4",
+      "status": "not_run",
+      "verification": {
+        "kind": "permanent_system_test",
+        "references": [
+          {
+            "locator": "iOS/Tests/ColorMatchingLPSAppTests/APIClientTests.swift:testFetchManifestAcceptsThePublishedOpenAPIMinimumResponse",
+            "result": "red by design until generated types are wired into the adapter; not executed because Swift is unavailable"
+          }
+        ]
+      }
+    },
+    {
+      "id": "AC-5",
+      "status": "passed",
+      "verification": {
+        "kind": "human_or_external_evidence",
+        "references": [
+          {
+            "locator": "docs/issue-5-openapi-client-verification.md",
+            "result": "published-spec/prose-contract deltas and endpoint gaps are recorded for the PR description"
+          }
+        ]
+      }
+    }
+  ]
+}
