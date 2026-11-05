@@ -1,0 +1,75 @@
+{
+  "status": "failed",
+  "summary": "Test-writing run: red migration tests and contract-delta evidence added. Swift is unavailable in the container, so the suite could not be executed.",
+  "acceptance_criteria": [
+    {
+      "id": "AC-1",
+      "status": "failed",
+      "verification": {
+        "kind": "unit_or_service_test",
+        "references": [
+          {
+            "locator": "iOS/Tests/ColorMatchingLPSAppTests/OpenAPIClientMigrationTests.swift:testPackageUsesSwiftOpenAPIToolchain",
+            "result": "red: current Package.swift has neither required OpenAPI dependency"
+          },
+          {
+            "locator": "iOS/Tests/ColorMatchingLPSAppTests/OpenAPIClientMigrationTests.swift:testVendoredOpenAPISpecCoversEveryCompanionEndpoint",
+            "result": "red: no vendored OpenAPI JSON exists"
+          }
+        ]
+      }
+    },
+    {
+      "id": "AC-2",
+      "status": "failed",
+      "verification": {
+        "kind": "unit_or_service_test",
+        "references": [
+          {
+            "locator": "iOS/Tests/ColorMatchingLPSAppTests/OpenAPIClientMigrationTests.swift:testHandWrittenTransportDTOsAreRemoved",
+            "result": "red: APIClient.swift still declares the transport DTOs"
+          }
+        ]
+      }
+    },
+    {
+      "id": "AC-3",
+      "status": "not_run",
+      "verification": {
+        "kind": "permanent_system_test",
+        "references": [
+          {
+            "locator": "iOS/Tests/ColorMatchingLPSAppTests/APIClientTests.swift",
+            "result": "not run: Swift toolchain unavailable; tests use MockURLProtocol and require ranked-results coverage in implementation run"
+          }
+        ]
+      }
+    },
+    {
+      "id": "AC-4",
+      "status": "not_run",
+      "verification": {
+        "kind": "unit_or_service_test",
+        "references": [
+          {
+            "locator": "swift test --disable-sandbox",
+            "result": "not run: swift executable is unavailable"
+          }
+        ]
+      }
+    },
+    {
+      "id": "AC-5",
+      "status": "not_run",
+      "verification": {
+        "kind": "human_or_external_evidence",
+        "references": [
+          {
+            "locator": "docs/issue-5-openapi-client-test-plan.md:31",
+            "result": "contract deltas recorded for later inclusion in the PR description; no PR has been opened in this tests-only run"
+          }
+        ]
+      }
+    }
+  ]
+}
