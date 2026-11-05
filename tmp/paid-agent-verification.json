@@ -1,0 +1,79 @@
+{
+  "status": "failed",
+  "summary": "Test-writing phase: local-stub regression tests and red generated-client readiness checks were added. The Swift toolchain is unavailable in this container, so the suite could not be executed.",
+  "acceptance_criteria": [
+    {
+      "id": "AC-1",
+      "status": "failed",
+      "verification": {
+        "kind": "unit_or_service_test",
+        "references": [
+          {
+            "locator": "iOS/Tests/ColorMatchingLPSAppTests/OpenAPIClientReadinessTests.swift:5",
+            "result": "red: Package.swift has no swift-openapi dependencies and iOS/OpenAPI/color-matching.json is absent"
+          }
+        ]
+      }
+    },
+    {
+      "id": "AC-2",
+      "status": "failed",
+      "verification": {
+        "kind": "unit_or_service_test",
+        "references": [
+          {
+            "locator": "iOS/Tests/ColorMatchingLPSAppTests/OpenAPIClientReadinessTests.swift:15",
+            "result": "red: required vendored OpenAPI document and generated ranked-results surface are absent"
+          },
+          {
+            "locator": "iOS/Tests/ColorMatchingLPSAppTests/APIClientTests.swift:49",
+            "result": "local URLProtocol stub added for manifest behavior; execution not run because Swift is unavailable"
+          },
+          {
+            "locator": "iOS/Tests/ColorMatchingLPSAppTests/APIClientTests.swift:81",
+            "result": "local URLProtocol stub added for recent-sheets behavior; execution not run because Swift is unavailable"
+          }
+        ]
+      }
+    },
+    {
+      "id": "AC-3",
+      "status": "failed",
+      "verification": {
+        "kind": "human_or_external_evidence",
+        "references": [
+          {
+            "locator": "docs/issue-5-openapi-client-verification.md:12",
+            "result": "implementation and code-review evidence pending generated target and adapter"
+          }
+        ]
+      }
+    },
+    {
+      "id": "AC-4",
+      "status": "not_run",
+      "verification": {
+        "kind": "unit_or_service_test",
+        "references": [
+          {
+            "locator": "iOS/Tests/ColorMatchingLPSAppTests/APIClientTests.swift:5",
+            "result": "swift test --disable-sandbox could not start: swift executable is unavailable"
+          }
+        ]
+      }
+    },
+    {
+      "id": "AC-5",
+      "status": "not_run",
+      "verification": {
+        "kind": "human_or_external_evidence",
+        "references": [
+          {
+            "locator": "docs/issue-5-openapi-client-verification.md:19",
+            "result": "PR description must compare the pinned published document; no implementation PR has been opened in this tests-only run"
+          }
+        ]
+      }
+    }
+  ]
+}
