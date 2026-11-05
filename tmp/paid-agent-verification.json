@@ -1,0 +1,62 @@
+{
+  "status": "not_run",
+  "summary": "Red-phase tests and verification plan added. Swift is not installed in the container, and the upstream OpenAPI pull request/spec was inaccessible (GitHub API returned 404).",
+  "acceptance_criteria": [
+    {
+      "id": "AC-1",
+      "status": "not_run",
+      "verification": {
+        "kind": "human_or_external_evidence",
+        "references": [
+          {
+            "locator": "docs/issue-5-verification-plan.md",
+            "result": "Upstream OpenAPI spec unavailable; generator/runtime dependency and vendored-spec inspection deferred to implementation."
+          }
+        ]
+      }
+    },
+    {
+      "id": "AC-2",
+      "status": "not_run",
+      "verification": {
+        "kind": "unit_or_service_test",
+        "references": [
+          {
+            "locator": "iOS/Tests/ColorMatchingLPSAppTests/APIClientTests.swift:49",
+            "result": "Permanent local-stub manifest/recent-sheet tests added; test execution blocked because swift is unavailable."
+          },
+          {
+            "locator": "iOS/Tests/ColorMatchingLPSAppTests/APIClientTests.swift:12",
+            "result": "Existing permanent local-stub capture/measurement/judgment tests are documented for generated-client rewiring; ranked results remains blocked on upstream schema."
+          }
+        ]
+      }
+    },
+    {
+      "id": "AC-3",
+      "status": "not_run",
+      "verification": {
+        "kind": "unit_or_service_test",
+        "references": [
+          {
+            "locator": "docs/issue-5-verification-plan.md",
+            "result": "Implementation has not begun in this tests-only phase."
+          }
+        ]
+      }
+    },
+    {
+      "id": "AC-4",
+      "status": "not_run",
+      "verification": {
+        "kind": "human_or_external_evidence",
+        "references": [
+          {
+            "locator": "docs/issue-5-verification-plan.md",
+            "result": "Contract delta inspection requires the published upstream OpenAPI document."
+          }
+        ]
+      }
+    }
+  ]
+}
