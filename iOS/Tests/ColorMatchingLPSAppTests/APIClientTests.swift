@@ -89,6 +89,28 @@ final class APIClientTests: XCTestCase {
         XCTAssertNil(sheets.first?.title)
     }
 
+    func testFetchRankedResultsUsesAuthenticatedEndpointAndDecodesPublishedMinimumFields() async throws {
+        var capturedRequest: URLRequest?
+        MockURLProtocol.handler = { request in
+            capturedRequest = request
+            return (
+                HTTPURLResponse(url: request.url!, statusCode: 200, httpVersion: nil, headerFields: nil)!,
+                Data(#"{\"schema_version\":\"lps-ranked-results/v1\",\"sheet_id\":\"sheet_1\"}"#.utf8)
+            )
+        }
+
+        let results = try await client().fetchRankedResults(
+            baseURL: URL(string: "https://example.test")!,
+            sheetID: "sheet_1"
+        )
+
+        XCTAssertEqual(capturedRequest?.httpMethod, "GET")
+        XCTAssertEqual(capturedRequest?.url?.path, "/api/v1/test_sheets/sheet_1/ranked_results")
+        XCTAssertEqual(capturedRequest?.value(forHTTPHeaderField: "Authorization"), "Bearer token")
+        XCTAssertEqual(results.schemaVersion, "lps-ranked-results/v1")
+        XCTAssertEqual(results.sheetID, "sheet_1")
+    }
+
     func testUploadMeasurementsEncodesScoresWithAlgorithmVersion() async throws {
         var capturedBody: Data?
         MockURLProtocol.handler = { request in
