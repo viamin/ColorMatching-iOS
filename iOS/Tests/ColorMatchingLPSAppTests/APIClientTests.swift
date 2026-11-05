@@ -46,6 +46,34 @@ final class APIClientTests: XCTestCase {
         XCTAssertEqual(quality["rejections"] as? [String], [])
     }
 
+    func testFetchesManifestAndRecentSheetsFromStubbedResponses() async throws {
+        MockURLProtocol.handler = { request in
+            switch request.url?.path {
+            case "/api/v1/test_sheets/sheet_1/manifest":
+                return (
+                    HTTPURLResponse(url: request.url!, statusCode: 200, httpVersion: nil, headerFields: nil)!,
+                    Data(Self.manifestResponse.utf8)
+                )
+            case "/api/v1/test_sheets/recent":
+                return (
+                    HTTPURLResponse(url: request.url!, statusCode: 200, httpVersion: nil, headerFields: nil)!,
+                    Data(#"{"sheets":[{"sheet_id":"sheet_1","manifest_url":"https://example.test/api/v1/test_sheets/sheet_1/manifest","title":null}]}"#.utf8)
+                )
+            default:
+                throw URLError(.badURL)
+            }
+        }
+
+        let baseURL = URL(string: "https://example.test")!
+        let manifest = try await client().fetchManifest(baseURL: baseURL, sheetCode: "sheet_1")
+        let recentSheets = try await client().fetchRecentSheets(baseURL: baseURL)
+
+        XCTAssertEqual(manifest.sheetID, "sheet_1")
+        XCTAssertEqual(manifest.patches.first?.id, "patch_1")
+        XCTAssertEqual(recentSheets.map(\.sheetID), ["sheet_1"])
+        XCTAssertNil(recentSheets.first?.title)
+    }
+
     func testUploadMeasurementsEncodesScoresWithAlgorithmVersion() async throws {
         var capturedBody: Data?
         MockURLProtocol.handler = { request in
@@ -117,6 +145,26 @@ final class APIClientTests: XCTestCase {
         }
         return data
     }
+
+    private static let manifestResponse = #"""
+    {
+      "schema_version": "lps-sheet-manifest/v1",
+      "sheet_version": "lps-letter-grid-v1",
+      "sheet_id": "sheet_1",
+      "manifest_url": "https://example.test/api/v1/test_sheets/sheet_1/manifest",
+      "page": {"units": "mm", "width": 215.9, "height": 279.4},
+      "registration_markers": [],
+      "patches": [{
+        "id": "patch_1", "role": "pair_color", "pair_id": "pair_1", "pair_side": "first",
+        "reference_role": null, "source_color": "#FF0000", "safe_inset_mm": 1.5,
+        "rect": {"x": 16, "y": 38, "width": 16, "height": 10}
+      }],
+      "pairs": [{
+        "id": "pair_1", "first_patch_id": "patch_1", "second_patch_id": "patch_2",
+        "source_colors": ["#FF0000", "#00FF00"], "grid_row": 0, "grid_col": 1
+      }]
+    }
+    """#
 }
 
 private final class MockURLProtocol: URLProtocol {
