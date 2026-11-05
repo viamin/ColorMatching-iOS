@@ -1,0 +1,45 @@
+{
+  "status": "failed",
+  "summary": "Red-phase tests and acceptance plan added; Swift is unavailable in this container, so the suite could not run.",
+  "acceptance_criteria": [
+    {
+      "id": "AC-1",
+      "status": "failed",
+      "verification": {
+        "kind": "unit_or_service_test",
+        "references": [
+          {
+            "locator": "iOS/Tests/ColorMatchingLPSAppTests/OpenAPIClientAdoptionTests.swift:5",
+            "result": "red: package dependencies and vendored OpenAPI document are absent"
+          }
+        ]
+      }
+    },
+    {
+      "id": "AC-2",
+      "status": "not_run",
+      "verification": {
+        "kind": "unit_or_service_test",
+        "references": [
+          {
+            "locator": "iOS/Tests/ColorMatchingLPSAppTests/APIClientTests.swift:95",
+            "result": "stub coverage added for manifest and recent sheets; generated client and ranked-results operation do not exist yet"
+          }
+        ]
+      }
+    },
+    {
+      "id": "AC-3",
+      "status": "not_run",
+      "verification": {
+        "kind": "human_or_external_evidence",
+        "references": [
+          {
+            "locator": "docs/openapi-client-test-plan.md:21",
+            "result": "server-side source review identifies contract deltas; implementation must vendor the rendered document from /api/v1/openapi.json"
+          }
+        ]
+      }
+    }
+  ]
+}
