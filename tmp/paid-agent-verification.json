@@ -1,0 +1,96 @@
+{
+  "status": "not_run",
+  "summary": "Tests-only PR: local-stub coverage was added for manifest and recent sheets. Swift is unavailable in the isolated container, so no Swift test result is claimed. Generated-client implementation remains for the approved follow-up run.",
+  "acceptance_criteria": [
+    {
+      "id": "AC-1",
+      "status": "not_run",
+      "verification": {
+        "kind": "human_or_external_evidence",
+        "references": [
+          {
+            "locator": "docs/issue-5-openapi-client-pr-notes.md:9",
+            "result": "Implementation verification plan recorded; generated package/spec do not exist in this tests-only revision."
+          }
+        ]
+      }
+    },
+    {
+      "id": "AC-2",
+      "status": "not_run",
+      "verification": {
+        "kind": "unit_or_service_test",
+        "references": [
+          {
+            "locator": "iOS/Tests/ColorMatchingLPSAppTests/APIClientTests.swift:49",
+            "result": "Local-stub manifest test added but not run because Swift is unavailable."
+          },
+          {
+            "locator": "iOS/Tests/ColorMatchingLPSAppTests/APIClientTests.swift:72",
+            "result": "Local-stub recent-sheets test added but not run because Swift is unavailable."
+          }
+        ]
+      }
+    },
+    {
+      "id": "AC-3",
+      "status": "not_run",
+      "verification": {
+        "kind": "unit_or_service_test",
+        "references": [
+          {
+            "locator": "iOS/Tests/ColorMatchingLPSAppTests/APIClientTests.swift:12",
+            "result": "Existing local-stub capture test not run because Swift is unavailable."
+          },
+          {
+            "locator": "iOS/Tests/ColorMatchingLPSAppTests/APIClientTests.swift:89",
+            "result": "Existing local-stub measurement test not run because Swift is unavailable."
+          },
+          {
+            "locator": "iOS/Tests/ColorMatchingLPSAppTests/APIClientTests.swift:114",
+            "result": "Existing local-stub judgment test not run because Swift is unavailable."
+          }
+        ]
+      }
+    },
+    {
+      "id": "AC-4",
+      "status": "not_run",
+      "verification": {
+        "kind": "unit_or_service_test",
+        "references": [
+          {
+            "locator": "docs/issue-5-openapi-client-pr-notes.md:15",
+            "result": "Ranked-results operation and local-stub test are explicitly pending implementation."
+          }
+        ]
+      }
+    },
+    {
+      "id": "AC-5",
+      "status": "not_run",
+      "verification": {
+        "kind": "human_or_external_evidence",
+        "references": [
+          {
+            "locator": "docs/issue-5-openapi-client-pr-notes.md:17",
+            "result": "Source-review verification plan recorded; hand-written API models remain in this tests-only revision."
+          }
+        ]
+      }
+    },
+    {
+      "id": "AC-6",
+      "status": "passed",
+      "verification": {
+        "kind": "human_or_external_evidence",
+        "references": [
+          {
+            "locator": "docs/issue-5-openapi-client-pr-notes.md:24",
+            "result": "Published-spec/prose-contract deltas and ranked-results application gap recorded from upstream source inspection."
+          }
+        ]
+      }
+    }
+  ]
+}
