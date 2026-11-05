@@ -1,0 +1,79 @@
+{
+  "status": "not_run",
+  "summary": "Tests and migration evidence were added in the required tests-only phase. Swift is unavailable in this container, so the Swift suite and red adoption gate could not execute.",
+  "acceptance_criteria": [
+    {
+      "id": "AC-1",
+      "status": "not_run",
+      "verification": {
+        "kind": "unit_or_service_test",
+        "references": [
+          {
+            "locator": "iOS/Tests/ColorMatchingLPSAppTests/APIClientTests.swift:135",
+            "result": "Not run: Swift executable is unavailable; the test is intentionally red until generator/runtime dependencies and the vendored spec are added."
+          }
+        ]
+      }
+    },
+    {
+      "id": "AC-2",
+      "status": "not_run",
+      "verification": {
+        "kind": "unit_or_service_test",
+        "references": [
+          {
+            "locator": "iOS/Tests/ColorMatchingLPSAppTests/APIClientTests.swift:151",
+            "result": "Not run: the generated-client surface gate is intentionally red pending implementation."
+          }
+        ]
+      }
+    },
+    {
+      "id": "AC-3",
+      "status": "not_run",
+      "verification": {
+        "kind": "human_or_external_evidence",
+        "references": [
+          {
+            "locator": "docs/openapi-client-migration.md:9",
+            "result": "The tests-only phase cannot alter implementation files; generated-type compilation and removal inspection are deferred to implementation."
+          }
+        ]
+      }
+    },
+    {
+      "id": "AC-4",
+      "status": "not_run",
+      "verification": {
+        "kind": "unit_or_service_test",
+        "references": [
+          {
+            "locator": "iOS/Tests/ColorMatchingLPSAppTests/APIClientTests.swift:95",
+            "result": "Local MockURLProtocol coverage was added but could not run because Swift is unavailable."
+          },
+          {
+            "locator": "iOS/Tests/ColorMatchingLPSAppTests/APIClientTests.swift:117",
+            "result": "Local MockURLProtocol coverage was added but could not run because Swift is unavailable."
+          }
+        ]
+      }
+    },
+    {
+      "id": "AC-5",
+      "status": "passed",
+      "verification": {
+        "kind": "human_or_external_evidence",
+        "references": [
+          {
+            "locator": "docs/openapi-client-migration.md:15",
+            "result": "Records the merged upstream OpenAPI dependency and its served endpoint."
+          },
+          {
+            "locator": "docs/openapi-client-migration.md:19",
+            "result": "Records concrete prose-contract deltas and the ranked-results endpoint gap."
+          }
+        ]
+      }
+    }
+  ]
+}
