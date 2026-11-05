@@ -1,0 +1,84 @@
+{
+  "status": "failed",
+  "summary": "Tests and verification plan added for issue #5; implementation inputs and generated client are not present in this tests-only phase, and Swift is unavailable in the container.",
+  "acceptance_criteria": [
+    {
+      "id": "AC-1",
+      "status": "failed",
+      "verification": {
+        "kind": "unit_or_service_test",
+        "references": [
+          {
+            "locator": "iOS/Tests/ColorMatchingLPSAppTests/APIClientTests.swift:172",
+            "result": "red: vendored OpenAPI document and package dependencies are absent"
+          }
+        ]
+      }
+    },
+    {
+      "id": "AC-2",
+      "status": "failed",
+      "verification": {
+        "kind": "unit_or_service_test",
+        "references": [
+          {
+            "locator": "iOS/Tests/ColorMatchingLPSAppTests/APIClientTests.swift:172",
+            "result": "red: required operation paths cannot be verified until the upstream document is vendored"
+          }
+        ]
+      }
+    },
+    {
+      "id": "AC-3",
+      "status": "not_run",
+      "verification": {
+        "kind": "human_or_external_evidence",
+        "references": [
+          {
+            "locator": "docs/issue-5-openapi-client-verification.md:20",
+            "result": "requires implementation and code review of generated versus client-only models"
+          }
+        ]
+      }
+    },
+    {
+      "id": "AC-4",
+      "status": "not_run",
+      "verification": {
+        "kind": "unit_or_service_test",
+        "references": [
+          {
+            "locator": "iOS/Tests/ColorMatchingLPSAppTests/APIClientTests.swift:7",
+            "result": "local-stub tests are present but could not run because the Swift executable is unavailable"
+          }
+        ]
+      }
+    },
+    {
+      "id": "AC-5",
+      "status": "not_run",
+      "verification": {
+        "kind": "human_or_external_evidence",
+        "references": [
+          {
+            "locator": "docs/issue-5-openapi-client-verification.md:27",
+            "result": "upstream-source comparison recorded; deployment OpenAPI artifact still needs reviewer verification"
+          }
+        ]
+      }
+    },
+    {
+      "id": "AC-6",
+      "status": "not_run",
+      "verification": {
+        "kind": "unit_or_service_test",
+        "references": [
+          {
+            "locator": "cd iOS && swift test --disable-sandbox",
+            "result": "not run: swift executable is unavailable in this container"
+          }
+        ]
+      }
+    }
+  ]
+}
