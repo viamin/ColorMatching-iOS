@@ -46,6 +46,51 @@ final class APIClientTests: XCTestCase {
         XCTAssertEqual(quality["rejections"] as? [String], [])
     }
 
+    func testFetchManifestDecodesStubbedManifest() async throws {
+        var capturedRequest: URLRequest?
+        MockURLProtocol.handler = { request in
+            capturedRequest = request
+            let body = #"""
+            {
+              "schema_version": "lps-sheet-manifest/v1",
+              "sheet_version": "lps-letter-grid-v1",
+              "sheet_id": "sheet_1",
+              "manifest_url": "https://example.test/api/v1/test_sheets/sheet_1/manifest",
+              "page": {"units": "mm", "width": 215.9, "height": 279.4},
+              "registration_markers": [],
+              "patches": [],
+              "pairs": []
+            }
+            """#
+            return (HTTPURLResponse(url: request.url!, statusCode: 200, httpVersion: nil, headerFields: nil)!, Data(body.utf8))
+        }
+
+        let manifest = try await client().fetchManifest(
+            baseURL: URL(string: "https://example.test")!,
+            sheetCode: "sheet_1"
+        )
+
+        XCTAssertEqual(capturedRequest?.httpMethod, "GET")
+        XCTAssertEqual(capturedRequest?.url?.path, "/api/v1/test_sheets/sheet_1/manifest")
+        XCTAssertEqual(manifest.sheetID, "sheet_1")
+    }
+
+    func testFetchRecentSheetsDecodesStubbedResponse() async throws {
+        var capturedRequest: URLRequest?
+        MockURLProtocol.handler = { request in
+            capturedRequest = request
+            let body = #"{"sheets":[{"sheet_id":"sheet_1","manifest_url":"https://example.test/api/v1/test_sheets/sheet_1/manifest","title":null}]}"#
+            return (HTTPURLResponse(url: request.url!, statusCode: 200, httpVersion: nil, headerFields: nil)!, Data(body.utf8))
+        }
+
+        let sheets = try await client().fetchRecentSheets(baseURL: URL(string: "https://example.test")!)
+
+        XCTAssertEqual(capturedRequest?.httpMethod, "GET")
+        XCTAssertEqual(capturedRequest?.url?.path, "/api/v1/test_sheets/recent")
+        XCTAssertEqual(sheets.map(\.sheetID), ["sheet_1"])
+        XCTAssertNil(sheets.first?.title)
+    }
+
     func testUploadMeasurementsEncodesScoresWithAlgorithmVersion() async throws {
         var capturedBody: Data?
         MockURLProtocol.handler = { request in
@@ -92,6 +137,29 @@ final class APIClientTests: XCTestCase {
         XCTAssertEqual((json["judgments"] as? [[String: Any]])?.first?["judgment"] as? String, "near_match")
     }
 
+    func testVendoredOpenAPISpecDeclaresEveryCompanionOperation() throws {
+        let specification = try XCTUnwrap(
+            try? Data(contentsOf: Self.openAPISpecificationURL),
+            "Vendor the published /api/v1/openapi.json document before generating the client."
+        )
+        let document = try XCTUnwrap(try JSONSerialization.jsonObject(with: specification) as? [String: Any])
+        let paths = try XCTUnwrap(document["paths"] as? [String: Any])
+
+        let expectedOperations: [String: String] = [
+            "/api/v1/test_sheets/{sheet_id}/manifest": "get",
+            "/api/v1/test_sheets/recent": "get",
+            "/api/v1/test_sheets/{sheet_id}/captures": "post",
+            "/api/v1/captures/{capture_id}/measurements": "post",
+            "/api/v1/captures/{capture_id}/judgments": "post",
+            "/api/v1/test_sheets/{sheet_id}/ranked_results": "get"
+        ]
+
+        for (path, method) in expectedOperations {
+            let operations = try XCTUnwrap(paths[path] as? [String: Any], "Missing OpenAPI path: \(path)")
+            XCTAssertNotNil(operations[method], "Missing OpenAPI operation: \(method.uppercased()) \(path)")
+        }
+    }
+
     private func client() -> APIClient {
         let configuration = URLSessionConfiguration.ephemeral
         configuration.protocolClasses = [MockURLProtocol.self]
@@ -116,6 +184,14 @@ final class APIClientTests: XCTestCase {
             }
         }
         return data
+    }
+
+    private static var openAPISpecificationURL: URL {
+        URL(fileURLWithPath: #filePath)
+            .deletingLastPathComponent()
+            .deletingLastPathComponent()
+            .deletingLastPathComponent()
+            .appending(path: "OpenAPI/color_matching-openapi.json")
     }
 }
 
