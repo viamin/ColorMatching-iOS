@@ -1,0 +1,83 @@
+{
+  "status": "not_run",
+  "summary": "Tests-only phase: local-stub characterization tests and a red generated-client package-configuration test were added. Swift is not installed in this container, so swift test could not run.",
+  "acceptance_criteria": [
+    {
+      "id": "AC-1",
+      "status": "failed",
+      "verification": {
+        "kind": "unit_or_service_test",
+        "references": [
+          {
+            "locator": "iOS/Tests/ColorMatchingLPSAppTests/GeneratedClientConfigurationTests.swift:5",
+            "result": "red: Package.swift does not yet declare swift-openapi-generator, swift-openapi-runtime, or the generation plugin"
+          }
+        ]
+      }
+    },
+    {
+      "id": "AC-2",
+      "status": "not_run",
+      "verification": {
+        "kind": "unit_or_service_test",
+        "references": [
+          {
+            "locator": "iOS/Tests/ColorMatchingLPSAppTests/APIClientTests.swift:49",
+            "result": "local-stub manifest characterization added; swift test not run because the Swift toolchain is absent"
+          },
+          {
+            "locator": "iOS/Tests/ColorMatchingLPSAppTests/APIClientTests.swift:68",
+            "result": "local-stub recent-sheets characterization added; swift test not run because the Swift toolchain is absent"
+          }
+        ]
+      }
+    },
+    {
+      "id": "AC-3",
+      "status": "not_run",
+      "verification": {
+        "kind": "unit_or_service_test",
+        "references": [
+          {
+            "locator": "iOS/Tests/ColorMatchingLPSAppTests/APIClientTests.swift:8",
+            "result": "existing local-stub capture characterization; swift test not run because the Swift toolchain is absent"
+          },
+          {
+            "locator": "iOS/Tests/ColorMatchingLPSAppTests/APIClientTests.swift:87",
+            "result": "existing local-stub measurement characterization; swift test not run because the Swift toolchain is absent"
+          },
+          {
+            "locator": "iOS/Tests/ColorMatchingLPSAppTests/APIClientTests.swift:112",
+            "result": "existing local-stub judgment characterization; swift test not run because the Swift toolchain is absent"
+          }
+        ]
+      }
+    },
+    {
+      "id": "AC-4",
+      "status": "not_run",
+      "verification": {
+        "kind": "unit_or_service_test",
+        "references": [
+          {
+            "locator": "iOS/Tests/ColorMatchingLPSAppTests/GeneratedClientConfigurationTests.swift:5",
+            "result": "ranked-results generated operation remains to be added during implementation"
+          }
+        ]
+      }
+    },
+    {
+      "id": "AC-5",
+      "status": "not_run",
+      "verification": {
+        "kind": "human_or_external_evidence",
+        "references": [
+          {
+            "locator": "docs/solutions/api/generated-openapi-client-test-plan.md:22",
+            "result": "contract-delta evidence recorded for the implementation PR; a PR description has not been created in this tests-only run"
+          }
+        ]
+      }
+    }
+  ]
+}
