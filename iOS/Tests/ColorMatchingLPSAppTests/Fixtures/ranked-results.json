@@ -1,0 +1,31 @@
+{
+  "schema_version": "lps-ranked-results/v1",
+  "sheet_id": "sheet_1",
+  "printer_profile": {
+    "printer_make_model": "Research printer",
+    "paper_type": "matte",
+    "ink_type": "pigment"
+  },
+  "capture_count": 1,
+  "latest_capture_at": "2026-10-30T12:00:00Z",
+  "earliest_capture_at": "2026-10-30T12:00:00Z",
+  "scoring_algorithm_versions": ["lps-distance-v1"],
+  "results": [
+    {
+      "rank": 1,
+      "pair_id": "pair_1",
+      "scoring_algorithm_version": "lps-distance-v1",
+      "row": 0,
+      "col": 0,
+      "source_colors": {"color_a_hex": "#FF0000", "color_b_hex": "#00FF00"},
+      "score": {"average": 0.9, "latest": 0.9, "minimum": 0.9, "maximum": 0.9, "capture_count": 1, "sample_count": 1, "algorithm_versions": ["lps-distance-v1"]},
+      "current_judgment": "near_match",
+      "current_judgment_observed_at": "2026-10-30T12:00:00Z",
+      "observation_count": 1,
+      "latest_observation": {"judgment": "near_match", "observed_at": "2026-10-30T12:00:00Z"},
+      "capture_count": 1,
+      "latest_capture_at": "2026-10-30T12:00:00Z",
+      "earliest_capture_at": "2026-10-30T12:00:00Z"
+    }
+  ]
+}

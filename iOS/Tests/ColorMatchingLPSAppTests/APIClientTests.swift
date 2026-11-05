@@ -46,6 +46,45 @@ final class APIClientTests: XCTestCase {
         XCTAssertEqual(quality["rejections"] as? [String], [])
     }
 
+    func testFetchManifestDecodesLocalOpenAPIStub() async throws {
+        var capturedRequest: URLRequest?
+        MockURLProtocol.handler = { request in
+            capturedRequest = request
+            return (
+                HTTPURLResponse(url: request.url!, statusCode: 200, httpVersion: nil, headerFields: nil)!,
+                try Self.fixtureData(named: "manifest")
+            )
+        }
+
+        let manifest = try await client().fetchManifest(
+            baseURL: URL(string: "https://example.test")!,
+            sheetCode: "sheet_1"
+        )
+
+        XCTAssertEqual(capturedRequest?.httpMethod, "GET")
+        XCTAssertEqual(capturedRequest?.url?.path, "/api/v1/test_sheets/sheet_1/manifest")
+        XCTAssertEqual(capturedRequest?.value(forHTTPHeaderField: "Authorization"), "Bearer token")
+        XCTAssertEqual(manifest.sheetID, "sheet_1")
+    }
+
+    func testFetchRecentSheetsDecodesLocalOpenAPIStub() async throws {
+        var capturedRequest: URLRequest?
+        MockURLProtocol.handler = { request in
+            capturedRequest = request
+            return (
+                HTTPURLResponse(url: request.url!, statusCode: 200, httpVersion: nil, headerFields: nil)!,
+                try Self.fixtureData(named: "recent-sheets")
+            )
+        }
+
+        let sheets = try await client().fetchRecentSheets(baseURL: URL(string: "https://example.test")!)
+
+        XCTAssertEqual(capturedRequest?.httpMethod, "GET")
+        XCTAssertEqual(capturedRequest?.url?.path, "/api/v1/test_sheets/recent")
+        XCTAssertEqual(sheets.map(\.sheetID), ["sheet_1"])
+        XCTAssertEqual(sheets.first?.title, "LPS comparison sheet")
+    }
+
     func testUploadMeasurementsEncodesScoresWithAlgorithmVersion() async throws {
         var capturedBody: Data?
         MockURLProtocol.handler = { request in
@@ -92,6 +131,25 @@ final class APIClientTests: XCTestCase {
         XCTAssertEqual((json["judgments"] as? [[String: Any]])?.first?["judgment"] as? String, "near_match")
     }
 
+    func testPackageConfiguresGeneratedOpenAPIDependencies() throws {
+        let package = try String(contentsOf: Self.packageURL, encoding: .utf8)
+
+        XCTAssertTrue(package.contains("swift-openapi-generator"))
+        XCTAssertTrue(package.contains("swift-openapi-runtime"))
+        XCTAssertTrue(package.contains("OpenAPIGenerator"))
+        XCTAssertTrue(package.contains("OpenAPIRuntime"))
+        XCTAssertTrue(package.contains("openapi-generator-config.yaml"))
+    }
+
+    func testRankedResultsFixturePreservesPublishedResponseShape() throws {
+        let data = try Self.fixtureData(named: "ranked-results")
+        let json = try XCTUnwrap(Self.jsonObject(from: data) as? [String: Any])
+
+        XCTAssertEqual(json["schema_version"] as? String, "lps-ranked-results/v1")
+        XCTAssertEqual(json["sheet_id"] as? String, "sheet_1")
+        XCTAssertEqual((json["results"] as? [[String: Any]])?.first?["pair_id"] as? String, "pair_1")
+    }
+
     private func client() -> APIClient {
         let configuration = URLSessionConfiguration.ephemeral
         configuration.protocolClasses = [MockURLProtocol.self]
@@ -116,6 +174,22 @@ final class APIClientTests: XCTestCase {
             }
         }
         return data
+    }
+
+    private static func fixtureData(named name: String) throws -> Data {
+        let url = URL(fileURLWithPath: #filePath)
+            .deletingLastPathComponent()
+            .appendingPathComponent("Fixtures")
+            .appendingPathComponent("\(name).json")
+        return try Data(contentsOf: url)
+    }
+
+    private static var packageURL: URL {
+        URL(fileURLWithPath: #filePath)
+            .deletingLastPathComponent()
+            .deletingLastPathComponent()
+            .deletingLastPathComponent()
+            .appendingPathComponent("Package.swift")
     }
 }
 
