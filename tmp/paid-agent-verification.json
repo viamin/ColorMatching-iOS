@@ -1,0 +1,71 @@
+{
+  "status": "failed",
+  "summary": "Tests-first run added local-stub coverage for the existing API operations and an intentional red assertion for the missing ranked-results operation. Swift is unavailable in this container, so the suite could not be executed.",
+  "acceptance_criteria": [
+    {
+      "id": "AC-1",
+      "status": "not_run",
+      "verification": {
+        "kind": "human_or_external_evidence",
+        "references": [
+          {
+            "locator": "docs/issue-5-openapi-client-test-plan.md",
+            "result": "Upstream OpenAPI document is dynamically served at /api/v1/openapi.json; package dependency and vendoring changes are deferred to the implementation run."
+          }
+        ]
+      }
+    },
+    {
+      "id": "AC-2",
+      "status": "failed",
+      "verification": {
+        "kind": "unit_or_service_test",
+        "references": [
+          {
+            "locator": "iOS/Tests/ColorMatchingLPSAppTests/APIClientTests.swift:testRankedResultsRequiresGeneratedTypedOperation",
+            "result": "Intentional red assertion: no typed ranked-results operation exists in the hand-written API client."
+          }
+        ]
+      }
+    },
+    {
+      "id": "AC-3",
+      "status": "not_run",
+      "verification": {
+        "kind": "human_or_external_evidence",
+        "references": [
+          {
+            "locator": "iOS/Sources/ColorMatchingLPSAppCore/APIClient.swift",
+            "result": "Current hand-written models remain in place during the tests-only run."
+          }
+        ]
+      }
+    },
+    {
+      "id": "AC-4",
+      "status": "not_run",
+      "verification": {
+        "kind": "unit_or_service_test",
+        "references": [
+          {
+            "locator": "iOS/Tests/ColorMatchingLPSAppTests/APIClientTests.swift",
+            "result": "Local URLProtocol stubs cover manifest, recent sheets, capture creation, measurement upload, and judgment upload; execution is blocked because swift is not installed."
+          }
+        ]
+      }
+    },
+    {
+      "id": "AC-5",
+      "status": "passed",
+      "verification": {
+        "kind": "human_or_external_evidence",
+        "references": [
+          {
+            "locator": "docs/issue-5-openapi-client-test-plan.md",
+            "result": "Records published-spec deltas and the incomplete ranked-results schema as an upstream endpoint gap."
+          }
+        ]
+      }
+    }
+  ]
+}
