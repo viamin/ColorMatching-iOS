@@ -1,0 +1,49 @@
+{
+  "status": "not_run",
+  "summary": "Red-phase tests and contract evidence added; Swift is unavailable in this container, so the test suite could not be run.",
+  "acceptance_criteria": [
+    {
+      "id": "AC-1-dependencies-and-spec",
+      "status": "skipped",
+      "verification": {
+        "kind": "human_or_external_evidence",
+        "references": [{"locator": "docs/openapi-client-test-plan.md", "result": "tests-only phase: package dependencies and production spec location are intentionally not yet changed"}]
+      }
+    },
+    {
+      "id": "AC-2-generated-surface",
+      "status": "not_run",
+      "verification": {
+        "kind": "unit_or_service_test",
+        "references": [{"locator": "iOS/Tests/ColorMatchingLPSAppTests/APIClientTests.swift:testPublishedOpenAPISpecCoversEveryGeneratedClientSurface", "result": "not_run: Swift toolchain unavailable"}]
+      }
+    },
+    {
+      "id": "AC-3-model-replacement",
+      "status": "skipped",
+      "verification": {
+        "kind": "human_or_external_evidence",
+        "references": [{"locator": "docs/openapi-client-test-plan.md", "result": "tests-only phase: generated transport types and adapters do not exist yet"}]
+      }
+    },
+    {
+      "id": "AC-4-local-stub-tests",
+      "status": "not_run",
+      "verification": {
+        "kind": "unit_or_service_test",
+        "references": [
+          {"locator": "iOS/Tests/ColorMatchingLPSAppTests/APIClientTests.swift:testFetchManifestDecodesPublishedSpecResponse", "result": "not_run: Swift toolchain unavailable"},
+          {"locator": "iOS/Tests/ColorMatchingLPSAppTests/APIClientTests.swift:testFetchRecentSheetsDecodesPublishedSpecResponse", "result": "not_run: Swift toolchain unavailable"}
+        ]
+      }
+    },
+    {
+      "id": "AC-5-contract-deltas",
+      "status": "passed",
+      "verification": {
+        "kind": "human_or_external_evidence",
+        "references": [{"locator": "docs/openapi-client-test-plan.md", "result": "published-spec deltas and endpoint gaps recorded from viamin/color_matching PR #113"}]
+      }
+    }
+  ]
+}
