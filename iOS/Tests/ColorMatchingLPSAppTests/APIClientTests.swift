@@ -46,6 +46,57 @@ final class APIClientTests: XCTestCase {
         XCTAssertEqual(quality["rejections"] as? [String], [])
     }
 
+    func testFetchManifestDecodesPublishedManifestFromStubbedResponse() async throws {
+        MockURLProtocol.handler = { request in
+            XCTAssertEqual(request.url?.path, "/api/v1/test_sheets/LPSM-1/manifest")
+            XCTAssertEqual(request.value(forHTTPHeaderField: "Authorization"), "Bearer token")
+            let body = #"""
+            {
+              "schema_version": "lps-sheet-manifest/v1",
+              "sheet_version": "lps-letter-grid-v1",
+              "sheet_id": "LPSM-1",
+              "manifest_url": "https://example.test/api/v1/test_sheets/LPSM-1/manifest",
+              "created_at": "2026-10-30T12:00:00Z",
+              "page": {"units": "mm", "width": 215.9, "height": 279.4},
+              "registration_markers": [],
+              "printer_profile": {"id": 1, "printer_make_model": "Research printer", "paper_type": "plain", "ink_type": "dye"},
+              "capture_profile": {"expected_illuminant": "low_pressure_sodium", "preferred_camera": "built_in_wide_angle_rear", "scoring_algorithm_version": "lps-distance-v1"},
+              "patches": [],
+              "pairs": []
+            }
+            """#
+            return (HTTPURLResponse(url: request.url!, statusCode: 200, httpVersion: nil, headerFields: nil)!, Data(body.utf8))
+        }
+
+        let manifest = try await client().fetchManifest(
+            baseURL: URL(string: "https://example.test")!,
+            sheetCode: "LPSM-1"
+        )
+
+        XCTAssertEqual(manifest.schemaVersion, "lps-sheet-manifest/v1")
+        XCTAssertEqual(manifest.sheetID, "LPSM-1")
+        XCTAssertEqual(manifest.page.units, "mm")
+    }
+
+    func testFetchRecentSheetsDecodesPublishedResponseFromStubbedResponse() async throws {
+        MockURLProtocol.handler = { request in
+            XCTAssertEqual(request.url?.path, "/api/v1/test_sheets/recent")
+            let body = #"""
+            {"sheets":[
+              {"sheet_id":"LPSM-1","manifest_url":"https://example.test/api/v1/test_sheets/LPSM-1/manifest","title":null},
+              {"sheet_id":"LPSM-2","manifest_url":"https://example.test/api/v1/test_sheets/LPSM-2/manifest","title":"October sheet"}
+            ]}
+            """#
+            return (HTTPURLResponse(url: request.url!, statusCode: 200, httpVersion: nil, headerFields: nil)!, Data(body.utf8))
+        }
+
+        let sheets = try await client().fetchRecentSheets(baseURL: URL(string: "https://example.test")!)
+
+        XCTAssertEqual(sheets.map(\.sheetID), ["LPSM-1", "LPSM-2"])
+        XCTAssertNil(sheets.first?.title)
+        XCTAssertEqual(sheets.last?.title, "October sheet")
+    }
+
     func testUploadMeasurementsEncodesScoresWithAlgorithmVersion() async throws {
         var capturedBody: Data?
         MockURLProtocol.handler = { request in
