@@ -1,0 +1,104 @@
+{
+  "status": "failed",
+  "summary": "Test-phase coverage added for local stubbed manifest and recent-sheet responses. The generator/runtime dependency gate is intentionally red; Swift is unavailable in this container, and the private upstream OpenAPI document could not be inspected.",
+  "acceptance_criteria": [
+    {
+      "id": "AC-1",
+      "status": "failed",
+      "verification": {
+        "kind": "unit_or_service_test",
+        "references": [
+          {
+            "locator": "iOS/Tests/ColorMatchingLPSAppTests/APIClientTests.swift:50",
+            "result": "Expected red assertion: Package.swift does not yet declare swift-openapi-generator or swift-openapi-runtime."
+          }
+        ]
+      }
+    },
+    {
+      "id": "AC-2",
+      "status": "not_run",
+      "verification": {
+        "kind": "human_or_external_evidence",
+        "references": [
+          {
+            "locator": "docs/issue-5-openapi-client-verification-plan.md:10",
+            "result": "Blocked: viamin/color_matching issue #110 and its OpenAPI document are not readable from this environment."
+          }
+        ]
+      }
+    },
+    {
+      "id": "AC-3",
+      "status": "not_run",
+      "verification": {
+        "kind": "permanent_system_test",
+        "references": [
+          {
+            "locator": "iOS/Tests/ColorMatchingLPSAppTests/APIClientTests.swift:12",
+            "result": "Local stub coverage added for manifest retrieval; not run because Swift is unavailable."
+          },
+          {
+            "locator": "iOS/Tests/ColorMatchingLPSAppTests/APIClientTests.swift:33",
+            "result": "Local stub coverage added for recent sheets; not run because Swift is unavailable."
+          },
+          {
+            "locator": "iOS/Tests/ColorMatchingLPSAppTests/APIClientTests.swift:57",
+            "result": "Existing local stubs cover capture creation; not run because Swift is unavailable."
+          },
+          {
+            "locator": "iOS/Tests/ColorMatchingLPSAppTests/APIClientTests.swift:94",
+            "result": "Existing local stubs cover measurement upload; not run because Swift is unavailable."
+          },
+          {
+            "locator": "iOS/Tests/ColorMatchingLPSAppTests/APIClientTests.swift:119",
+            "result": "Existing local stubs cover judgment upload; not run because Swift is unavailable."
+          },
+          {
+            "locator": "docs/issue-5-openapi-client-verification-plan.md:11",
+            "result": "Ranked-results operation remains pending the published OpenAPI contract and generated operation names."
+          }
+        ]
+      }
+    },
+    {
+      "id": "AC-4",
+      "status": "not_run",
+      "verification": {
+        "kind": "human_or_external_evidence",
+        "references": [
+          {
+            "locator": "docs/issue-5-openapi-client-verification-plan.md:12",
+            "result": "Requires the implementation diff; no production files may change in this test-writing run."
+          }
+        ]
+      }
+    },
+    {
+      "id": "AC-5",
+      "status": "not_run",
+      "verification": {
+        "kind": "human_or_external_evidence",
+        "references": [
+          {
+            "locator": "docs/issue-5-openapi-client-verification-plan.md:14",
+            "result": "Requires comparison to the inaccessible upstream OpenAPI document."
+          }
+        ]
+      }
+    },
+    {
+      "id": "AC-6",
+      "status": "not_run",
+      "verification": {
+        "kind": "unit_or_service_test",
+        "references": [
+          {
+            "locator": "iOS/Tests/ColorMatchingLPSAppTests/APIClientTests.swift:12",
+            "result": "Tests use MockURLProtocol local stubs, but swift test --disable-sandbox could not start because Swift is unavailable."
+          }
+        ]
+      }
+    }
+  ]
+}
